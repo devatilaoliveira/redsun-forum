@@ -1,0 +1,109 @@
+<section class="manage-character-view">
+  <rs-view-header
+    [title]="'MANAGE_CHARACTER' | translate"
+    [subTittle]="'CHARACTER_SHEET_SUBTITLE' | translate"
+  />
+
+  <div class="content">
+    @if (sheetLoading()) {
+      <div class="status">
+        <rs-spinner [variant]="EVariant.PRIMARY" />
+      </div>
+    } @else {
+      <form class="form" [formGroup]="characterSheetFormGroup" (submit)="$event.preventDefault(); onSubmit()">
+        <div class="avatar-field avatar-field--hero">
+          <rs-avatar
+            [src]="avatarImageSrc()"
+            [userName]="controls.characterName.value || null"
+            [size]="200"
+            [uploadable]="true"
+            [deletable]="false"
+            (fileSelected)="onAvatarFileSelected($event)"
+          />
+        </div>
+
+        <div class="character-fields">
+          <rs-input
+            [label]="'CHARACTER_SHEET_NAME' | translate"
+            [maxLength]="40"
+            [placeholder]="'CHARACTER_SHEET_NAME_PLACEHOLDER' | translate"
+            [value]="controls.characterName.value"
+            (valueChanged)="onValueChange(controls.characterName, $event)"
+          />
+
+          <rs-textarea
+            [label]="'CHARACTER_SHEET_DESCRIPTION' | translate"
+            [maxLength]="500"
+            [placeholder]="'CHARACTER_SHEET_DESCRIPTION_PLACEHOLDER' | translate"
+            [rows]="8"
+            [value]="controls.characterDescription.value"
+            (valueChanged)="onValueChange(controls.characterDescription, $event)"
+          />
+        </div>
+
+        <div class="cta-btn">
+          <rs-button
+            [inProgress]="saveInProgress()"
+            [disabled]="characterSheetFormGroup.invalid || saveInProgress() || avatarUploading() || !hasChanges()"
+            (pressed)="onSubmit()"
+          >
+            {{ 'SAVE' | translate }}
+          </rs-button>
+        </div>
+
+        <rs-button
+          class="quit-button"
+          [variant]="EVariant.WARNING"
+          [inProgress]="leavingInProgress()"
+          (pressed)="onQuitPressed()"
+        >
+          {{ 'QUIT_TALE' | translate }}
+        </rs-button>
+      </form>
+    }
+  </div>
+</section>
+
+@if (confirmQuitOpen()) {
+  <rs-dialog-modal
+    [title]="'QUIT_TALE' | translate"
+    [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.SECONDARY, disabled: leavingInProgress() }"
+    [ctaBtnTwo]="{ label: ('CONFIRM' | translate), variant: EVariant.WARNING, disabled: leavingInProgress(), inProgress: leavingInProgress() }"
+    (closePressed)="closeQuitConfirm()"
+    (ctaBtnOnePressed)="closeQuitConfirm()"
+    (ctaBtnTwoPressed)="confirmQuit()"
+  >
+    <ng-template>
+      <p>{{ 'QUIT_TALE_CONFIRM_MESSAGE' | translate }}</p>
+    </ng-template>
+  </rs-dialog-modal>
+}
+
+@if (avatarCropOpen()) {
+  <rs-dialog-modal
+    [title]="'CROP_IMAGE' | translate"
+    [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.SECONDARY, disabled: avatarUploading() }"
+    [ctaBtnTwo]="{ label: ('SAVE' | translate), variant: EVariant.PRIMARY, disabled: !avatarCropBlob() || avatarUploading(), inProgress: avatarUploading() }"
+    (closePressed)="closeAvatarCrop()"
+    (ctaBtnOnePressed)="closeAvatarCrop()"
+    (ctaBtnTwoPressed)="confirmAvatarCrop()"
+  >
+    <ng-template>
+      <div class="avatar-cropper">
+        <image-cropper
+          [imageFile]="avatarCropFile()"
+          [maintainAspectRatio]="true"
+          [aspectRatio]="1"
+          [roundCropper]="true"
+          [resizeToWidth]="200"
+          [resizeToHeight]="200"
+          [onlyScaleDown]="true"
+          [output]="'blob'"
+          [format]="'jpeg'"
+          [imageQuality]="92"
+          (imageCropped)="onAvatarCropped($event)"
+        ></image-cropper>
+      </div>
+    </ng-template>
+  </rs-dialog-modal>
+}

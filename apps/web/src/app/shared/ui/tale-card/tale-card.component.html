@@ -1,0 +1,59 @@
+<rs-box-clickable class="tale-card" [minHeight]="320" (pressed)="onCardPressed()">
+  <div class="cover">
+    <rs-badge
+      class="visibility-badge"
+      [label]="badgeLabelKey | translate"
+      [variant]="badgeVariant"
+    />
+
+    @if (hasImage) {
+      <img
+        class="card-image"
+        [src]="tale.imageUrl!"
+        [alt]="tale.taleName + ' cover'"
+        loading="lazy"
+        (load)="onImageLoad()"
+        [class.loaded]="imageLoaded"
+      />
+    } @else {
+      <div class="placeholder">
+        <span class="initials">{{ initials }}</span>
+      </div>
+    }
+  </div>
+
+  <div class="body">
+    <div class="title-row">
+      <h3 class="title">{{ tale.taleName }}</h3>
+      <rs-badge
+        [label]="('SYSTEM_RULE_' + tale.rules) | translate"
+        [variant]="EVariant.SECONDARY"
+      />
+    </div>
+
+    <p class="description">
+      {{ tale.description || ('NO_DESCRIPTION' | translate) }}
+    </p>
+
+    <div class="info">
+      <div class="stat">
+        <span class="stat-label">{{ 'PARTICIPANTS' | translate }}</span>
+        <span class="stat-value">{{ participantsCount }}</span>
+      </div>
+
+      @if (tale.creationDate) {
+        <div class="stat">
+          <span class="stat-label">{{ 'CREATED_ON' | translate }}</span>
+          <span class="stat-value">{{ tale.creationDate | date:'y MMMM d' }}</span>
+        </div>
+      }
+
+      @if (tale.lastTimeActive) {
+        <div class="stat">
+          <span class="stat-label">{{ 'LAST_ACTIVE' | translate }}</span>
+          <span class="stat-value">{{ tale.lastTimeActive | date:'y MMMM d' }}</span>
+        </div>
+      }
+    </div>
+  </div>
+</rs-box-clickable>

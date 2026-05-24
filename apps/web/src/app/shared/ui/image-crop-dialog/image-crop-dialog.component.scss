@@ -1,0 +1,15 @@
+@use "../../../../styles/breakpoints" as bp;
+
+$min-content: bp.$bp-sm;
+
+.cover-cropper {
+  width: min($min-content, 100%);
+  margin: 0 auto;
+
+  image-cropper {
+    display: block;
+    width: 100%;
+    max-height: min(70vh, 520px);
+    overflow-y: auto;
+  }
+}

@@ -1,0 +1,11 @@
+export enum ERuleSystem {
+  DND_5E = "DND_5E",
+  STORYTELLER = "STORYTELLER",
+  PATHFINDER_2E = "PATHFINDER_2E",
+  BRP = "BRP",
+  GURPS = "GURPS",
+  SWADE = "SWADE",
+  OTHER = "OTHER",
+  CUSTOM = "CUSTOM",
+  FIM_DO_MUNDO = "FIM_DO_MUNDO"
+}

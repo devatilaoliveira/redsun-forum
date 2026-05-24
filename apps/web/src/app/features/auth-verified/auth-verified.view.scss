@@ -1,0 +1,34 @@
+@use "../../../styles/breakpoints" as bp;
+@use "../../../styles/mixins" as mix;
+
+.cover {
+  @include mix.main-wrapper();
+  padding: var(--space-6) 0;
+  min-height: 100vh;
+
+  @include bp.desktop {
+    padding: var(--space-3) 0;
+  }
+
+  @include bp.mobile {
+    padding: var(--space-1-5) 0;
+  }
+}
+
+.content {
+  width: min(460px, 100%);
+  margin-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+}
+
+.cta-btn {
+  width: min(460px, 100%);
+  margin-top: var(--space-2);
+}
+
+.legal-footer-wrapper {
+  width: 100%;
+  margin-top: auto;
+}

@@ -1,0 +1,23 @@
+@use "../../../../styles/breakpoints" as bp;
+
+$min-content: bp.$bp-sm;
+
+:host {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.title {
+  display: flex;
+  justify-content: space-between;
+  font-family: "Cinzel Decorative", sans-serif;
+  font-size: var(--rs-title-font-size, clamp(2.4rem, 4vw, 6rem));
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--color-yellow);
+
+  @media (max-width: $min-content) {
+    width: 100%;
+  }
+}

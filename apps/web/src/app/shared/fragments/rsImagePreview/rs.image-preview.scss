@@ -1,0 +1,84 @@
+:host {
+  display: inline-block;
+  width: 100%;
+}
+
+.rs-image-preview {
+  --rs-image-preview-width: 320px;
+
+  width: var(--rs-image-preview-width);
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.label {
+  display: inline-flex;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  border: 0;
+}
+
+.frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-md);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.photo {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.clear-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  background-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 120ms ease, transform 120ms ease-in-out;
+  cursor: pointer;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.rs-image-preview.is-uploadable .frame:hover .clear-btn {
+  opacity: 1;
+  transform: scale(0.9);
+  pointer-events: auto;
+}
+
+.trash-icon {
+  color: var(--color-danger);
+}
+
+.placeholder {
+  padding: 0 12px;
+  text-align: center;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.02em;
+}

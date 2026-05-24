@@ -1,0 +1,25 @@
+<rs-dialog-modal
+  [title]="'CROP_IMAGE' | translate"
+  [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.SECONDARY, disabled: cropProcessing() }"
+  [ctaBtnTwo]="{ label: ('SAVE' | translate), variant: EVariant.PRIMARY, disabled: saveDisabled() || cropProcessing(), inProgress: cropProcessing() }"
+  (closePressed)="onClose()"
+  (ctaBtnOnePressed)="onClose()"
+  (ctaBtnTwoPressed)="onConfirm()"
+>
+  <ng-template>
+    <div class="cover-cropper">
+      <image-cropper
+        [imageFile]="imageFile()"
+        [maintainAspectRatio]="true"
+        [aspectRatio]="16 / 9"
+        [resizeToWidth]="UTIL_CONSTANTS.DEFAULT_RESIZE_WIDTH"
+        [resizeToHeight]="UTIL_CONSTANTS.DEFAULT_RESIZE_HEIGHT"
+        [onlyScaleDown]="true"
+        [output]="'blob'"
+        [format]="'jpeg'"
+        [imageQuality]="92"
+        (imageCropped)="onImageCropped($event)"
+      ></image-cropper>
+    </div>
+  </ng-template>
+</rs-dialog-modal>

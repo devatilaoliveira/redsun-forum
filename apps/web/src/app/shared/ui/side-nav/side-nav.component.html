@@ -1,0 +1,57 @@
+@if (isVisible()) {
+  <div class="dialog-modal" [class.is-open]="menuOpen()" [class.is-closing]="isClosing()" role="presentation">
+    <div
+      class="backdrop"
+      role="presentation"
+      aria-hidden="true"
+      (click)="requestClose()"
+    ></div>
+    <nav
+      #drawer
+      class="sidenav"
+      [id]="sideNavId()"
+      role="navigation"
+      aria-label="Main navigation"
+      [attr.aria-hidden]="!menuOpen()"
+      tabindex="-1"
+      (keydown)="onDrawerKeydown($event)"
+    >
+      @for (item of navItems(); track item.routePath) {
+        <rs-button
+          (pressed)="handleNavSelection()"
+          [inProgress]="inProgress()"
+          [variant]="EVariant.BLACK"
+          [customStyle]="customStyle"
+          [routerLink]="item.routePath"
+          [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+          routerLinkActive="is-active"
+        >
+          <img rsButtonIcon [ngSrc]="item.iconAddress" alt="" aria-hidden="true" height="24" width="24"/>
+          {{ item.label | translate }}
+        </rs-button>
+      }
+      @if (showLogoutBtn()) {
+        <div class="support-button">
+          <rs-button
+            (pressed)="handleNavSelection()"
+            [inProgress]="inProgress()"
+            [variant]="EVariant.BLACK"
+            [customStyle]="customStyle"
+            [routerLink]="supportRoutePath"
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="is-active"
+          >
+            <img rsButtonIcon ngSrc="/assets/svgs/mail.svg" alt="" aria-hidden="true" height="24" width="24"/>
+            {{ 'SUPPORT' | translate }}
+          </rs-button>
+        </div>
+        <div>
+          <rs-button (pressed)="logout()" [inProgress]="inProgress()" [variant]="EVariant.BLACK" [customStyle]="customStyle">
+            <img rsButtonIcon ngSrc="/assets/svgs/logout.svg" alt="" aria-hidden="true" height="24" width="24"/>
+            {{ 'LOG_OUT' | translate }}
+          </rs-button>
+        </div>
+      }
+    </nav>
+  </div>
+}

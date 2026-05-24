@@ -1,0 +1,112 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.rs-button {
+  --rs-text-fc: var(--color-black);
+  --rs-button-height: 32px;
+
+  display: flex;
+  width: 100%;
+  height: var(--rs-button-height);
+  border: none;
+  border-radius: var(--radius-md);
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-family-body), serif;
+  font-size: var(--text-normal);
+  font-weight: var(--font-weight-regular);
+  color: var(--rs-text-fc);
+  background-color: var(--rs-button-bg);
+  cursor: pointer;
+  transition: background-color 120ms ease, opacity 120ms ease;
+  padding: 7px 14px;
+}
+
+.rs-button[data-size="m"] {
+  --rs-button-height: 42px;
+}
+
+.rs-button[data-size="l"] {
+  --rs-button-height: 48px;
+}
+
+.rs-button[data-variant="primary"] {
+  --rs-button-bg: var(--color-primary);
+}
+
+.rs-button[data-variant="secondary"] {
+  --rs-button-bg: var(--color-secondary);
+}
+
+.rs-button[data-variant="accent"] {
+  --rs-button-bg: var(--color-accent);
+  --rs-text-fc: var(--color-text-light);
+}
+
+.rs-button[data-variant="success"] {
+  --rs-button-bg: var(--color-success);
+}
+
+.rs-button[data-variant="danger"] {
+  --rs-button-bg: var(--color-danger);
+  --rs-text-fc: var(--color-white);
+}
+
+.rs-button[data-variant="warning"] {
+  --rs-button-bg: var(--color-warning);
+}
+
+.rs-button[data-variant="black"] {
+  --rs-button-bg: var(--color-button-neutral-bg);
+  --rs-text-fc: var(--color-button-neutral-text);
+}
+
+.rs-button[data-variant="black"]:not(:disabled):hover {
+  --rs-button-bg: var(--color-button-neutral-hover);
+}
+
+:host(.is-active) .rs-button[data-variant="black"]:not(:disabled) {
+  --rs-button-bg: var(--color-button-neutral-active);
+}
+
+.rs-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--color-disabled-bg);
+  color: var(--color-muted);
+}
+
+.rs-button.is-busy {
+  cursor: progress;
+  &:hover {
+    filter: none;
+  }
+}
+
+.label {
+  white-space: nowrap;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.content {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.content [rsButtonIcon] {
+  display: inline-flex;
+  align-items: center;
+}
+
+.content [rsButtonIcon] svg,
+.content [rsButtonIcon] img {
+  width: 16px;
+  height: 16px;
+  display: block;
+}

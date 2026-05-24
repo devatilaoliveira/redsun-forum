@@ -1,0 +1,26 @@
+<div class="rs-carousel">
+  @if (title()) {
+    <h3 class="title">{{ title() }}</h3>
+  }
+  <swiper-container
+    class="container"
+    #swiperContainer
+    init="false"
+    [attr.loop]="slides().length > 1 ? 'true' : null"
+    [attr.slides-per-view]="slidesPerView()"
+    [attr.slides-per-group]="slidesPerGroup()"
+    [attr.space-between]="spaceBetween()"
+  >
+    @for (slide of slides(); track slide.id) {
+      <swiper-slide>
+        @if (slideTemplate) {
+          <ng-container
+            *ngTemplateOutlet="slideTemplate; context: { $implicit: slide }"
+          ></ng-container>
+        } @else {
+          <div class="content">{{ slide }}</div>
+        }
+      </swiper-slide>
+    }
+  </swiper-container>
+</div>

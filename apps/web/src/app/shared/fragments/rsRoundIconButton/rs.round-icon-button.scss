@@ -1,0 +1,51 @@
+:host {
+  display: inline-flex;
+}
+
+.rs-round-icon-button {
+  --rs-icon-size: 24px;
+  --rs-icon-color: var(--color-text);
+  --rs-hover-bg: var(--color-hover);
+  width: calc(var(--rs-icon-size) + 16px);
+  height: calc(var(--rs-icon-size) + 16px);
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
+  background-color: transparent;
+  color: var(--rs-icon-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  transition: color 120ms ease, background-color 120ms ease;
+}
+
+.icon {
+  width: var(--rs-icon-size);
+  height: var(--rs-icon-size);
+  background-color: currentColor;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+.rs-round-icon-button:hover {
+  background-color: var(--rs-hover-bg);
+}
+
+.rs-round-icon-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.rs-round-icon-button:disabled:hover {
+  background-color: transparent;
+}
+
+.rs-round-icon-button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}

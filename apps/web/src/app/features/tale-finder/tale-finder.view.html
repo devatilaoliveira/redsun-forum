@@ -1,0 +1,29 @@
+<section class="tale-finder">
+  <div class="filters">
+    <rs-select
+      [label]="'LANGUAGE' | translate"
+      [optionsEnum]="ELanguage"
+      [value]="selectedLanguage()"
+      [nullOptionLabel]="'ALL_LANGUAGES' | translate"
+      [localizationPrefix]="'LANGUAGE_'"
+      (valueChanged)="onLanguageChange($event)"
+    />
+
+    <rs-select
+      [label]="'RULES' | translate"
+      [optionsEnum]="ERuleSystem"
+      [value]="selectedRules()"
+      [nullOptionLabel]="'ALL_RULES' | translate"
+      [localizationPrefix]="'SYSTEM_RULE_'"
+      (valueChanged)="onRulesChange($event)"
+    />
+  </div>
+
+  <rs-tales-grid
+    [title]="'FIND_TALE' | translate"
+    [emptyLabel]="'FIND_TALE_EMPTY' | translate"
+    [loadPage]="loadPublicTales"
+    [reloadToken]="reloadToken()"
+    [infiniteScroll]="true"
+  />
+</section>

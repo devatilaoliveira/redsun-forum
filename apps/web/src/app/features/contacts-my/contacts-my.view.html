@@ -1,0 +1,57 @@
+<section class="contacts-view">
+  <div class="content">
+    <rs-view-header [title]="'CONTACTS' | translate" />
+    <form class="form" (submit)="$event.preventDefault(); onAddContact()">
+      <rs-input
+        [label]="'ADD_MEMBER_BY_EMAIL_OR_USERNAME' | translate"
+        [value]="contactIdentifier()"
+        (valueChanged)="onIdentifierChange($event)"
+      />
+      <rs-button
+        [type]="'submit'"
+        [inProgress]="inProgress()"
+        [disabled]="!contactIdentifier().trim() || inProgress()"
+      >
+        {{ 'SEND' | translate }}
+      </rs-button>
+    </form>
+    @if (!hasContacts()) {
+      <div class="status">
+        <p>{{ 'NO_CONTACTS' | translate }}</p>
+      </div>
+    } @else {
+      <div class="table">
+        <div class="header">
+          <div class="avatar-column"></div>
+          <div class="name-column">{{ 'CONTACT_NAME' | translate }}</div>
+          <div class="actions-column">{{ 'ACTIONS' | translate }}</div>
+        </div>
+        <div class="body">
+          @for (contact of contacts(); track contact.id ?? contact.username; let index = $index) {
+            <button class="row" (click)="onContactPressed(contact)">
+              <div class="avatar-column">
+                <div class="avatar">
+                  @if (contact.imageURL) {
+                    <img [src]="contact.imageURL" [alt]="contact.username" />
+                  } @else {
+                    <span class="avatar-fallback">{{ UtilFunctions.getInitials(contact.username) }}</span>
+                  }
+                </div>
+              </div>
+              <div class="name-column">
+                {{ contact.username }}
+              </div>
+              <div class="actions-column">
+                <rs-more-options
+                  [options]="[{ text: ('DELETE' | translate), action: EAction.DELETE }]"
+                  [disabled]="isRemoving()"
+                  (actionSelected)="onOptionSelected(contact, $event, index)"
+                ></rs-more-options>
+              </div>
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</section>

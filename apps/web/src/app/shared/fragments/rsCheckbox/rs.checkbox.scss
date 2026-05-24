@@ -1,0 +1,82 @@
+:host {
+  display: inline-flex;
+}
+
+.rs-checkbox {
+  position: relative;
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  color: var(--color-text);
+  font-weight: var(--font-weight-regular);
+  cursor: pointer;
+  user-select: none;
+}
+
+.rs-checkbox.is-disabled {
+  cursor: not-allowed;
+  color: var(--color-muted);
+}
+
+.native {
+  position: absolute;
+  top: 0.15rem;
+  left: 0;
+  width: 21px;
+  height: 21px;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+
+.box {
+  --rs-checkbox-border: var(--color-muted);
+  --rs-checkbox-bg: transparent;
+  --rs-checkbox-icon: transparent;
+  --rs-checkbox-size: 21px;
+
+  width: var(--rs-checkbox-size);
+  height: var(--rs-checkbox-size);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--rs-checkbox-border);
+  background-color: var(--rs-checkbox-bg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  margin-top: 0.15rem;
+  transition: border-color 120ms ease, background-color 120ms ease, color 120ms ease;
+  color: var(--rs-checkbox-icon);
+}
+
+.icon {
+  width: var(--rs-checkbox-size);
+  height: var(--rs-checkbox-size);
+}
+
+.native:checked + .box {
+  --rs-checkbox-border: var(--color-primary);
+  --rs-checkbox-bg: var(--color-primary);
+  --rs-checkbox-icon: var(--color-black);
+}
+
+.native:checked + .box .icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.native:focus-visible + .box {
+  --rs-checkbox-border: var(--color-primary);
+}
+
+.native:disabled + .box {
+  --rs-checkbox-border: var(--color-muted);
+  background-color: var(--color-disabled-bg);
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.label {
+  font-size: inherit;
+  line-height: inherit;
+}

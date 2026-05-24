@@ -1,0 +1,30 @@
+<div class="rs-input">
+  @if (label()) {
+    <label class="label" [for]="inputId()">
+      {{ label() }}
+      @if (required()) {
+        <span class="required" aria-hidden="true">*</span>
+      }
+    </label>
+  }
+
+  <div class="field" [class.is-blocked]="blocked()">
+    <input
+      class="control"
+      [id]="inputId()"
+      [attr.maxLength]="maxValue()"
+      type="text"
+      [attr.inputmode]="inputModeAttr()"
+      [placeholder]="placeholder()"
+      [value]="currentValue()"
+      [attr.readonly]="blocked() ? '' : null"
+      [attr.required]="required() ? '' : null"
+      [attr.autocomplete]="autocomplete() ?? null"
+      [attr.pattern]="patternAttr()"
+      [attr.aria-required]="required()"
+      [attr.aria-readonly]="blocked()"
+      (input)="onInput($event)"
+      (keydown)="onKeyDown($event)"
+    />
+  </div>
+</div>

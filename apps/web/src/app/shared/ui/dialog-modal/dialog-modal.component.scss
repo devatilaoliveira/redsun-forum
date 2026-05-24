@@ -1,0 +1,62 @@
+:host {
+  display: contents;
+}
+
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 950;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1);
+  background: var(--color-translucid-black);
+}
+
+.dialog-panel {
+  width: clamp(320px, 90vw, 720px);
+  min-height: min(220px, 60vh);
+  max-height: min(84vh, 720px);
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-1-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.dialog-title {
+  margin: 0;
+  font-size: var(--text-medium);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.dialog-content {
+  padding: var(--space-1) var(--space-1-5);
+  overflow: auto;
+  color: var(--color-text);
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-0-5);
+  padding: var(--space-1) var(--space-1-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.dialog-close {
+  --rs-icon-color: var(--color-text);
+  --rs-hover-bg: var(--color-hover);
+}

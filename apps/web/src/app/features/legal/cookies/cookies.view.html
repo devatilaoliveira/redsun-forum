@@ -1,0 +1,33 @@
+<rs-legal-page-shell>
+  <article class="legal-document">
+    <div class="header">
+      <rs-view-header
+        [title]="'LEGAL_COOKIES_TITLE' | translate"
+        [subTittle]="'LEGAL_COOKIES_LAST_UPDATED' | translate"
+      />
+      <p>{{ "LEGAL_COOKIES_INTRO" | translate }}</p>
+      <rs-divider />
+    </div>
+
+    <section class="legal-section">
+      <h2>{{ "LEGAL_COOKIES_STORAGE_TITLE" | translate }}</h2>
+      <ul class="legal-list">
+        <li>{{ "LEGAL_COOKIES_STORAGE_AUTH" | translate }}</li>
+        <li>{{ "LEGAL_COOKIES_STORAGE_USER" | translate }}</li>
+        <li>{{ "LEGAL_COOKIES_STORAGE_LANGUAGE" | translate }}</li>
+        <li>{{ "LEGAL_COOKIES_STORAGE_THEME" | translate }}</li>
+        <li>{{ "LEGAL_COOKIES_STORAGE_SUPABASE" | translate }}</li>
+      </ul>
+    </section>
+
+    <section class="legal-section">
+      <h2>{{ "LEGAL_COOKIES_TRACKING_TITLE" | translate }}</h2>
+      <p>{{ "LEGAL_COOKIES_TRACKING_TEXT" | translate }}</p>
+    </section>
+
+    <section class="legal-section">
+      <h2>{{ "LEGAL_COOKIES_CONTROL_TITLE" | translate }}</h2>
+      <p>{{ "LEGAL_COOKIES_CONTROL_TEXT" | translate }}</p>
+    </section>
+  </article>
+</rs-legal-page-shell>

@@ -1,0 +1,19 @@
+:host {
+  --rs-view-header-subtitle-color: inherit;
+  --rs-view-header-subtitle-size: inherit;
+  width: 100%;
+}
+
+p,
+h1 {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+p {
+  color: var(--rs-view-header-subtitle-color);
+  font-size: var(--rs-view-header-subtitle-size);
+}

@@ -1,0 +1,57 @@
+<section class="contact-details">
+  <div class="content">
+    @if (isLoading()) {
+      <div class="status">
+        <rs-spinner [variant]="EVariant.PRIMARY" />
+      </div>
+    } @else {
+      @if (contact(); as contact) {
+        <rs-contact-card
+          [profileId]="contact.id"
+          [displayName]="contact.username"
+          [avatarSrc]="contact.imageURL"
+          [avatarSize]="160"
+          [clickable]="false"
+        />
+        <rs-contact-about-card [contact]="contact" />
+        @if (!isSelf()) {
+          <div class="actions">
+            @if (isAlreadyContact()) {
+              <rs-button
+                [variant]="EVariant.PRIMARY"
+                (pressed)="onSendLetter()"
+              >
+                {{ 'SEND_LETTER' | translate }}
+              </rs-button>
+              <rs-button
+                [variant]="EVariant.WARNING"
+                [inProgress]="isRemoving()"
+                [disabled]="isRemoving()"
+                (pressed)="onRemoveContact()"
+              >
+                {{ 'REMOVE_CONTACT' | translate }}
+              </rs-button>
+            } @else {
+              <rs-button
+                [variant]="EVariant.PRIMARY"
+                [inProgress]="isAdding()"
+                [disabled]="isAdding()"
+                (pressed)="onAddContact()"
+              >
+                {{ 'ADD_TO_CONTACTS' | translate }}
+              </rs-button>
+              <rs-button
+                [variant]="EVariant.PRIMARY"
+                (pressed)="onSendLetter()"
+              >
+                {{ 'SEND_LETTER' | translate }}
+              </rs-button>
+            }
+          </div>
+        }
+      } @else {
+        <p class="muted empty">{{ 'CONTACT_NOT_FOUND' | translate }}</p>
+      }
+    }
+  </div>
+</section>

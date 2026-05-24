@@ -1,0 +1,24 @@
+@use "../../../../styles/breakpoints" as bp;
+
+$min-content: bp.$bp-sm;
+
+:host {
+  display: block;
+  width: min($min-content, 100%);
+  margin: var(--space-2, 2rem) auto 0;
+}
+
+.public-legal-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-0-5, 0.5rem) var(--space-1, 1rem);
+  font-size: var(--text-small);
+  line-height: var(--line-height-normal);
+  text-align: center;
+
+  @media (max-width: bp.$bp-sm) {
+    justify-content: center;
+  }
+}

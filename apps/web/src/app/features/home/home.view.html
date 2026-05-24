@@ -1,0 +1,8 @@
+@if (user(); as user) {
+  <section class="home-view">
+    <div class="content">
+      <rs-view-header [title]="'WELCOME' | translate:{name: user.username}" />
+      <rs-avatar [src]="user.imageURL || null" [userName]="user.username" [size]="200"/>
+    </div>
+  </section>
+}

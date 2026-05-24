@@ -1,0 +1,60 @@
+<div class="rs-contacts-multi-select">
+  @if (label()) {
+    <label class="label" [attr.for]="inputId()">
+      <span class="label-text">{{ label() }}</span>
+      @if (required()) {
+        <span class="required" aria-hidden="true">*</span>
+      }
+    </label>
+  }
+
+  <div class="body">
+    <div class="field" [class.is-blocked]="disabled()">
+      <div class="chips">
+        @for (contact of selectedContacts(); track contact.id ?? contact.username) {
+          <span class="chip">
+            <span class="chip-label">{{ contact.username }}</span>
+            <button
+              type="button"
+              class="chip-remove"
+              [disabled]="disabled()"
+              (click)="removeContact(contact.id)"
+              aria-label="Remove contact"
+            >
+              &times;
+            </button>
+          </span>
+        }
+        <input
+          class="input"
+          type="text"
+          [id]="inputId()"
+          [value]="query()"
+          [disabled]="disabled()"
+          [attr.aria-required]="required()"
+          [placeholder]="placeholderText()"
+          (input)="onInput($event)"
+          (focus)="onFocus()"
+          (blur)="onBlur()"
+          (keydown)="onKeydown($event)"
+        />
+      </div>
+    </div>
+
+    @if (showDropdown()) {
+      <ul class="dropdown" role="listbox">
+        @for (option of filteredOptions(); track option.id) {
+          <li class="option" role="option" aria-selected="false">
+            <button
+              type="button"
+              class="option-btn"
+              (mousedown)="onOptionMouseDown($event, option)"
+            >
+              {{ option.username }}
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</div>

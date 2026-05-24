@@ -1,0 +1,94 @@
+# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files
+
+### System files ###
+.DS_Store
+Thumbs.db
+
+### Editors and IDEs ###
+.idea/
+*.iws
+*.iml
+*.ipr
+.project
+.classpath
+.factorypath
+.settings/
+.c9/
+*.launch
+*.sublime-workspace
+.apt_generated/
+.springBeans
+.sts4-cache/
+**/.vscode/*
+!**/.vscode/settings.json
+!**/.vscode/tasks.json
+!**/.vscode/launch.json
+!**/.vscode/extensions.json
+**/.history/
+
+### Logs ###
+*.log
+npm-debug.log*
+yarn-error.log*
+testem.log
+libpeerconnection.log
+
+### Environment and secrets ###
+.env
+.env.*
+!.env.template
+!.env*.template
+!**/.env.template
+!**/.env*.template
+apps/web/src/environments/environment.ts
+apps/web/src/environments/environment.prod.ts
+apps/web/e2e/.env.e2e.local
+
+### Node and Angular ###
+**/node_modules/
+apps/web/dist/
+apps/web/tmp/
+apps/web/out-tsc/
+apps/web/bazel-out/
+apps/web/.angular/cache/
+apps/web/.sass-cache/
+apps/web/connect.lock
+apps/web/coverage/
+apps/web/typings/
+
+### Playwright ###
+apps/web/test-results/
+apps/web/playwright-report/
+apps/web/blob-report/
+apps/web/playwright/.cache/
+apps/web/playwright/.auth/
+apps/web/__screenshots__/
+
+### Java, Maven, and build output ###
+apps/api/HELP.md
+**/target/
+**/build/
+**/.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
+**/nbproject/private/
+**/nbbuild/
+**/nbdist/
+**/.nb-gradle/
+
+### Local project artifacts ###
+**/reports/
+**/exports/
+**/backups/
+**/todos/
+TODOS.txt
+__screenshots__/
+
+### Agent and temporary files ###
+.agents/tmp/
+.agents/cache/
+.agents/sessions/
+**/.codex/
+skills-lock.json

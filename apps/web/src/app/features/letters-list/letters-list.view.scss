@@ -1,0 +1,123 @@
+@use "../../../styles/mixins" as mix;
+@use "../../../styles/breakpoints" as bp;
+
+$min-content: bp.$bp-sm;
+
+:host {
+  @include mix.main-host();
+}
+
+.letters-list-view {
+  @include mix.main-wrapper();
+  gap: var(--space-2, 1rem);
+}
+
+h1 {
+  line-height: var(--line-height-tight);
+}
+
+.content {
+  display: flex;
+  width: min($min-content, 100%);
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2, 1rem);
+}
+
+rs-view-header {
+  --rs-view-header-subtitle-color: var(--color-warning);
+  --rs-view-header-subtitle-size: 0.85rem;
+}
+
+.input-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-0-5, 1rem);
+  width: 100%;
+}
+
+.status {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 64px;
+  color: var(--color-muted);
+}
+
+.table {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 64px 1fr 2fr;
+  gap: var(--space-0-5);
+  padding: var(--space-0-5) var(--space-1);
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.header > div,
+.row > div {
+  min-width: 0;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 64px 1fr 2fr;
+  gap: var(--space-0-5);
+  padding: var(--space-0-5) var(--space-1);
+  align-items: center;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+}
+
+.row:hover {
+  border-bottom-color: var(--color-primary);
+}
+
+.row:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.avatar-column,
+.sender-column,
+.subject-column {
+  display: flex;
+  align-items: center;
+}
+
+.sender-column,
+.subject-column {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 428px) {
+  .header,
+  .row {
+    grid-template-columns: 64px 1fr;
+  }
+
+  .sender-column {
+    display: none;
+  }
+}

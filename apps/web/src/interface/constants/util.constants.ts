@@ -1,0 +1,16 @@
+export const UTIL_CONSTANTS = {
+  I18N_PREFIX: "assets/i18n/",
+  JSON_EXTENSION: ".json",
+  OAUTH_CALLBACK_PATH: "oauth/callback",
+  FILE: "file", // WARNING: This has to be the same as the 'file' defined in the backend.
+  DEFAULT_ASPECT_RATIO: "16 / 9",
+  DEFAULT_RESIZE_HEIGHT: 405,
+  DEFAULT_RESIZE_WIDTH: 720,
+  EXTRA_LONG_TEXT_LENGTH: 4000,
+  LONG_TEXT_LENGTH: 2000,
+  MEDIUM_TEXT_LENGTH: 1000,
+  SHORT_TEXT_LENGTH: 500,
+  EXTRA_SHORT_TEXT_LENGTH: 120,
+  MIN_LENGTH: 4,
+  USERNAME_MAX_LENGTH: 20
+}

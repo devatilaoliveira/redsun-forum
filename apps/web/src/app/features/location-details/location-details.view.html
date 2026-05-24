@@ -1,0 +1,130 @@
+<section class="location-details">
+  @if (isLoading()) {
+    <div class="loading">
+      <rs-spinner [variant]="EVariant.PRIMARY" />
+    </div>
+  } @else {
+    @if (locationDetails(); as location) {
+      <rs-local-details-card [location]="location" />
+      <rs-view-header [title]="location.locationName" />
+      <div class="post-form">
+        <div class="input-toggle">
+          <rs-round-icon-button
+            [iconSrc]="'/assets/svgs/post.svg'"
+            [ariaLabel]="'Show post input'"
+            [disabled]="postInProgress()"
+            (pressed)="onShowPostInput()"
+          />
+          <rs-round-icon-button
+            [iconSrc]="'/assets/svgs/dice.svg'"
+            [ariaLabel]="'Show dice input'"
+            [disabled]="postInProgress()"
+            (pressed)="onShowDiceInput()"
+          />
+        </div>
+        @if (!showDiceInput()) {
+          <div class="input-row">
+            <rs-avatar
+              [src]="currentTaleParticipant()?.characterImageUrl || ''"
+              [userName]="currentTaleParticipant()?.characterName || null"
+              [size]="40"
+            />
+            <div class="textarea-wrapper">
+              <rs-textarea
+                [placeholder]="'POST_PLACEHOLDER' | translate"
+                [maxLength]="UTIL_CONSTANTS.MEDIUM_TEXT_LENGTH"
+                [rows]="4"
+                [blocked]="postInProgress()"
+                [value]="postControls.content.value"
+                (valueChanged)="onPostContentChange($event)"
+              />
+            </div>
+          </div>
+        } @else {
+          <div class="dice-row">
+            <rs-dice-input
+              [label]="'DICE_BUILD_PROMPT' | translate"
+              [disabled]="postInProgress()"
+              (valueChanged)="onDiceValueChange($event)"
+            ></rs-dice-input>
+          </div>
+        }
+
+        <div class="post-actions">
+          <rs-button
+            [inProgress]="postInProgress()"
+            [disabled]="postInProgress() || (showDiceInput() ? !hasDiceCount() : postFormGroup.invalid || postControls.content.value.trim().length === 0)"
+            (pressed)="onSubmitPost(location.id)"
+          >
+            {{ 'POST_SUBMIT' | translate }}
+          </rs-button>
+        </div>
+      </div>
+
+      @if (isLoadingPosts()) {
+        <div class="status">
+          <rs-spinner [variant]="EVariant.PRIMARY" />
+        </div>
+      } @else {
+        @if (visiblePostViewModels().length) {
+          <div class="posts-list">
+            @for (postViewModel of visiblePostViewModels(); track postViewModel.post.id) {
+              <rs-post-details-card
+                [post]="postViewModel.post"
+                [options]="postViewModel.options"
+                (actionSelected)="onPostOptionSelected(postViewModel.post, $event)"
+              ></rs-post-details-card>
+            }
+          </div>
+          <div #loadMoreTrigger class="load-more-trigger" aria-hidden="true"></div>
+          <div class="footer">
+            @if (isLoadingMore()) {
+              <div class="status">
+                <rs-spinner [variant]="EVariant.PRIMARY" />
+              </div>
+            }
+            <p class="footnote">
+              {{ 'POSTS_FOOTNOTE' | translate: { loaded: loadedPostsCount(), total: totalPostsCount() } }}
+            </p>
+          </div>
+        } @else {
+          <p class="empty">{{ 'NO_POSTS' | translate }}</p>
+        }
+      }
+
+      @if (confirmDeactivateOpen()) {
+        <rs-dialog-modal
+          [title]="'CANCEL_ACTION' | translate"
+          [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.PRIMARY }"
+          [ctaBtnTwo]="{ label: ('CONFIRM_DEACTIVATION' | translate), variant: EVariant.WARNING }"
+          (closePressed)="closeDeactivateConfirm()"
+          (ctaBtnOnePressed)="closeDeactivateConfirm()"
+          (ctaBtnTwoPressed)="confirmDeactivatePost()"
+        >
+          <ng-template>
+            <p>{{ 'POST_DEACTIVATE_WARNING' | translate }}</p>
+          </ng-template>
+        </rs-dialog-modal>
+      }
+
+      @if (confirmDeleteOpen()) {
+        <rs-dialog-modal
+          [title]="'DELETE_POST' | translate"
+          [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.PRIMARY }"
+          [ctaBtnTwo]="{ label: ('CONFIRM_DELETION' | translate), variant: EVariant.WARNING }"
+          (closePressed)="closeDeleteConfirm()"
+          (ctaBtnOnePressed)="closeDeleteConfirm()"
+          (ctaBtnTwoPressed)="confirmDeletePost()"
+        >
+          <ng-template>
+            <p>{{ 'POST_DELETE_WARNING' | translate }}</p>
+          </ng-template>
+        </rs-dialog-modal>
+      }
+
+    } @else {
+      <rs-view-header [title]="'LOCATION_NAME' | translate" />
+      <p class="empty">{{ 'NO_DESCRIPTION' | translate }}</p>
+    }
+  }
+</section>

@@ -1,0 +1,21 @@
+@use "../../../styles/breakpoints" as bp;
+
+$min-content: bp.$bp-sm;
+
+:host {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  padding: var(--space-4, 2rem) 0;
+  align-items: flex-start;
+  height: calc(100vh - var(--space-4, 2rem) * 2);
+}
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-2, 1rem);
+  width: min($min-content, 100%);
+}

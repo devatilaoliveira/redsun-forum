@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="SVG" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 275.36 275.36">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #860115;
+      }
+
+      .cls-2 {
+        fill: #faef0f;
+      }
+    </style>
+  </defs>
+  <circle class="cls-2" cx="137.68" cy="137.68" r="55"/>
+  <circle class="cls-1" cx="137.68" cy="137.68" r="47.5"/>
+  <g>
+    <g id="_Radial_Repeat_" data-name="&amp;lt;Radial Repeat&amp;gt;">
+      <polygon class="cls-1" points="132.3 204.46 142.99 204.47 137.95 275.36 132.3 204.46"/>
+    </g>
+    <g id="_Radial_Repeat_-2" data-name="&amp;lt;Radial Repeat&amp;gt;">
+      <polygon class="cls-1" points="70.9 132.3 70.9 142.99 0 137.95 70.9 132.3"/>
+    </g>
+    <g id="_Radial_Repeat_-3" data-name="&amp;lt;Radial Repeat&amp;gt;">
+      <polygon class="cls-1" points="143.06 70.9 132.37 70.9 137.41 0 143.06 70.9"/>
+    </g>
+    <g id="_Radial_Repeat_-4" data-name="&amp;lt;Radial Repeat&amp;gt;">
+      <polygon class="cls-1" points="204.46 143.06 204.47 132.37 275.36 137.41 204.46 143.06"/>
+    </g>
+  </g>
+  <g>
+    <polygon class="cls-1" points="85.72 179.77 93.36 187.79 42.9 228.66 85.72 179.77"/>
+    <polygon class="cls-1" points="95.59 85.72 87.57 93.36 46.7 42.9 95.59 85.72"/>
+    <polygon class="cls-1" points="189.64 95.59 182.01 87.57 232.46 46.7 189.64 95.59"/>
+    <polygon class="cls-1" points="179.77 189.64 187.79 182.01 228.66 232.46 179.77 189.64"/>
+  </g>
+  <g>
+    <polygon class="cls-1" points="106.74 197.24 115.91 201.16 98.47 230.03 106.74 197.24"/>
+    <polygon class="cls-1" points="73.69 157.92 77.4 167.18 44.66 175.25 73.69 157.92"/>
+    <polygon class="cls-1" points="78.12 106.74 74.2 115.91 45.33 98.47 78.12 106.74"/>
+    <polygon class="cls-1" points="117.44 73.69 108.18 77.4 100.11 44.66 117.44 73.69"/>
+    <polygon class="cls-1" points="168.62 78.12 159.45 74.2 176.89 45.33 168.62 78.12"/>
+    <polygon class="cls-1" points="201.67 117.44 197.96 108.18 230.7 100.11 201.67 117.44"/>
+    <polygon class="cls-1" points="197.24 168.62 201.16 159.45 230.03 176.89 197.24 168.62"/>
+    <polygon class="cls-1" points="157.92 201.67 167.18 197.96 175.25 230.7 157.92 201.67"/>
+  </g>
+</svg>

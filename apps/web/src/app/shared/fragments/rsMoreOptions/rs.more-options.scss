@@ -1,0 +1,47 @@
+:host {
+  display: inline-flex;
+}
+
+.more-options {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+
+  &.disabled {
+    cursor: not-allowed;
+  }
+
+  .menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 160px;
+    padding: 6px;
+    border-radius: var(--radius-md);
+    background-color: var(--color-background);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    display: grid;
+    gap: 4px;
+    z-index: 20;
+
+    .item {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: var(--color-text);
+      text-align: left;
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      font-size: var(--text-normal);
+      font-family: var(--font-family-body), serif;
+      cursor: pointer;
+      transition: background-color 120ms ease, color 120ms ease;
+
+      &:hover,
+      &:focus-visible {
+        background-color: var(--color-hover);
+      }
+    }
+  }
+}

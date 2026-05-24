@@ -1,0 +1,25 @@
+@use "../../../styles/mixins" as mix;
+@use "../../../styles/breakpoints" as bp;
+
+$min-content: bp.$bp-sm;
+
+:host {
+  @include mix.main-host();
+}
+
+.tale-finder {
+  @include mix.main-wrapper();
+
+  gap: var(--space-1-5);
+}
+
+rs-tales-grid {
+  width: 100%;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+  gap: var(--space-1);
+  width: min($min-content, 100%);
+}

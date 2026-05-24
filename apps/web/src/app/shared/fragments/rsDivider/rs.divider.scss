@@ -1,0 +1,12 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+hr {
+  width: 100%;
+  height: 1px;
+  margin: 0;
+  border: 0;
+  background: var(--color-border);
+}

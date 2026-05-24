@@ -1,0 +1,61 @@
+<section class="location-view">
+  <rs-view-header
+    [title]="'CREATE_LOCATION' | translate "
+    [subTittle]="'LOCATION_SUBTITLE' | translate"
+  />
+
+  <div class="content">
+    <form class="form" [formGroup]="createNewLocationFormGroup" (submit)="$event.preventDefault(); onSubmit()">
+      <rs-input
+        [label]="'LOCATION_NAME' | translate"
+        [placeholder]="'LOCATION_NAME_PLACEHOLDER' | translate"
+        [required]="true"
+        [value]="locationFormControls.locationName.value"
+        [pattern]="locationNamePattern"
+        [errorMessage]="'NAME_ERROR' | translate"
+        (valueChanged)="onNameChange($event)"
+      />
+
+      <rs-textarea
+        [label]="'LOCATION_DESCRIPTION' | translate"
+        [placeholder]="'DESCRIPTION_YOUR_LOCATION' | translate"
+        [maxLength]="UTIL_CONSTANTS.LONG_TEXT_LENGTH"
+        [required]="true"
+        [value]="locationFormControls.description.value"
+        (valueChanged)="onDescriptionChange($event)"
+      />
+
+      <rs-image-preview
+        [src]="imagePreview()"
+        [alt]="'UPLOAD_LOCATION_IMAGE' | translate"
+        [height]="405"
+        [uploadable]="true"
+        (fileSelected)="onImageSelected($event)"
+        (imageCleared)="onImageCleared()"
+      />
+
+      <div class="cta-btn">
+        <rs-button
+          [inProgress]="inProgress()"
+          (pressed)="onSubmit()"
+          [disabled]="!createNewLocationFormGroup.valid || inProgress()"
+        >
+          {{ 'LOCATION_SUBMIT' | translate }}
+        </rs-button>
+      </div>
+    </form>
+  </div>
+</section>
+
+@if (imageCropOpen()) {
+  @defer (when imageCropOpen()) {
+    <rs-image-crop-dialog
+      [imageFile]="imageCropFile()"
+      [cropProcessing]="cropProcessing()"
+      [saveDisabled]="!imageCropBlob()"
+      (cropped)="onImageCropped($event)"
+      (closed)="closeImageCrop()"
+      (confirmed)="confirmImageCrop()"
+    />
+  }
+}

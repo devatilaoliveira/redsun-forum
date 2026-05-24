@@ -1,0 +1,37 @@
+<section class="locations-list-view">
+  <div class="content">
+    <rs-view-header [title]="'LOCATIONS' | translate" />
+    <div class="actions">
+      <div>
+        @if (canCreateLocation()) {
+          <rs-button (pressed)="navigateToCreateLocation()">
+            {{ 'CREATE_LOCATION' | translate }}
+          </rs-button>
+        }
+      </div>
+    </div>
+    @if (isLoading()) {
+      <div class="status">
+        <rs-spinner [variant]="EVariant.PRIMARY" />
+      </div>
+    } @else {
+      <div class="table-locals">
+        <rs-locations-table
+          [locations]="locations()"
+          [taleId]="taleId"
+        />
+        <div #loadMoreTrigger class="load-more-trigger" aria-hidden="true"></div>
+        <div class="footer">
+          @if (isLoadingMore()) {
+            <div class="status">
+              <rs-spinner [variant]="EVariant.PRIMARY" />
+            </div>
+          }
+          <p class="footnote">
+            {{ 'LOCATIONS_FOOTNOTE' | translate: { loaded: loadedCount(), total: totalCount() } }}
+          </p>
+        </div>
+      </div>
+    }
+  </div>
+</section>

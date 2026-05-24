@@ -1,0 +1,87 @@
+<section class="user-finder" [attr.aria-busy]="loading() || loadingMore()">
+  <div class="content">
+    <rs-view-header
+      [title]="'FIND_USERS' | translate"
+      [subTittle]="'FIND_USERS_SUBTITLE' | translate"
+    />
+
+    <div class="filters">
+      <rs-input
+        [label]="'USERNAME' | translate"
+        [placeholder]="'FIND_USERS_USERNAME_PLACEHOLDER' | translate"
+        [value]="usernameFilter()"
+        (valueChanged)="onUsernameChange($event)"
+      />
+
+      <rs-select
+        [label]="'ROLE' | translate"
+        [optionsEnum]="ERole"
+        [value]="selectedRole()"
+        [nullOptionLabel]="'ALL_ROLES' | translate"
+        [localizationPrefix]="'ROLE_'"
+        (valueChanged)="onRoleChange($event)"
+      />
+
+      <rs-select
+        [label]="'RULES' | translate"
+        [optionsEnum]="ERuleSystem"
+        [value]="selectedRules()"
+        [nullOptionLabel]="'ALL_RULES' | translate"
+        [localizationPrefix]="'SYSTEM_RULE_'"
+        (valueChanged)="onRulesChange($event)"
+      />
+
+      <rs-select
+        [label]="'LANGUAGE' | translate"
+        [optionsEnum]="EProfileLanguage"
+        [value]="selectedLanguage()"
+        [nullOptionLabel]="'ALL_LANGUAGES' | translate"
+        [localizationPrefix]="'LANGUAGE_'"
+        (valueChanged)="onLanguageChange($event)"
+      />
+    </div>
+
+    @if (accountError()) {
+      <div class="status">
+        <p>{{ 'FIND_USERS_ACCOUNT_ERROR' | translate }}</p>
+      </div>
+    } @else if (loading()) {
+      <div class="status">
+        <rs-spinner class="spinner" [variant]="EVariant.PRIMARY" aria-hidden="true" />
+        <p>{{ 'LOADING' | translate }}</p>
+      </div>
+    } @else if (!hasUsers()) {
+      <div class="status">
+        <p>{{ 'FIND_USERS_EMPTY' | translate }}</p>
+      </div>
+    } @else {
+      <div class="results">
+        @for (user of users(); track user.id) {
+          <rs-user-finder-card
+            [user]="user"
+            [alreadyContact]="isAlreadyContact(user.id)"
+            [currentUser]="isCurrentUser(user.id)"
+            [inProgress]="addingContactId() === user.id"
+            (addContactPressed)="addToContacts($event)"
+          />
+        }
+      </div>
+
+      <div class="footer">
+        <p class="footnote">
+          {{ 'USERS_FOOTNOTE' | translate: { loaded: loadedCount(), total: totalCount() } }}
+        </p>
+
+        @if (canLoadMore()) {
+          <rs-button
+            [disabled]="loadingMore()"
+            [inProgress]="loadingMore()"
+            (pressed)="loadMore()"
+          >
+            {{ 'LOAD_MORE' | translate }}
+          </rs-button>
+        }
+      </div>
+    }
+  </div>
+</section>

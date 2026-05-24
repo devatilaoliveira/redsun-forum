@@ -1,0 +1,56 @@
+<div class="dialog-overlay" role="presentation" (click)="onOverlayClick($event)">
+  <div
+    #panel
+    class="dialog-panel"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="title()"
+    tabindex="-1"
+    (click)="$event.stopPropagation()"
+    (keydown)="onPanelKeydown($event)"
+  >
+    <header class="dialog-header">
+      <h2 class="dialog-title">{{ title() }}</h2>
+      <rs-round-icon-button
+        class="dialog-close"
+        [iconSrc]="'/assets/svgs/close.svg'"
+        [ariaLabel]="'Close dialog'"
+        [size]="20"
+        (pressed)="onClose()"
+      />
+    </header>
+
+    <section class="dialog-content">
+      @if (resolvedTemplate(); as template) {
+        <ng-container *ngTemplateOutlet="template"></ng-container>
+      } @else {
+        <ng-content></ng-content>
+      }
+    </section>
+
+    @if (hasActions()) {
+      <footer class="dialog-actions">
+        @if (ctaOne(); as btnOne) {
+          <rs-button
+            [variant]="btnOne.variant ?? EVariant.PRIMARY"
+            [disabled]="btnOne.disabled ?? false"
+            [inProgress]="btnOne.inProgress ?? false"
+            (pressed)="onCtaOne()"
+          >
+            {{ btnOne.label }}
+          </rs-button>
+        }
+        @if (ctaTwo(); as btnTwo) {
+          <rs-button
+            [variant]="btnTwo.variant ?? EVariant.PRIMARY"
+            [disabled]="btnTwo.disabled ?? false"
+            [inProgress]="btnTwo.inProgress ?? false"
+            (pressed)="onCtaTwo()"
+          >
+            {{ btnTwo.label }}
+          </rs-button>
+        }
+      </footer>
+    }
+  </div>
+</div>

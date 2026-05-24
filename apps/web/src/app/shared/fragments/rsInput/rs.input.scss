@@ -1,0 +1,138 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.rs-input {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: var(--text-label);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-normal);
+  color: var(--color-text);
+  margin-bottom: 0.35rem;
+}
+
+.required {
+  color: var(--color-danger);
+  font-weight: var(--font-weight-bold);
+}
+
+.field {
+  --rs-input-border: var(--color-border);
+  --rs-input-bg: var(--color-control-bg);
+  --rs-input-text: var(--color-text);
+
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  height: 42px;
+  padding: 0 0.75rem;
+  gap: 0.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rs-input-border);
+  background-color: var(--rs-input-bg);
+}
+
+.field:focus-within {
+  --rs-input-border: var(--color-primary);
+}
+
+.field.is-invalid,
+.field.is-invalid:focus-within {
+  --rs-input-border: var(--color-danger);
+  box-shadow: 0 0 0 1px var(--color-danger);
+}
+
+.field.is-blocked {
+  --rs-input-text: var(--color-muted);
+  --rs-input-bg: var(--color-disabled-bg);
+  --rs-input-border: var(--color-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.control {
+  flex: 1;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--rs-input-text);
+  font-size: var(--text-normal);
+  font-family: var(--font-family-body), serif;
+  min-width: 0;
+}
+
+.control:-webkit-autofill,
+.control:-webkit-autofill:hover,
+.control:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--rs-input-text) !important;
+  caret-color: var(--rs-input-text);
+  -webkit-box-shadow: 0 0 0 1000px var(--rs-input-bg) inset !important;
+  box-shadow: 0 0 0 1000px var(--rs-input-bg) inset !important;
+  transition: background-color 9999s ease-out 0s;
+}
+
+.control::placeholder {
+  color: var(--color-muted);
+}
+
+.control:read-only {
+  cursor: not-allowed;
+}
+
+.toggle {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  color: var(--color-muted);
+  transition: color 120ms ease;
+}
+
+.toggle:hover {
+  color: var(--color-text);
+}
+
+.toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.toggle svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: currentColor;
+}
+
+.toggle img {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.error {
+  margin: 0;
+  margin-top: 0.35rem;
+  color: var(--color-danger);
+  font-size: var(--text-caption);
+  min-height: 1.2em;
+  visibility: hidden;
+}
+
+.error.is-visible {
+  visibility: visible;
+}

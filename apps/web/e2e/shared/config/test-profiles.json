@@ -1,0 +1,38 @@
+[
+  {
+    "email": "test-1@redsun.local",
+    "password": "123456789"
+  },
+  {
+    "email": "test-2@redsun.local",
+    "password": "123456789"
+  },
+  {
+    "email": "test-3@redsun.local",
+    "password": "123456789"
+  },
+  {
+    "email": "test-4@redsun.local",
+    "password": "123456789"
+  },
+  {
+    "email": "test-5@redsun.local",
+    "password": "123456789"
+  },
+  {
+    "email": "test-6@redsun.local",
+    "password": "123456789"
+  },
+  {
+    "email": "test-7@redsun.local",
+    "password": "123456789"
+  },
+  {
+    "email": "test-8@redsun.local",
+    "password": "123456789"
+  },
+  {
+    "email": "test-9@redsun.local",
+    "password": "123456789"
+  }
+]

@@ -1,0 +1,27 @@
+<section class="cover">
+  <header class="header">
+    <rs-button-text
+      class="brand"
+      kind="link"
+      [routePath]="homeRoute"
+      [customStyle]="{justifyContent: 'flex-start'}"
+      [attr.aria-label]="'RS' | translate"
+    >
+      <rs-title fontSize="1.75rem" />
+    </rs-button-text>
+
+    <rs-round-icon-button
+      [iconSrc]="'/assets/svgs/arrow.svg'"
+      [ariaLabel]="'GO_BACK' | translate"
+      (pressed)="onBack()"
+    />
+  </header>
+
+  <div class="content">
+    <ng-content />
+  </div>
+
+  <div class="legal-footer-wrapper">
+    <rs-public-legal-footer />
+  </div>
+</section>

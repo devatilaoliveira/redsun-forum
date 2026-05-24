@@ -1,0 +1,54 @@
+<div class="rs-avatar" [style.--rs-avatar-size]="dimension()" [class.is-uploadable]="uploadable()">
+  @if (uploadable()) {
+    <label class="label">
+      <input
+        class="input-file"
+        type="file"
+        [accept]="accept()"
+        (change)="onFileChange($event)"
+      />
+      <ng-container *ngTemplateOutlet="avatarContent"></ng-container>
+    </label>
+  } @else {
+    <ng-container *ngTemplateOutlet="avatarContent"></ng-container>
+  }
+</div>
+
+<ng-template #avatarContent>
+  <div class="image-wrapper" [attr.aria-label]="alt()" role="img">
+    @if (uploadable() && deletable() && hasImage()) {
+      <button
+        type="button"
+        class="delete-btn"
+        aria-label="Remove avatar"
+        [disabled]="isDeleting()"
+        (click)="onDeleteAvatar($event)"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          focusable="false"
+          class="delete-icon"
+        >
+          <use [attr.href]="'/assets/svgs/delete.svg#delete'"></use>
+        </svg>
+      </button>
+    }
+
+    @if (hasImage()) {
+      @if (uploadable()) {
+        <div class="image-container" [attr.aria-label]="alt()" role="img">
+          <img class="avatar-image" [src]="src()!" [alt]="alt()" />
+        </div>
+      } @else {
+        <div class="image-container" [attr.aria-label]="alt()" role="img">
+          <img class="avatar-image" [ngSrc]="src()!" [alt]="alt()" fill priority/>
+        </div>
+      }
+    } @else {
+      <div class="image-container" [attr.aria-label]="alt()" role="img">
+        <span class="initials">{{ initials() }}</span>
+      </div>
+    }
+  </div>
+</ng-template>

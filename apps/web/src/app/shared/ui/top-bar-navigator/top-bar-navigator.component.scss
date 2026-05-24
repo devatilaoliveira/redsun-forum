@@ -1,0 +1,128 @@
+@use "../../../../styles/breakpoints" as bp;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.top-bar {
+  --topbar-element-size: 40px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--topbar-height);
+  background: var(--color-background);
+  color: var(--color-text);
+  z-index: 1000;
+  border-bottom: 1px solid var(--color-border);
+
+  .content {
+    height: 100%;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: var(--space-1);
+    width: 100%;
+    max-width: bp.$max-content;
+    margin: 0 auto;
+    box-sizing: border-box;
+    padding: 0 var(--space-1-5);
+  }
+
+  .top-bar-element {
+    display: inline-flex;
+    align-items: center;
+
+    &--left {
+      gap: var(--space-0-5);
+    }
+
+    &--right {
+      gap: var(--space-0-5);
+      justify-content: flex-end;
+    }
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .brand-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--topbar-element-size);
+    border: 1px solid transparent;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    cursor: pointer;
+    padding: 0 var(--space-0-5);
+
+    &--logo {
+      width: var(--topbar-element-size);
+      padding: 0;
+    }
+
+    &--left {
+      display: none;
+    }
+
+    &:hover {
+      background: var(--color-hover);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+  }
+
+  rs-title {
+    width: auto;
+  }
+
+  @include bp.mobile {
+    .content {
+      grid-template-columns: auto 1fr auto;
+    }
+
+    .brand {
+      justify-content: center;
+    }
+
+    .brand-button {
+      &--title {
+        display: none;
+      }
+
+      &--left {
+        display: inline-flex;
+        height: 47px;
+        width: 47px;
+
+        img {
+          height: 100%;
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .back-placeholder {
+    display: inline-flex;
+    align-items: center;
+    height: var(--topbar-element-size);
+    width: var(--topbar-element-size);
+  }
+}
+
+.top-bar-ghost {
+  height: var(--topbar-height);
+  width: 100%;
+  pointer-events: none;
+}

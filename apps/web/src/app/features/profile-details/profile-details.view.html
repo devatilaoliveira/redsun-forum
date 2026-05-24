@@ -1,0 +1,158 @@
+<section class="profile-view">
+  <div class="content">
+    @if (authenticatedUser(); as user) {
+      <rs-avatar
+        [src]="user.imageURL || null"
+        [userName]="user.username"
+        [size]="200"
+        [uploadable]="true"
+        (fileSelected)="onAvatarFilePicked($event)"
+        (imageRemoved)="onAvatarRemoved($event)"
+      />
+    }
+    <form class="form" [formGroup]="profileFormGroup" (submit)="$event.preventDefault(); onToggleEdit()">
+      <rs-input
+        [label]="'USERNAME' | translate"
+        [value]="controls.username.value"
+        [required]="true"
+        [pattern]="usernamePattern"
+        [errorMessage]="'USERNAME_ERROR' | translate"
+        [validateAfterLength]="UTIL_CONSTANTS.MIN_LENGTH"
+        [blocked]="!isEditMode() || isSaving()"
+        (valueChanged)="onUsernameChange($event)"
+      />
+      <rs-textarea
+        [label]="'DESCRIPTION' | translate"
+        [value]="controls.description.value"
+        [blocked]="!isEditMode() || isSaving()"
+        [maxLength]="UTIL_CONSTANTS.LONG_TEXT_LENGTH"
+        (valueChanged)="onDescriptionChange($event)"
+      />
+
+      <div class="preference-group">
+        <div class="preference-label">{{ 'FAVORITE_LANGUAGES' | translate }}</div>
+        <div class="preference-options">
+          @for (language of profileLanguageOptions; track language) {
+            <rs-checkbox
+              [label]="`LANGUAGE_${language}` | translate"
+              [checked]="isSelected(controls.favoriteLanguage.value, language)"
+              [disabled]="!isEditMode() || isSaving()"
+              (checkedChange)="onFavoriteLanguageToggle(language, $event)"
+            />
+          }
+        </div>
+      </div>
+
+      <div class="preference-group">
+        <div class="preference-label">{{ 'FAVORITE_RULES' | translate }}</div>
+        <div class="preference-options">
+          @for (rules of ruleSystemOptions; track rules) {
+            <rs-checkbox
+              [label]="`SYSTEM_RULE_${rules}` | translate"
+              [checked]="isSelected(controls.favoriteRules.value, rules)"
+              [disabled]="!isEditMode() || isSaving()"
+              (checkedChange)="onFavoriteRulesToggle(rules, $event)"
+            />
+          }
+        </div>
+      </div>
+
+      <div class="preference-group">
+        <div class="preference-label">{{ 'FAVORITE_ROLES' | translate }}</div>
+        <div class="preference-options">
+          @for (role of roleOptions; track role) {
+            <rs-checkbox
+              [label]="`ROLE_${role}` | translate"
+              [checked]="isSelected(controls.favoriteRole.value, role)"
+              [disabled]="!isEditMode() || isSaving()"
+              (checkedChange)="onFavoriteRoleToggle(role, $event)"
+            />
+          }
+        </div>
+      </div>
+
+      <div class="cta-btn">
+        <rs-button
+          [variant]="EVariant.PRIMARY"
+          [disabled]="(isEditMode() && profileFormGroup.invalid) || isSaving()"
+          [inProgress]="isSaving()"
+          (pressed)="onToggleEdit()"
+        >
+          {{ isEditMode() ? ("SAVE" | translate) : ("EDIT" | translate) }}
+        </rs-button>
+      </div>
+    </form>
+
+    <div class="change-email-section">
+      <rs-button
+        [variant]="EVariant.PRIMARY"
+        [disabled]="isSaving() || deleteInProgress()"
+        (pressed)="navigateToChangeEmail()"
+      >
+        {{ "CHANGE_PASSWORD" | translate }}
+      </rs-button>
+    </div>
+
+    <div class="danger-zone">
+      <rs-button
+        [variant]="EVariant.WARNING"
+        [disabled]="isSaving() || deleteInProgress()"
+        (pressed)="openDeleteDialog()"
+      >
+        {{ "DELETE_ACCOUNT" | translate }}
+      </rs-button>
+    </div>
+  </div>
+</section>
+
+@if (deleteDialogOpen()) {
+  <rs-dialog-modal
+    [title]="'DELETE_ACCOUNT' | translate"
+    [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.PRIMARY, disabled: deleteInProgress() }"
+    [ctaBtnTwo]="{ label: ('CONFIRM' | translate), variant: EVariant.DANGER, disabled: !canConfirmDelete() || deleteInProgress(), inProgress: deleteInProgress() }"
+    (closePressed)="closeDeleteDialog()"
+    (ctaBtnOnePressed)="closeDeleteDialog()"
+    (ctaBtnTwoPressed)="confirmDeleteAccount()"
+  >
+    <ng-template>
+      <p>{{ "DELETE_ACCOUNT_WARNING" | translate }}</p>
+      <rs-input
+        [label]="'DELETE_ACCOUNT_CONFIRM_LABEL' | translate"
+        [placeholder]="'DELETE_ACCOUNT_CONFIRM_PLACEHOLDER' | translate"
+        [value]="deleteUsernameValue()"
+        [required]="true"
+        [blocked]="deleteInProgress()"
+        (valueChanged)="onDeleteUsernameChange($event)"
+      />
+    </ng-template>
+  </rs-dialog-modal>
+}
+
+@if (avatarCropOpen()) {
+  <rs-dialog-modal
+    [title]="'CROP_IMAGE' | translate"
+    [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.SECONDARY, disabled: avatarUploading() }"
+    [ctaBtnTwo]="{ label: ('SAVE' | translate), variant: EVariant.PRIMARY, disabled: !avatarCropBlob() || avatarUploading(), inProgress: avatarUploading() }"
+    (closePressed)="closeAvatarCrop()"
+    (ctaBtnOnePressed)="closeAvatarCrop()"
+    (ctaBtnTwoPressed)="confirmAvatarCrop()"
+  >
+    <ng-template>
+      <div class="avatar-cropper">
+        <image-cropper
+          [imageFile]="avatarCropFile()"
+          [maintainAspectRatio]="true"
+          [aspectRatio]="1"
+          [roundCropper]="true"
+          [resizeToWidth]="200"
+          [resizeToHeight]="200"
+          [onlyScaleDown]="true"
+          [output]="'blob'"
+          [format]="'jpeg'"
+          [imageQuality]="92"
+          (imageCropped)="onAvatarCropped($event)"
+        ></image-cropper>
+      </div>
+    </ng-template>
+  </rs-dialog-modal>
+}

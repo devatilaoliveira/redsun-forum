@@ -1,0 +1,43 @@
+<rs-legal-page-shell>
+  <article class="legal-document">
+    <div class="header">
+      <rs-view-header
+        [title]="'LEGAL_DATA_PROTECTION_TITLE' | translate"
+        [subTittle]="'LEGAL_DATA_PROTECTION_LAST_UPDATED' | translate"
+      />
+      <p>{{ "LEGAL_DATA_PROTECTION_INTRO" | translate }}</p>
+      <rs-divider />
+    </div>
+
+    <section class="legal-section">
+      <h2>{{ "LEGAL_DATA_PROTECTION_RIGHTS_TITLE" | translate }}</h2>
+      <p>{{ "LEGAL_DATA_PROTECTION_RIGHTS_TEXT" | translate }}</p>
+    </section>
+
+    <section class="legal-section">
+      <h2>{{ "LEGAL_DATA_PROTECTION_CONTACT_TITLE" | translate }}</h2>
+      <p>
+        {{ "LEGAL_DATA_PROTECTION_CONTACT_TEXT" | translate }}
+        <a class="text-link" [href]="mailtoHref">{{ contactEmail }}</a>{{ "LEGAL_SENTENCE_END" | translate }}
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2>{{ "LEGAL_DATA_PROTECTION_WORKFLOW_TITLE" | translate }}</h2>
+      <p>{{ "LEGAL_DATA_PROTECTION_WORKFLOW_TEXT" | translate }}</p>
+    </section>
+
+    <section class="legal-section">
+      <h2>{{ "LEGAL_DATA_PROTECTION_IDENTITY_TITLE" | translate }}</h2>
+      <p>{{ "LEGAL_DATA_PROTECTION_IDENTITY_TEXT" | translate }}</p>
+    </section>
+
+    <section class="legal-section">
+      <h2>{{ "LEGAL_DATA_PROTECTION_PRIVACY_TITLE" | translate }}</h2>
+      <p>
+        {{ "LEGAL_DATA_PROTECTION_PRIVACY_TEXT" | translate }}
+        <a class="text-link" [routerLink]="privacyRoute">{{ "LEGAL_NAV_PRIVACY" | translate }}</a>{{ "LEGAL_SENTENCE_END" | translate }}
+      </p>
+    </section>
+  </article>
+</rs-legal-page-shell>

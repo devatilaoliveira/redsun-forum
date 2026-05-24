@@ -1,0 +1,98 @@
+@if (!hideTopBar) {
+  <div class="top-bar-ghost" aria-hidden="true"></div>
+  <header class="top-bar" role="banner">
+    <div class="content">
+      <div class="top-bar-element top-bar-element--left">
+        <rs-round-icon-button
+          #menuButton
+          [iconSrc]="'/assets/svgs/menu.svg'"
+          ariaLabel="Toggle menu"
+          [ariaExpanded]="menuOpen"
+          [ariaControls]="sideNavId"
+          (pressed)="onMenuToggle()"
+        />
+        <button
+          type="button"
+          class="brand-button brand-button--logo brand-button--left"
+          aria-label="Go to home"
+          (click)="onLogoClick()"
+        >
+          <img
+            src="/assets/svgs/rs.svg"
+            alt=""
+            aria-hidden="true"
+            width="32"
+            height="32"
+          />
+        </button>
+      </div>
+
+      <div class="brand">
+        <button
+          type="button"
+          class="brand-button brand-button--title"
+          aria-label="Go to home"
+          (click)="onLogoClick()"
+        >
+          <rs-title [fontSize]="'1.4rem'"/>
+        </button>
+      </div>
+
+      <div class="top-bar-element top-bar-element--right">
+        @if (manageVisible()) {
+          <rs-round-icon-button
+            #manageButton
+            [iconSrc]="'/assets/svgs/manage.svg'"
+            [ariaLabel]="'Manage tale'"
+            [ariaExpanded]="manageMenuOpen"
+            [ariaControls]="manageSideNavId"
+            (pressed)="onManageToggle()"
+          />
+        }
+        @if (playerVisible() && !manageVisible()) {
+          <rs-round-icon-button
+            #playerButton
+            [iconSrc]="'/assets/svgs/profile.svg'"
+            [ariaLabel]="'Player menu'"
+            [ariaExpanded]="playerMenuOpen"
+            [ariaControls]="playerSideNavId"
+            (pressed)="onPlayerToggle()"
+          />
+        }
+        @if (!hideBackBtn) {
+          <rs-round-icon-button
+            [iconSrc]="'/assets/svgs/arrow.svg'"
+            [ariaLabel]="'Go back'"
+            (pressed)="onBack()"
+          />
+        }
+      </div>
+    </div>
+  </header>
+
+  <rs-side-nav
+    [menuOpen]="menuOpen"
+    [navItems]="menuNavItems"
+    [showLogoutBtn]="showLogoutBtn"
+    [sideNavId]="sideNavId"
+    (navSelected)="closeMenu()"
+  />
+  @if (manageVisible()) {
+    <rs-side-nav
+      [menuOpen]="manageMenuOpen"
+      [navItems]="manageNavItems"
+      [showLogoutBtn]="false"
+      [sideNavId]="manageSideNavId"
+      (navSelected)="closeManageMenu()"
+    />
+  }
+  @if (playerVisible() && !manageVisible()) {
+    <rs-side-nav
+      [menuOpen]="playerMenuOpen"
+      [navItems]="playerNavItems"
+      [showLogoutBtn]="false"
+      [sideNavId]="playerSideNavId"
+      (navSelected)="closePlayerMenu()"
+    />
+  }
+}

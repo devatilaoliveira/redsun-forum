@@ -1,0 +1,45 @@
+<section class="tale-details">
+  @if (isLoading()) {
+    <div class="status">
+      <rs-spinner [variant]="EVariant.PRIMARY"/>
+    </div>
+  } @else {
+    @if (tale(); as tale) {
+      <rs-tale-details-card [tale]="tale"/>
+      @if (tale.participants.length) {
+        <rs-carousel
+          [title]="'PARTICIPANTS' | translate"
+          [slides]="tale.participants"
+          [slidesPerView]="'auto'"
+          [slidesPerGroup]="1"
+          [spaceBetween]="12"
+          class="participants-carousel"
+        >
+          <ng-template let-participant>
+            <rs-contact-card
+              [profileId]="participant.id"
+              [displayName]="participant.characterName || ''"
+              [avatarSrc]="participant.characterImageUrl"
+              [avatarSize]="64"
+              [hideLabel]="true"
+            />
+          </ng-template>
+        </rs-carousel>
+      }
+      <div class="table-locals">
+        <div class="actions">
+          <div>
+            <rs-button (pressed)="navigateToListofLocations()">
+              {{ 'VIEW_LOCATIONS' | translate }}
+            </rs-button>
+          </div>
+        </div>
+        <rs-locations-table
+          [locations]="tale.locations"
+          [taleId]="tale.id"
+        />
+      </div>
+    }
+  }
+
+</section>

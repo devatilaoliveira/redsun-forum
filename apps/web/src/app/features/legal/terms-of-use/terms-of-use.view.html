@@ -1,0 +1,88 @@
+<rs-legal-page-shell>
+  <article class="legal-document">
+    <div class="header">
+      <rs-view-header
+        [title]="'LEGAL_TERMS_TITLE' | translate"
+        [subTittle]="'LEGAL_TERMS_LAST_UPDATED' | translate"
+      />
+      <p>{{ "LEGAL_TERMS_INTRO" | translate }}</p>
+      <rs-divider />
+    </div>
+
+    <section class="legal-section">
+      <h2>{{ "LEGAL_TERMS_SERVICE_TITLE" | translate }}</h2>
+      <p>{{ "LEGAL_TERMS_SERVICE_TEXT" | translate }}</p>
+    </section>
+
+    <section class="legal-section">
+      <h2>{{ "LEGAL_TERMS_ACCOUNT_TITLE" | translate }}</h2>
+      <p>{{ "LEGAL_TERMS_ACCOUNT_TEXT" | translate }}</p>
+    </section>
+
+    <section class="legal-section">
+      <h2>{{ "LEGAL_TERMS_RESPONSIBILITIES_TITLE" | translate }}</h2>
+      <p>{{ "LEGAL_TERMS_RESPONSIBILITIES_TEXT" | translate }}</p>
+    </section>
+
+    <section class="legal-section">
+      <h2>{{ "LEGAL_TERMS_ACCEPTABLE_USE_TITLE" | translate }}</h2>
+      <ul class="legal-list">
+        <li>{{ "LEGAL_TERMS_ACCEPTABLE_USE_1" | translate }}</li>
+        <li>{{ "LEGAL_TERMS_ACCEPTABLE_USE_2" | translate }}</li>
+        <li>{{ "LEGAL_TERMS_ACCEPTABLE_USE_3" | translate }}</li>
+        <li>{{ "LEGAL_TERMS_ACCEPTABLE_USE_4" | translate }}</li>
+      </ul>
+    </section>
+
+    <section class="legal-section">
+      <h2>{{ "LEGAL_TERMS_CONTENT_TITLE" | translate }}</h2>
+      <p>{{ "LEGAL_TERMS_CONTENT_TEXT" | translate }}</p>
+    </section>
+
+    <section class="legal-section">
+      <h2>{{ "LEGAL_TERMS_LICENSE_TITLE" | translate }}</h2>
+      <p>{{ "LEGAL_TERMS_LICENSE_TEXT" | translate }}</p>
+    </section>
+
+    <section class="legal-section">
+      <h2>{{ "LEGAL_TERMS_MODERATION_TITLE" | translate }}</h2>
+      <p>{{ "LEGAL_TERMS_MODERATION_TEXT" | translate }}</p>
+    </section>
+
+    <section class="legal-section">
+      <h2>{{ "LEGAL_TERMS_REPORTING_TITLE" | translate }}</h2>
+      <p>
+        {{ "LEGAL_TERMS_REPORTING_TEXT" | translate }}
+        <a class="text-link" [routerLink]="reportContentRoute">{{ "LEGAL_NAV_REPORT_CONTENT" | translate }}</a>{{ "LEGAL_SENTENCE_END" | translate }}
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2>{{ "LEGAL_TERMS_DELETION_TITLE" | translate }}</h2>
+      <p>{{ "LEGAL_TERMS_DELETION_TEXT" | translate }}</p>
+    </section>
+
+    <section class="legal-section">
+      <h2>{{ "LEGAL_TERMS_AVAILABILITY_TITLE" | translate }}</h2>
+      <p>{{ "LEGAL_TERMS_AVAILABILITY_TEXT" | translate }}</p>
+    </section>
+
+    <section class="legal-section">
+      <h2>{{ "LEGAL_TERMS_LIABILITY_TITLE" | translate }}</h2>
+      <p>{{ "LEGAL_TERMS_LIABILITY_TEXT" | translate }}</p>
+    </section>
+
+    <section class="legal-section">
+      <h2>{{ "LEGAL_TERMS_PRIVACY_TITLE" | translate }}</h2>
+      <p>
+        {{ "LEGAL_TERMS_PRIVACY_TEXT" | translate }}
+        <a class="text-link" [routerLink]="privacyRoute">{{ "LEGAL_NAV_PRIVACY" | translate }}</a>{{ "LEGAL_SENTENCE_END" | translate }}
+      </p>
+    </section>
+
+    <section class="legal-section">
+      <h2>{{ "LEGAL_TERMS_GOVERNING_LAW_TITLE" | translate }}</h2>
+      <p>{{ "LEGAL_TERMS_GOVERNING_LAW_TEXT" | translate }}</p>
+    </section>
+  </article>
+</rs-legal-page-shell>

@@ -1,0 +1,58 @@
+<section class="about" [attr.aria-labelledby]="'contact-about-title-' + contact().id">
+  <header>
+    <img class="icon" src="/assets/svgs/badge.svg" alt="" aria-hidden="true" />
+    <h2 [id]="'contact-about-title-' + contact().id">{{ 'CONTACT_ABOUT' | translate }}</h2>
+  </header>
+
+  <rs-divider class="header-divider" />
+
+  <p class="text">{{ description() ?? ('NO_DESCRIPTION' | translate) }}</p>
+
+  @if (hasPreferences()) {
+    <rs-divider class="preferences-divider" />
+
+    <div class="preferences">
+      @if (favoriteRoles().length) {
+        <section class="preference">
+          <h4>{{ 'FAVORITE_ROLES' | translate }}</h4>
+          <div class="chips">
+            @for (role of favoriteRoles(); track role) {
+              <rs-badge
+                [label]="roleLabelKey(role) | translate"
+                [variant]="EVariant.SECONDARY"
+              />
+            }
+          </div>
+        </section>
+      }
+
+      @if (favoriteRules().length) {
+        <section class="preference">
+          <h4>{{ 'FAVORITE_RULES' | translate }}</h4>
+          <div class="chips">
+            @for (rules of favoriteRules(); track rules) {
+              <rs-badge
+                [label]="rulesLabelKey(rules) | translate"
+                [variant]="EVariant.SECONDARY"
+              />
+            }
+          </div>
+        </section>
+      }
+
+      @if (favoriteLanguages().length) {
+        <section class="preference">
+          <h4>{{ 'FAVORITE_LANGUAGES' | translate }}</h4>
+          <div class="chips">
+            @for (language of favoriteLanguages(); track language) {
+              <rs-badge
+                [label]="languageLabelKey(language) | translate"
+                [variant]="EVariant.SECONDARY"
+              />
+            }
+          </div>
+        </section>
+      }
+    </div>
+  }
+</section>

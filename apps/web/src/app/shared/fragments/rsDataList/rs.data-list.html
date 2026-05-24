@@ -1,0 +1,32 @@
+<div class="rs-data-list">
+  @if (label()) {
+    <label class="label" [attr.for]="inputId()">
+      <span class="label-text">{{ label() }}</span>
+      @if (required()) {
+        <span class="required" aria-hidden="true">*</span>
+      }
+    </label>
+  }
+
+  <div class="field" [class.is-blocked]="disabled()">
+    <input
+      class="control"
+      type="text"
+      [id]="inputId()"
+      [value]="currentValue() ?? ''"
+      [disabled]="disabled()"
+      [attr.list]="datalistId()"
+      [attr.placeholder]="placeholder() ?? null"
+      [attr.aria-required]="required()"
+      (input)="onChange($event)"
+    />
+
+    <datalist [id]="datalistId()">
+      @for (option of options(); track option) {
+        <option [value]="option">
+          {{ `${localizationPrefix()}${option.toUpperCase()}` | translate }}
+        </option>
+      }
+    </datalist>
+  </div>
+</div>

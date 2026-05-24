@@ -1,0 +1,24 @@
+name: redsun-api
+services:
+  api:
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+    image: redsun-api:latest
+    container_name: redsun-api
+    env_file:
+      - ${APP_ENV_FILE:-.env.local}
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL","exec 3<>/dev/tcp/127.0.0.1/8080 || exit 1"]  # no bash if not needed
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - rs-net
+
+networks:
+  rs-net:
+    external: true

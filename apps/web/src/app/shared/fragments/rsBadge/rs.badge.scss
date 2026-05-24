@@ -1,0 +1,44 @@
+.rs-badge {
+  --rs-badge-bg: var(--color-primary);
+
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-0-2) var(--space-0-5);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-small);
+  font-weight: var(--font-weight-regular);
+  background: var(--rs-badge-bg);
+  color: var(--color-black);
+  white-space: nowrap;
+}
+
+.rs-badge[data-variant="primary"] {
+  --rs-badge-bg: var(--color-primary);
+}
+
+.rs-badge[data-variant="secondary"] {
+  --rs-badge-bg: var(--color-secondary);
+}
+
+.rs-badge[data-variant="accent"] {
+  --rs-badge-bg: var(--color-accent);
+}
+
+.rs-badge[data-variant="success"] {
+  --rs-badge-bg: var(--color-success);
+}
+
+.rs-badge[data-variant="danger"] {
+  --rs-badge-bg: var(--color-danger);
+  color: var(--color-white);
+}
+
+.rs-badge[data-variant="warning"] {
+  --rs-badge-bg: var(--color-warning);
+}
+
+.rs-badge[data-variant="black"] {
+  --rs-badge-bg: var(--color-black);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}

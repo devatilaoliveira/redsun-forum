@@ -1,0 +1,98 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.rs-dice-input {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5, 1rem);
+  width: 100%;
+}
+
+// Necessary to avoid layout-shift in localization-details. TODO: Replace with link for "How to play".
+.dice-list {
+  margin-bottom: 32px;
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: var(--text-label);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-normal);
+  color: var(--color-text);
+}
+
+.label-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-0-5, 1rem);
+}
+
+.label-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-0-25, 0.5rem);
+}
+
+.container {
+  display: flex;
+  .dice-name {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .dice-count {
+    flex: 0 0 100px;
+    min-width: 0;
+  }
+
+  .dice-select {
+    flex: 0 0 100px;
+    min-width: 0;
+  }
+}
+
+::ng-deep rs-input .rs-input {
+  min-width: 0;
+  .field {
+    border-radius: var(--radius-md) 0 0 var(--radius-md);
+  }
+}
+
+::ng-deep rs-number .rs-input {
+  min-width: 0;
+  .field {
+    border-radius: 0;
+  }
+}
+
+::ng-deep rs-select .rs-select {
+  min-width: 0;
+  .field {
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  }
+}
+
+.container:not(:first-child) {
+  ::ng-deep rs-input .field {
+    border-top-left-radius: 0;
+  }
+
+  ::ng-deep rs-select .field {
+    border-top-right-radius: 0;
+  }
+}
+
+.container:not(:last-child) {
+  ::ng-deep rs-input .field {
+    border-bottom-left-radius: 0;
+  }
+
+  ::ng-deep rs-select .field {
+    border-bottom-right-radius: 0;
+  }
+}

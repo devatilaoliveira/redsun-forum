@@ -1,0 +1,19 @@
+<div class="rs-toast" [attr.role]="role()" [attr.aria-live]="ariaLive()" [attr.data-variant]="variant()">
+  <div class="accent" aria-hidden="true"></div>
+  <div class="status-icon" aria-hidden="true" [style.--rs-status-icon]="iconUrl()"></div>
+
+  <div class="content">
+    <div class="label">{{ label() }}</div>
+    <div class="body">
+      @if (resolvedTemplate(); as templateRef) {
+        <ng-container [ngTemplateOutlet]="templateRef"></ng-container>
+      } @else {
+        <ng-content></ng-content>
+      }
+    </div>
+  </div>
+
+  <button type="button" class="close" aria-label="Close toast" (click)="onClose()">
+    <span class="icon" aria-hidden="true"></span>
+  </button>
+</div>

@@ -1,0 +1,30 @@
+<label class="rs-checkbox" [class.is-disabled]="disabled()">
+  <input
+    class="native"
+    type="checkbox"
+    [id]="inputId()"
+    [name]="name() ?? null"
+    [attr.data-testid]="testId()"
+    [checked]="checked()"
+    [disabled]="disabled()"
+    [attr.required]="required() ? '' : null"
+    [attr.aria-checked]="checked()"
+    [attr.aria-required]="required()"
+    [attr.aria-disabled]="disabled()"
+    (change)="onToggle($event)"
+  />
+
+  <span class="box" aria-hidden="true">
+    @if (checked()) {
+      <img src="/assets/svgs/check.svg" aria-hidden="true"  alt="check-box checked"/>
+    }
+  </span>
+
+  <span class="label">
+    @if (label(); as labelText) {
+      {{ labelText }}
+    } @else {
+      <ng-content></ng-content>
+    }
+  </span>
+</label>

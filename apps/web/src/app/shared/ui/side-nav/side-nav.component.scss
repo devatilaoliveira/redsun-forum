@@ -1,0 +1,98 @@
+@use "../../../../styles/breakpoints" as bp;
+
+:host {
+  display: contents;
+}
+
+.dialog-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  pointer-events: none;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--color-translucid-black);
+  pointer-events: auto;
+  z-index: 0;
+}
+
+.sidenav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-2);
+  height: 100%;
+  width: 280px;
+  background: var(--color-background);
+  padding: calc(var(--topbar-height) + var(--space-0-2)) var(--space-1) var(--space-1) var(--space-1);
+  border-right: 1px solid var(--color-border);
+  pointer-events: auto;
+  z-index: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.support-button {
+  margin-top: auto;
+}
+
+.dialog-modal.is-open {
+  .sidenav{
+    animation: drawer-in 300ms ease-out;
+  }
+  .backdrop{
+    animation: backdrop-in 160ms ease-out;
+  }
+}
+
+.dialog-modal.is-closing {
+  .sidenav{
+    animation: drawer-out 200ms ease-in forwards;
+    pointer-events: none;
+  }
+  .backdrop{
+    animation: backdrop-out 160ms ease-in forwards;
+    pointer-events: none;
+  }
+}
+
+@keyframes drawer-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes drawer-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes backdrop-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}

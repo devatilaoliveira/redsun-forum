@@ -1,0 +1,81 @@
+<section class="support-view">
+  <rs-view-header
+    [title]="'SUPPORT' | translate"
+    [subTittle]="'SUPPORT_SUBTITLE' | translate"
+  />
+
+  <div class="content">
+    <div class="topics">
+      <section class="topic">
+        <h2>{{ 'SUPPORT_IMPROVEMENTS_TITLE' | translate }}</h2>
+        <p>{{ 'SUPPORT_IMPROVEMENTS_TEXT' | translate }}</p>
+      </section>
+
+      <section class="topic">
+        <h2>{{ 'SUPPORT_SUGGESTIONS_TITLE' | translate }}</h2>
+        <p>{{ 'SUPPORT_SUGGESTIONS_TEXT' | translate }}</p>
+      </section>
+
+      <section class="topic">
+        <h2>{{ 'SUPPORT_BUGS_TITLE' | translate }}</h2>
+        <p>{{ 'SUPPORT_BUGS_TEXT' | translate }}</p>
+      </section>
+
+      <section class="topic">
+        <h2>{{ 'SUPPORT_CONTENT_REPORTS_TITLE' | translate }}</h2>
+        <p>{{ 'SUPPORT_CONTENT_REPORTS_TEXT' | translate }}</p>
+      </section>
+    </div>
+
+    <p class="email">
+      {{ 'SUPPORT_EMAIL_PROMPT' | translate }}
+      <a [href]="'mailto:' + supportEmail">{{ supportEmail }}</a>,
+      {{ 'SUPPORT_FORM_PROMPT' | translate }}
+    </p>
+
+    <form class="form" [formGroup]="supportFormGroup" (submit)="$event.preventDefault(); onSubmit()">
+      <rs-input
+        [label]="'SUPPORT_IDENTIFICATION' | translate"
+        [placeholder]="'SUPPORT_IDENTIFICATION_PLACEHOLDER' | translate"
+        [required]="true"
+        [maxLength]="identificationMaxLength"
+        [pattern]="identificationPattern"
+        [blocked]="inProgress()"
+        [value]="controls.identification.value"
+        (valueChanged)="onIdentificationChange($event)"
+      />
+
+      <rs-input
+        [label]="'SUPPORT_SUBJECT' | translate"
+        [placeholder]="'SUPPORT_SUBJECT_PLACEHOLDER' | translate"
+        [required]="true"
+        [maxLength]="subjectMaxLength"
+        [pattern]="subjectPattern"
+        [blocked]="inProgress()"
+        [value]="controls.subject.value"
+        (valueChanged)="onSubjectChange($event)"
+      />
+
+      <rs-textarea
+        [label]="'SUPPORT_MESSAGE' | translate"
+        [placeholder]="'SUPPORT_MESSAGE_PLACEHOLDER' | translate"
+        [required]="true"
+        [rows]="8"
+        [maxLength]="messageMaxLength"
+        [blocked]="inProgress()"
+        [value]="controls.message.value"
+        (valueChanged)="onMessageChange($event)"
+      />
+
+      <div class="cta-btn">
+        <rs-button
+          [disabled]="supportFormGroup.invalid || inProgress()"
+          [inProgress]="inProgress()"
+          (pressed)="onSubmit()"
+        >
+          {{ 'SEND' | translate }}
+        </rs-button>
+      </div>
+    </form>
+  </div>
+</section>

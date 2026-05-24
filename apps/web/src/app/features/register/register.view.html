@@ -1,0 +1,146 @@
+<section class="cover">
+  <rs-title />
+
+  @if (!registrationSubmitted()) {
+    <form id="registerForm" class="register-form" (submit)="onSubmit($event)">
+      <p class="subtitle">{{ "REGISTER_SUBTITLE" | translate }}</p>
+
+      <rs-input
+        testId="register-email-input"
+        [label]="'EMAIL' | translate"
+        type="email"
+        [value]="registerFormControls.email.value"
+        [required]="true"
+        [maxLength]="254"
+        [pattern]="emailPattern"
+        autocomplete="email"
+        (valueChanged)="onEmailChange($event)"
+      />
+
+      <rs-input
+        testId="register-password-input"
+        [label]="'PASSWORD' | translate"
+        type="password"
+        [value]="registerFormControls.password.value"
+        [required]="true"
+        [maxLength]="100"
+        [pattern]="passwordPattern"
+        [errorMessage]="'PASSWORD_REQUIREMENTS' | translate"
+        autocomplete="new-password"
+        (valueChanged)="onPasswordChange($event)"
+      />
+
+      <rs-input
+        testId="register-confirm-password-input"
+        [label]="'CONFIRM_PASSWORD' | translate"
+        type="password"
+        [value]="registerFormControls.confirmPassword.value"
+        [required]="true"
+        [maxLength]="100"
+        [pattern]="getConfirmPasswordPattern()"
+        [errorMessage]="passwordPattern.test(registerFormControls.password.value) ? ('PASSWORDS_DO_NOT_MATCH' | translate) : ('PASSWORD_REQUIREMENTS' | translate)"
+        autocomplete="new-password"
+        (valueChanged)="onConfirmPasswordChange($event)"
+      />
+
+      <rs-checkbox
+        class="legal-consent"
+        id="register-accepted-legal"
+        testId="register-accepted-legal"
+        [checked]="registerFormControls.acceptedLegal.value"
+        [disabled]="inProgress()"
+        [required]="true"
+        (checkedChange)="onAcceptedLegalChange($event)"
+      >
+        {{ "REGISTER_ACCEPT_LEGAL_PREFIX" | translate }}
+        <a data-testid="register-terms-link" [routerLink]="termsRoute">{{ "LEGAL_NAV_TERMS" | translate }}</a>
+        {{ "REGISTER_ACCEPT_LEGAL_MIDDLE" | translate }}
+        <a data-testid="register-privacy-link" [routerLink]="privacyRoute">{{ "LEGAL_NAV_PRIVACY" | translate }}</a>
+        {{ "REGISTER_ACCEPT_LEGAL_SUFFIX" | translate }}
+      </rs-checkbox>
+    </form>
+
+    @if (errorMessage(); as errorMessage) {
+      <p class="error_msg">{{ errorMessage }}</p>
+    }
+
+    <div class="register-form cta-btn">
+      <rs-button
+        testId="register-submit"
+        class="register-form__submit"
+        [disabled]="!registerForm.valid || registerFormControls.password.value !== registerFormControls.confirmPassword.value || inProgress()"
+        [inProgress]="inProgress()"
+        [type]="'submit'"
+        form="registerForm"
+        [variant]="EVariant.PRIMARY"
+      >
+        {{ "CREATE_ACCOUNT" | translate }}
+      </rs-button>
+      <rs-button
+        [variant]="EVariant.PRIMARY"
+        (pressed)="onBackToLogin()"
+      >
+        {{ "BACK_TO_LOGIN" | translate }}
+      </rs-button>
+    </div>
+  } @else {
+    <div class="register-form result">
+      <h2>{{ "CHECK_EMAIL_TITLE" | translate }}</h2>
+      <p>{{ infoMessage() }}</p>
+      <p>{{ "CHECK_EMAIL_SENT_TO" | translate:{email: submittedEmail()} }}</p>
+
+      <rs-input
+        testId="register-verification-code-input"
+        [label]="'VERIFICATION_CODE' | translate"
+        type="text"
+        [value]="verificationCode()"
+        [required]="true"
+        [maxLength]="6"
+        [pattern]="verificationCodePattern"
+        [errorMessage]="'VERIFY_CODE_VALIDATION_ERROR' | translate"
+        autocomplete="one-time-code"
+        (valueChanged)="onVerificationCodeChange($event)"
+      />
+    </div>
+
+    @if (errorMessage(); as errorMessage) {
+      <p class="error_msg">{{ errorMessage }}</p>
+    }
+
+    <div class="register-form cta-btn">
+      <rs-button
+        testId="register-verify-code-submit"
+        [disabled]="!canVerify()"
+        [inProgress]="verifyInProgress()"
+        [variant]="EVariant.PRIMARY"
+        (pressed)="onVerifyCode()"
+      >
+        {{ "VERIFY_CODE" | translate }}
+      </rs-button>
+      <rs-button
+        [disabled]="!canResend()"
+        [inProgress]="resendInProgress()"
+        [variant]="EVariant.PRIMARY"
+        (pressed)="onResendVerification()"
+      >
+        {{ getResendButtonText() }}
+      </rs-button>
+      <rs-button
+        [variant]="EVariant.PRIMARY"
+        (pressed)="onEditEmail()"
+      >
+        {{ "USE_ANOTHER_EMAIL" | translate }}
+      </rs-button>
+      <rs-button
+        [variant]="EVariant.PRIMARY"
+        (pressed)="onBackToLogin()"
+      >
+        {{ "BACK_TO_LOGIN" | translate }}
+      </rs-button>
+    </div>
+  }
+
+  <div class="legal-footer-wrapper">
+    <rs-public-legal-footer />
+  </div>
+</section>

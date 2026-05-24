@@ -1,0 +1,58 @@
+<section class="legal-acceptance">
+  <rs-title />
+
+  <div class="acceptance-content">
+    <header class="header">
+      <p class="eyebrow">{{ "LEGAL_ACCEPTANCE_EYEBROW" | translate }}</p>
+      <h1>{{ "LEGAL_ACCEPTANCE_TITLE" | translate }}</h1>
+      <p>{{ "LEGAL_ACCEPTANCE_INTRO" | translate }}</p>
+    </header>
+
+    <form id="legalAcceptanceForm" class="acceptance-form" (submit)="$event.preventDefault(); onAccept()">
+      <rs-checkbox
+        class="legal-consent"
+        testId="legal-acceptance-terms"
+        [checked]="acceptedTerms()"
+        [disabled]="inProgress() || loadingProfile()"
+        [required]="true"
+        (checkedChange)="onAcceptedTermsChange($event)"
+      >
+        {{ "LEGAL_ACCEPTANCE_TERMS_PREFIX" | translate }}
+        <a data-testid="legal-acceptance-terms-link" [routerLink]="termsRoute">{{ "LEGAL_NAV_TERMS" | translate }}</a>
+        {{ "LEGAL_ACCEPTANCE_TERMS_SUFFIX" | translate }}
+      </rs-checkbox>
+
+      <rs-checkbox
+        class="legal-consent"
+        testId="legal-acceptance-privacy"
+        [checked]="acknowledgedPrivacy()"
+        [disabled]="inProgress() || loadingProfile()"
+        [required]="true"
+        (checkedChange)="onAcknowledgedPrivacyChange($event)"
+      >
+        {{ "LEGAL_ACCEPTANCE_PRIVACY_PREFIX" | translate }}
+        <a data-testid="legal-acceptance-privacy-link" [routerLink]="privacyRoute">{{ "LEGAL_NAV_PRIVACY" | translate }}</a>
+        {{ "LEGAL_ACCEPTANCE_PRIVACY_SUFFIX" | translate }}
+      </rs-checkbox>
+    </form>
+
+    @if (errorMessage(); as errorMessage) {
+      <p class="error_msg">{{ errorMessage | translate }}</p>
+    }
+
+    <rs-button
+      testId="legal-acceptance-submit"
+      form="legalAcceptanceForm"
+      [type]="'submit'"
+      [variant]="EVariant.PRIMARY"
+      [disabled]="!acceptedTerms() || !acknowledgedPrivacy() || inProgress() || loadingProfile()"
+      [inProgress]="inProgress() || loadingProfile()"
+    >
+      {{ "LEGAL_ACCEPTANCE_CONTINUE" | translate }}
+    </rs-button>
+  </div>
+
+  <div class="legal-footer-wrapper">
+    <rs-public-legal-footer />
+  </div>
+</section>

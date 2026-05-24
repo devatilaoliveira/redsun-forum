@@ -1,0 +1,61 @@
+@use "../../../../styles/breakpoints" as bp;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.about {
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  color: var(--color-text);
+  text-align: left;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-0-75, 0.75rem);
+}
+
+header h2 {
+  font-size: var(--h2-size);
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+}
+
+.header-divider {
+  margin: var(--space-1) 0 var(--space-1-5);
+}
+
+.preferences {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-1);
+  margin-top: var(--space-1-5);
+}
+
+.preferences-divider {
+  margin-top: var(--space-1-5);
+}
+
+.preference {
+  min-width: 0;
+}
+
+.preference h4 {
+  margin-bottom: var(--space-0-5);
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-0-5);
+}

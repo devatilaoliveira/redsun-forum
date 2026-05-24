@@ -1,0 +1,62 @@
+:root {
+  --color-primary: #63A6E9;
+  --color-secondary: #AC93E6;
+  --color-accent: #454449;
+  --color-success: #29D65C;
+  --color-warning: #d97706;
+  --color-danger: #FF0000;
+
+  --color-black: #000000;
+  --color-translucid-black: #000000B2;
+  --color-white: #FFFFFF;
+  --color-translucid-white-90: #FFFFFF1A;
+  --color-translucid-white-80: #FFFFFF33;
+  --color-yellow: #ffd35a;
+  --color-medium-grey: #3A383F;
+  --color-dark-gray: #2A292F;
+  --color-very-dark-gray: #0F0F0F;
+  --color-light-grey: #F2F4F7;
+  --color-muted: #89888D;
+  --color-red: #FF0000;
+
+  --color-background: var(--color-black);
+  --color-text: var(--color-white);
+  --color-text-light: var(--color-white);
+  --color-surface: var(--color-dark-gray);
+  --color-surface-muted: var(--color-medium-grey);
+  --color-border: var(--color-medium-grey);
+  --color-hover: rgba(255, 255, 255, 0.12);
+  --color-control-bg: var(--color-background);
+  --color-disabled-bg: var(--color-dark-gray);
+  --color-button-neutral-bg: var(--color-black);
+  --color-button-neutral-text: var(--color-white);
+  --color-button-neutral-hover: var(--color-translucid-white-90);
+  --color-button-neutral-active: var(--color-translucid-white-80);
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --color-background: var(--color-white);
+  --color-text: #111113;
+  --color-muted: #62616A;
+  --color-surface: #F4F5F7;
+  --color-surface-muted: #EAECF0;
+  --color-border: #D0D5DD;
+  --color-hover: #F2F4F7;
+  --color-control-bg: var(--color-white);
+  --color-disabled-bg: var(--color-surface-muted);
+  --color-button-neutral-bg: transparent;
+  --color-button-neutral-text: var(--color-text);
+  --color-button-neutral-hover: var(--color-hover);
+  --color-button-neutral-active: var(--color-surface-muted);
+  --color-medium-grey: var(--color-border);
+  --color-dark-gray: var(--color-surface);
+  --color-very-dark-gray: #E4E7EC;
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --color-background: var(--color-black);
+  --color-text: var(--color-white);
+  color-scheme: dark;
+}

@@ -1,0 +1,78 @@
+<section class="letters-list-view">
+  <div class="content">
+    <rs-view-header
+      [title]="'LETTERS' | translate"
+      [subTittle]="'LETTERS_RETENTION_WARNING' | translate"
+    />
+    <div class="input-toggle">
+      <div>
+        <rs-round-icon-button
+          [iconSrc]="'/assets/svgs/edit.svg'"
+          [ariaLabel]="'Compose a new letter'"
+          [disabled]="isLoading()"
+          (pressed)="onComposeLetter()"
+        />
+      </div>
+      <div>
+        <rs-round-icon-button
+          [iconSrc]="'/assets/svgs/inbox.svg'"
+          [ariaLabel]="'Show received letters'"
+          [disabled]="isLoading()"
+          (pressed)="onShowReceived()"
+        />
+        <rs-round-icon-button
+          [iconSrc]="'/assets/svgs/send.svg'"
+          [ariaLabel]="'Show sent letters'"
+          [disabled]="isLoading()"
+          (pressed)="onShowSent()"
+        />
+      </div>
+    </div>
+
+    @if (isLoading()) {
+      <div class="status">
+        <rs-spinner [variant]="EVariant.PRIMARY" />
+      </div>
+    } @else if (!hasLetters()) {
+      <div class="status">
+        <p>{{ 'NO_LETTERS' | translate }}</p>
+      </div>
+    } @else {
+      <div class="table">
+        <div class="header">
+          <div class="avatar-column"></div>
+          <div class="sender-column">
+            @if (isSent()) {
+              {{ 'LETTER_RECIPIENTS' | translate }}
+            } @else {
+              {{ 'SENDER' | translate }}
+            }
+          </div>
+          <div class="subject-column">{{ 'LETTER_SUBJECT' | translate }}</div>
+        </div>
+
+        <div class="body">
+          @for (letter of lettersState(); track letter.id) {
+            @let contact = getPrimaryContact(letter);
+            <button class="row" type="button" (click)="onLetterPressed(letter)">
+              <div class="avatar-column">
+                <rs-avatar
+                  [src]="contact?.imageURL || null"
+                  [userName]="contact?.username || null"
+                  [size]="40"
+                  [alt]="contact?.username ?? 'User avatar'"
+                />
+              </div>
+              <div class="sender-column">
+                {{ contact?.username ?? '-' }}
+              </div>
+              <div class="subject-column">
+                {{ letter.subject || '-' }}
+              </div>
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</section>

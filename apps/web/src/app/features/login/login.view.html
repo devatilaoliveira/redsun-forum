@@ -1,0 +1,73 @@
+<section class="cover">
+  <rs-title />
+  <div class="logo-wrapper">
+    <img ngSrc="assets/svgs/rs.svg" alt="Red Sun logo" fill priority >
+  </div>
+
+  <form id="loginForm" class="login-form" (submit)="onEmailLogin($event)">
+      <rs-input
+        testId="login-email-input"
+        [label]="'EMAIL' | translate"
+        type="email"
+        [value]="email"
+        [required]="true"
+        [maxLength]="254"
+        [pattern]="emailPattern"
+        autocomplete="email"
+        (valueChanged)="onEmailChange($event)"
+      />
+
+      <rs-input
+        testId="login-password-input"
+        [label]="'PASSWORD' | translate"
+        type="password"
+        [value]="password"
+        [required]="true"
+        autocomplete="current-password"
+        (valueChanged)="onPasswordChange($event)"
+      />
+      <rs-button-text
+        class="forgot-cta"
+        kind="link"
+        [routePath]="forgotPasswordRoute"
+        [variant]="EVariant.PRIMARY"
+      >
+        {{ "FORGOT_PASSWORD" | translate }}
+      </rs-button-text>
+  </form>
+
+  @if (errorMessage(); as errorMessage) {
+    <p class="error_msg">{{ errorMessage }}</p>
+  }
+
+  <div class="login-form cta-btn">
+    <rs-button
+      testId="login-submit"
+      class="login-form__submit"
+      [disabled]="!emailPattern.test(email.trim()) || !password || inProgress()"
+      [inProgress]="inProgress()"
+      [type]="'submit'"
+      form="loginForm"
+      [variant]="EVariant.PRIMARY"
+    >
+      {{ 'LOG_IN' | translate }}
+    </rs-button>
+    <div class="signup-cta">
+      <span class="signup-cta__label">{{ 'LOGIN_NEW_TO_REDSUN' | translate }}</span>
+      <rs-button-text
+        kind="link"
+        [routePath]="registerRoute"
+        [variant]="EVariant.PRIMARY"
+      >
+        {{ 'CREATE_ACCOUNT' | translate }}
+      </rs-button-text>
+    </div>
+    <div class="google-button">
+      <google-button/>
+    </div>
+  </div>
+
+  <div class="legal-footer-wrapper">
+    <rs-public-legal-footer />
+  </div>
+</section>

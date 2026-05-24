@@ -1,0 +1,161 @@
+<section class="tale-manager">
+  <rs-view-header
+    [title]="'MANAGE_TALE' | translate"
+    [subTittle]="'TALE_SUBTITLE' | translate"
+  />
+  @if (tale(); as tale) {
+    <div class="content">
+      <form class="form" [formGroup]="editTaleFormGroup" (submit)="$event.preventDefault(); onSubmit()">
+        <rs-input
+          [label]="'TALE_NAME' | translate"
+          [placeholder]="'TALE_NAME_PLACEHOLDER' | translate"
+          [required]="true"
+          [value]="controls.taleName.value"
+          [pattern]="namePattern"
+          [errorMessage]="'NAME_ERROR' | translate"
+          (valueChanged)="onNameChange($event)"
+        />
+
+        <rs-textarea
+          [label]="'TALE_DESCRIPTION' | translate"
+          [placeholder]="'DESCRIPTION_YOUR_WORLD' | translate"
+          [maxLength]="UTIL_CONSTANTS.EXTRA_LONG_TEXT_LENGTH"
+          [required]="true"
+          [value]="controls.description.value"
+          (valueChanged)="onDescriptionChange($event)"
+        />
+
+        <rs-data-list
+          [label]="'LANGUAGE' | translate"
+          [optionsEnum]="ETaleLanguageSuggestion"
+          [value]="controls.language.value"
+          [required]="false"
+          [allowNull]="true"
+          [localizationPrefix]="'TALE_LANGUAGE_OPTION_'"
+          (valueChanged)="onLanguageChange($event)"
+        />
+
+        <rs-image-preview
+          [src]="imagePreview() || (!removeImage() ? tale.imageUrl : null)"
+          [alt]="'UPLOAD_TALE_COVER' | translate"
+          [height]="405"
+          [uploadable]="true"
+          (fileSelected)="onImageSelected($event)"
+          (imageCleared)="onImageCleared()"
+        />
+        <div class="check-box">
+          <rs-checkbox
+            [label]="'MAKE_TALE_PUBLIC' | translate"
+            [checked]="controls.isPublic.value"
+            (checkedChange)="onPublicToggle($event)"
+          />
+        </div>
+        <rs-select
+          [label]="'RULES' | translate"
+          [optionsEnum]="ERuleSystem"
+          [value]="controls.ruleSystem.value"
+          [required]="true"
+          [allowNull]="false"
+          (valueChanged)="onRuleSystemChange($event)"
+          [localizationPrefix]="'SYSTEM_RULE_'"
+        />
+      </form>
+      <div class="cta-btn">
+        <rs-button
+          [inProgress]="inProgress()"
+          [disabled]="editTaleFormGroup.invalid || inProgress() || archiveInProgress() || !hasChanges()"
+          (pressed)="onSubmit()"
+        >
+          {{ 'SAVE' | translate }}
+        </rs-button>
+        <rs-button
+          class="archive-btn"
+          [variant]="EVariant.WARNING"
+          [inProgress]="archiveInProgress()"
+          [disabled]="inProgress()"
+          (pressed)="openArchiveDialog()"
+        >
+          {{ 'DELETE' | translate }}
+        </rs-button>
+      </div>
+    </div>
+
+  } @else {
+    <div class="status">
+      <rs-spinner [variant]="EVariant.PRIMARY"/>
+    </div>
+  }
+</section>
+
+@if (imageCropOpen()) {
+  <rs-dialog-modal
+    [title]="'CROP_IMAGE' | translate"
+    [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.SECONDARY, disabled: cropProcessing() }"
+    [ctaBtnTwo]="{ label: ('SAVE' | translate), variant: EVariant.PRIMARY, disabled: !imageCropBlob() || cropProcessing(), inProgress: cropProcessing() }"
+    (closePressed)="closeImageCrop()"
+    (ctaBtnOnePressed)="closeImageCrop()"
+    (ctaBtnTwoPressed)="confirmImageCrop()"
+  >
+    <ng-template>
+      <div class="cover-cropper">
+        <image-cropper
+          [imageFile]="imageCropFile()"
+          [maintainAspectRatio]="true"
+          [aspectRatio]="16 / 9"
+          [resizeToWidth]="UTIL_CONSTANTS.DEFAULT_RESIZE_WIDTH"
+          [resizeToHeight]="UTIL_CONSTANTS.DEFAULT_RESIZE_HEIGHT"
+          [onlyScaleDown]="true"
+          [output]="'blob'"
+          [format]="'jpeg'"
+          [imageQuality]="92"
+          (imageCropped)="onImageCropped($event)"
+        ></image-cropper>
+      </div>
+    </ng-template>
+  </rs-dialog-modal>
+}
+
+@if (archiveDialogOpen()) {
+  <rs-dialog-modal
+    [title]="'DELETE' | translate"
+    [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.SECONDARY, disabled: archiveInProgress() }"
+    [ctaBtnTwo]="{ label: ('DELETE' | translate), variant: EVariant.WARNING, disabled: !canConfirmArchive() || archiveInProgress(), inProgress: archiveInProgress() }"
+    (closePressed)="closeArchiveDialog()"
+    (ctaBtnOnePressed)="closeArchiveDialog()"
+    (ctaBtnTwoPressed)="confirmArchive()"
+  >
+    <ng-template>
+      <p>{{ 'DELETE_TALE_WARNING' | translate }}</p>
+      <rs-input
+        [label]="'DELETE_TALE_CONFIRM_LABEL' | translate"
+        [placeholder]="'DELETE_TALE_CONFIRM_PLACEHOLDER' | translate"
+        [value]="archiveNameValue()"
+        [required]="true"
+        [blocked]="archiveInProgress()"
+        (valueChanged)="onArchiveNameChange($event)"
+      />
+    </ng-template>
+  </rs-dialog-modal>
+}
+
+@if (ruleChangeDialogOpen()) {
+  <rs-dialog-modal
+    [title]="'RULES' | translate"
+    [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.SECONDARY }"
+    [ctaBtnTwo]="{ label: ('CONFIRM' | translate), variant: EVariant.WARNING, disabled: !canConfirmRuleChange() }"
+    (closePressed)="closeRuleChangeDialog()"
+    (ctaBtnOnePressed)="closeRuleChangeDialog()"
+    (ctaBtnTwoPressed)="confirmRuleChange()"
+  >
+    <ng-template>
+      <p>{{ 'TALE_RULE_CHANGE_WARNING' | translate }}</p>
+      <rs-input
+        [label]="'TALE_RULE_CHANGE_CONFIRM_LABEL' | translate"
+        [placeholder]="'TALE_RULE_CHANGE_CONFIRM_PLACEHOLDER' | translate"
+        [value]="ruleChangeNameValue()"
+        [required]="true"
+        (valueChanged)="onRuleChangeNameChange($event)"
+      />
+    </ng-template>
+  </rs-dialog-modal>
+}

@@ -1,0 +1,12 @@
+@if (toast(); as currentToast) {
+  <div class="toast-container">
+    <rs-toast
+      [label]="currentToast.label"
+      [variant]="currentToast.variant"
+      [durationMs]="currentToast.durationMs"
+      (dismissed)="dismiss(currentToast.id)"
+    >
+      {{ currentToast.message }}
+    </rs-toast>
+  </div>
+}

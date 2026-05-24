@@ -1,0 +1,37 @@
+<section class="tales-grid">
+  <div class="header">
+    <h1>{{ title() }}</h1>
+  </div>
+
+  @if (loading()) {
+    <div class="spinner">
+      <rs-spinner [variant]="spinnerVariant()" />
+    </div>
+  } @else if (talesPage(); as tales) {
+    @if (tales.content.length) {
+      <div class="grid">
+        @for (tale of tales.content; track tale.id) {
+          <rs-tale-card
+            [tale]="tale"
+            (pressed)="onTalePressed($event)"
+          />
+        }
+      </div>
+      @if (infiniteScroll()) {
+        <div #loadMoreTrigger class="load-more-trigger" aria-hidden="true"></div>
+        <div class="footer">
+          @if (loadingMore()) {
+            <div class="status">
+              <rs-spinner [variant]="spinnerVariant()" />
+            </div>
+          }
+          <p class="footnote">
+            {{ 'TALES_FOOTNOTE' | translate: { loaded: loadedCount(), total: totalCount() } }}
+          </p>
+        </div>
+      }
+    } @else {
+      <p class="empty">{{ emptyLabel() }}</p>
+    }
+  }
+</section>

@@ -1,0 +1,66 @@
+@use "../../../styles/mixins" as mix;
+@use "../../../styles/breakpoints" as bp;
+
+$min-content: bp.$bp-sm;
+
+:host {
+  @include mix.main-host();
+}
+
+.locations-list-view {
+  @include mix.main-wrapper();
+  gap: var(--space-2, 1rem);
+}
+
+.content {
+  display: flex;
+  width: min($min-content, 100%);
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2, 1rem);
+}
+
+.table-locals {
+  width: 100%;
+  max-width: bp.$bp-lg;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 1rem);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+.status {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-1);
+  color: var(--color-muted);
+  height: 64px;
+}
+
+.load-more-trigger {
+  width: 100%;
+  height: 1px;
+}
+
+.footer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-0-5, 0.5rem);
+  padding: var(--space-0-5, 0.5rem) 0 var(--space-1, 1rem);
+}
+
+.footnote {
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}

@@ -1,0 +1,104 @@
+:host {
+  display: block;
+}
+
+.rs-textarea {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-label);
+  line-height: var(--line-height-normal);
+  color: var(--color-text);
+}
+
+.required {
+  color: var(--color-danger);
+}
+
+textarea {
+  min-height: 200px;
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-control-bg);
+  color: var(--color-text);
+  font-size: var(--text-normal);
+  font-family: var(--font-family-body), serif;
+  resize: vertical;
+}
+
+textarea::-webkit-scrollbar-corner {
+  background: var(--color-background);
+}
+
+textarea::-webkit-resizer {
+  border: 0;
+  background-image: url("/assets/svgs/drag.svg");
+  background-repeat: no-repeat;
+  background-size: 10px 10px;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.rs-textarea.is-blocked textarea {
+  background-color: var(--color-disabled-bg);
+  border-color: var(--color-muted);
+  color: var(--color-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.rs-textarea.is-blocked textarea::-webkit-scrollbar-corner {
+  background-color: var(--color-disabled-bg);
+}
+
+.rs-textarea.is-blocked textarea::placeholder {
+  color: var(--color-muted);
+}
+
+textarea:read-only {
+  cursor: not-allowed;
+}
+
+textarea.is-invalid,
+textarea[aria-invalid="true"] {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 1px var(--color-danger);
+}
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  font-size: var(--text-caption);
+  color: var(--color-muted);
+}
+
+.error {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: var(--text-caption);
+  min-height: 1.2em;
+  visibility: hidden;
+}
+
+.error.is-visible {
+  visibility: visible;
+}
+
+.counter {
+  margin-top: var(--space-0-5);
+  margin-left: auto;
+  font-size: var(--text-caption);
+  color: var(--color-muted);
+}

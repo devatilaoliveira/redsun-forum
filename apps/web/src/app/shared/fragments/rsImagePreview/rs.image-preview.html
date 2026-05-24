@@ -1,0 +1,52 @@
+<div
+  class="rs-image-preview"
+  [style.--rs-image-preview-width]="frameWidth()"
+  [style.aspect-ratio]="aspectRatio()"
+  [class.is-uploadable]="uploadable()"
+>
+  @if (uploadable()) {
+    <label class="label">
+      <input
+        class="file"
+        type="file"
+        [accept]="accept()"
+        (change)="onFileChange($event)"
+      />
+      <ng-container *ngTemplateOutlet="imageContent"></ng-container>
+    </label>
+  } @else {
+    <ng-container *ngTemplateOutlet="imageContent"></ng-container>
+  }
+</div>
+
+<ng-template #imageContent>
+  <div class="frame" [attr.aria-label]="alt()" role="img">
+    @if (uploadable() && hasPreview()) {
+      <button
+        type="button"
+        class="clear-btn"
+        aria-label="Remove image"
+        (click)="onClearClick($event)"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          focusable="false"
+          class="trash-icon"
+        >
+          <use [attr.href]="'/assets/svgs/delete.svg#delete'"></use>
+        </svg>
+      </button>
+    }
+
+    @if (hasPreview()) {
+      @if (uploadable()) {
+        <img class="photo" [src]="src()!" [alt]="alt()" />
+      } @else {
+        <img class="photo" [ngSrc]="src()!" [alt]="alt()" fill priority/>
+      }
+    } @else {
+      <span class="placeholder">{{ alt() }}</span>
+    }
+  </div>
+</ng-template>

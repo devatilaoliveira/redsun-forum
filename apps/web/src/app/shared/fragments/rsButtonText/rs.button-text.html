@@ -1,0 +1,40 @@
+@if (kind() === "link") {
+  <a
+    [routerLink]="interactiveRoutePath()"
+    class="rs-button-text"
+    [class.is-busy]="inProgress()"
+    [class.is-disabled]="disabled()"
+    [attr.aria-busy]="inProgress()"
+    [attr.aria-disabled]="disabled() ? 'true' : null"
+    [attr.data-variant]="variant()"
+    [attr.data-size]="size()"
+    (click)="onClick($event)"
+  >
+    <ng-container [ngTemplateOutlet]="content"></ng-container>
+  </a>
+} @else {
+  <button
+    [attr.type]="type()"
+    [attr.form]="form()"
+    class="rs-button-text"
+    [class.is-busy]="inProgress()"
+    [disabled]="disabled()"
+    [attr.aria-busy]="inProgress()"
+    [attr.data-variant]="variant()"
+    [attr.data-size]="size()"
+    (click)="onClick($event)"
+  >
+    <ng-container [ngTemplateOutlet]="content"></ng-container>
+  </button>
+}
+
+<ng-template #content>
+  @if (inProgress()) {
+    <rs-spinner [variant]="EVariant.SECONDARY" aria-hidden="true" />
+  } @else {
+    <div class="content" [ngStyle]="customStyle()">
+      <ng-content select="[rsButtonIcon]"></ng-content>
+      <span class="label"><ng-content></ng-content></span>
+    </div>
+  }
+</ng-template>

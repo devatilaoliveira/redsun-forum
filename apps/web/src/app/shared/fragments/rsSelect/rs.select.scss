@@ -1,0 +1,75 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.rs-select {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: var(--text-label);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-normal);
+  color: var(--color-text);
+  margin-bottom: 0.35rem;
+}
+
+.required {
+  color: var(--color-danger);
+  font-weight: var(--font-weight-bold);
+}
+
+.field {
+  --rs-select-border: var(--color-border);
+  --rs-select-bg: var(--color-control-bg);
+  --rs-select-text: var(--color-text);
+
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  height: 42px;
+  padding: 0 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rs-select-border);
+  background-color: var(--rs-select-bg);
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.field:focus-within {
+  --rs-select-border: var(--color-primary);
+}
+
+.field.is-blocked {
+  background-color: var(--color-disabled-bg);
+  border-color: var(--color-muted);
+  cursor: not-allowed;
+}
+
+.control {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: var(--rs-select-bg);
+  color: var(--rs-select-text);
+  font-size: var(--text-normal);
+  font-family: var(--font-family-body), serif;
+  cursor: pointer;
+}
+
+.control:disabled {
+  cursor: not-allowed;
+  color: var(--color-muted);
+}
+
+.control option {
+  background-color: var(--rs-select-bg);
+  color: var(--rs-select-text);
+}

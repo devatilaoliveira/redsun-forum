@@ -1,0 +1,74 @@
+<section class="letter-read-view">
+  <rs-view-header [title]="'LETTER_READ' | translate" />
+
+  <div class="content">
+    @if (letter(); as letterData) {
+      @if (isSentByCurrentUser()) {
+        @if (letterData.recipients.length > 1) {
+          <rs-carousel
+            [title]="'LETTER_RECIPIENTS' | translate"
+            [slides]="letterData.recipients"
+            [slidesPerView]="'auto'"
+            [slidesPerGroup]="1"
+            [spaceBetween]="12"
+            class="recipients-carousel"
+          >
+            <ng-template let-recipient>
+              <rs-contact-card
+                [profileId]="recipient.id"
+                [displayName]="recipient.username"
+                [avatarSrc]="recipient.imageURL"
+                [avatarSize]="64"
+                [hideLabel]="true"
+              />
+            </ng-template>
+          </rs-carousel>
+        } @else if (letterData.recipients.length === 1) {
+          <rs-contact-card
+            [profileId]="letterData.recipients[0].id"
+            [displayName]="letterData.recipients[0].username"
+            [avatarSrc]="letterData.recipients[0].imageURL"
+            [avatarSize]="160"
+            [clickable]="false"
+          />
+        }
+      } @else if (letterData.sender) {
+        <rs-contact-card
+          [profileId]="letterData.sender.id"
+          [displayName]="letterData.sender.username"
+          [avatarSrc]="letterData.sender.imageURL"
+          [avatarSize]="160"
+          [clickable]="false"
+        />
+      }
+
+      <form class="form" [formGroup]="letterFormGroup" (submit)="$event.preventDefault(); onRespond()">
+        <rs-input
+          [label]="'LETTER_SUBJECT' | translate"
+          [value]="letterControls.subject.value"
+          [blocked]="true"
+        />
+
+        <rs-textarea
+          [label]="'LETTER_CONTENT' | translate"
+          [value]="letterControls.content.value"
+          [blocked]="true"
+          [rows]="8"
+        />
+
+        @if (!isSentByCurrentUser()) {
+          <div class="cta-btn">
+            <rs-button
+              [variant]="EVariant.PRIMARY"
+              (pressed)="onRespond()"
+            >
+              {{ 'RESPOND' | translate }}
+            </rs-button>
+          </div>
+        }
+      </form>
+    } @else {
+      <p class="muted empty">{{ 'LETTER_NOT_FOUND' | translate }}</p>
+    }
+  </div>
+</section>

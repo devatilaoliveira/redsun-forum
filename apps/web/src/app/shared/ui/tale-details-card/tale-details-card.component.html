@@ -1,0 +1,53 @@
+<rs-box class="tale-details-card" [minHeight]="320">
+  <div class="cover">
+    @if (hasImage()) {
+      <img
+        class="card-image"
+        [src]="tale().imageUrl!"
+        [alt]="tale().taleName + ' cover'"
+        (load)="onImageLoad()"
+        loading="lazy"
+        [class.loaded]="imageLoaded"
+      />
+    } @else {
+      <div class="placeholder">
+        <span class="initials">{{ initials() }}</span>
+      </div>
+    }
+  </div>
+
+  <div class="body">
+    <div class="title-row">
+      <h2 class="title">{{ tale().taleName }}</h2>
+      <rs-badge
+        [label]="('SYSTEM_RULE_' + tale().rules) | translate"
+        [variant]="EVariant.SECONDARY"
+      />
+    </div>
+
+    <p class="description">
+      {{ tale().description || ('NO_DESCRIPTION' | translate) }}
+    </p>
+
+    <div class="info">
+      <div class="stat">
+        <span class="stat-label">{{ 'TALE_OWNER' | translate }}</span>
+        <span class="stat-value">{{ ownerName() }}</span>
+      </div>
+
+      @if (tale().creationDate) {
+        <div class="stat">
+          <span class="stat-label">{{ 'CREATED_ON' | translate }}</span>
+          <span class="stat-value">{{ tale().creationDate | date:'y MMMM d' }}</span>
+        </div>
+      }
+
+      @if (tale().lastTimeActive) {
+        <div class="stat">
+          <span class="stat-label">{{ 'LAST_ACTIVE' | translate }}</span>
+          <span class="stat-value">{{ tale().lastTimeActive | date:'y MMMM d' }}</span>
+        </div>
+      }
+    </div>
+  </div>
+</rs-box>

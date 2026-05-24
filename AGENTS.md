@@ -1,0 +1,38 @@
+# Repository Agent Rules
+
+This repository uses layered instruction files stored under the root `.agents/` directory.
+
+## Baseline
+
+- Treat this `AGENTS.md` file as always-on baseline guidance.
+- Treat files under `.agents/` as optional layers unless the user or the session launcher explicitly activates them.
+- Do not use app-local `AGENTS.md` files; the root file is the single repository entrypoint.
+- When optional layers are activated, prefer instructions in this order:
+  1. Explicit task and user instructions
+  2. Skill-specific files
+  3. Core files
+  4. Project-specific files
+  5. Stack-specific files
+
+## App Selection
+
+Use `scripts/rsAgents.ps1` from the repository root to start a layered Codex session.
+
+- `-App web` activates the shared core, `redsun-web`, and `angular` layers.
+- `-App api` activates the shared core, `redsun-api`, `domain-map`, `spring-boot`, and `persistence-storage` layers.
+- `-App all` activates the shared core, both project layers, and both stack layers.
+
+The launcher accepts `-Core`, `-Project`, `-Stack`, and `-Skill` overrides for explicit sessions.
+
+## Layer Index
+
+- Shared engineering baseline: `.agents/core/methodical.md`
+- Teaching mode: `.agents/core/teacher.md`
+- Playwright E2E testing mode: `.agents/core/playwright-tester.md`
+- RedSun web project map: `.agents/projects/redsun-web.md`
+- RedSun API project map: `.agents/projects/redsun-api.md`
+- Domain boundaries: `.agents/projects/domain-map.md`
+- Angular stack rules: `.agents/stacks/angular.md`
+- Spring Boot stack rules: `.agents/stacks/spring-boot.md`
+- Persistence and storage rules: `.agents/stacks/persistence-storage.md`
+- Angular skills: `.agents/skills/angular/*.md`

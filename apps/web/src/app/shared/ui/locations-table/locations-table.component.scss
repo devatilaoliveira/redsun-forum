@@ -1,0 +1,95 @@
+@use "../../../../styles/breakpoints" as bp;
+
+:host {
+  // width: 100%;
+}
+
+.locations-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 0.75fr auto;
+  gap: var(--space-0-5);
+  padding: var(--space-0-5) var(--space-1);
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.last-active-column {
+  display: flex;
+  text-align: center;
+  align-items: center;
+}
+
+.interactions-column {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.actions-column {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 0.75fr auto;
+  gap: var(--space-0-5);
+  padding: var(--space-0-5) var(--space-1);
+  align-items: center;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+}
+
+.row:hover {
+  border-bottom-color: var(--color-primary);
+}
+
+.row:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-1);
+}
+
+@media (max-width: bp.$bp-sm) {
+  .header,
+  .row {
+    grid-template-columns: 1fr auto;
+  }
+
+  .last-active-column,
+  .interactions-column {
+    display: none;
+  }
+}

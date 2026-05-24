@@ -1,0 +1,96 @@
+<section class="tale-view">
+  <rs-view-header
+    [title]="'CREATE_TALE' | translate "
+    [subTittle]="'TALE_SUBTITLE' | translate"
+  />
+
+  <div class="content">
+    <form class="form" [formGroup]="createNewTaleFormGroup" (submit)="$event.preventDefault(); onSubmit()">
+      <rs-input
+        [label]="'TALE_NAME' | translate"
+        [placeholder]="'TALE_NAME_PLACEHOLDER' | translate"
+        [required]="true"
+        [value]="taleFormControls.taleName.value"
+        [pattern]="taleNamePattern"
+        [errorMessage]="'NAME_ERROR' | translate"
+        (valueChanged)="onNameChange($event)"
+      />
+
+      <rs-textarea
+        [label]="'TALE_DESCRIPTION' | translate"
+        [placeholder]="'DESCRIPTION_YOUR_WORLD' | translate"
+        [maxLength]="UTIL_CONSTANTS.EXTRA_LONG_TEXT_LENGTH"
+        [required]="true"
+        [value]="taleFormControls.description.value"
+        (valueChanged)="onDescriptionChange($event)"
+      />
+
+      <rs-data-list
+        [label]="'LANGUAGE' | translate"
+        [optionsEnum]="ETaleLanguageSuggestion"
+        [value]="taleFormControls.language.value"
+        [required]="false"
+        [allowNull]="true"
+        [localizationPrefix]="'TALE_LANGUAGE_OPTION_'"
+        (valueChanged)="onLanguageChange($event)"
+      />
+
+      <rs-image-preview
+        [src]="imagePreview()"
+        [alt]="'UPLOAD_TALE_COVER' | translate"
+        [height]="405"
+        [uploadable]="true"
+        (fileSelected)="onImageSelected($event)"
+        (imageCleared)="onImageCleared()"
+      />
+
+      <div class="check-box">
+        <rs-checkbox
+          [label]="'MAKE_TALE_PUBLIC' | translate"
+          [checked]="taleFormControls.isPublic.value"
+          (checkedChange)="onPublicToggle($event)"
+        />
+      </div>
+
+      <rs-select
+        [label]="'RULES' | translate"
+        [optionsEnum]="ERuleSystem"
+        [value]="taleFormControls.ruleSystem.value"
+        [required]="true"
+        [allowNull]="false"
+        (valueChanged)="onRuleSystemChange($event)"
+        [localizationPrefix]="'SYSTEM_RULE_'"
+      />
+
+      <rs-contacts-multi-select
+        [label]="'CONTACTS' | translate"
+        [contacts]="myContacts()"
+        [value]="selectedContactIds()"
+        (valueChanged)="onContactsChange($event)"
+      />
+
+      <div class="cta-btn">
+        <rs-button
+          [inProgress]="inProgress()"
+          (pressed)="onSubmit()"
+          [disabled]="!createNewTaleFormGroup.valid || inProgress()"
+        >
+          {{ 'TALE_SUBMIT' | translate }}
+        </rs-button>
+      </div>
+    </form>
+  </div>
+</section>
+
+@if (imageCropOpen()) {
+  @defer (when imageCropOpen()) {
+    <rs-image-crop-dialog
+      [imageFile]="imageCropFile()"
+      [cropProcessing]="cropProcessing()"
+      [saveDisabled]="!imageCropBlob()"
+      (cropped)="onImageCropped($event)"
+      (closed)="closeImageCrop()"
+      (confirmed)="confirmImageCrop()"
+    />
+  }
+}

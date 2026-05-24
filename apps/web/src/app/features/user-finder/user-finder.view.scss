@@ -1,0 +1,66 @@
+@use "../../../styles/mixins" as mix;
+@use "../../../styles/breakpoints" as bp;
+
+$min-content: bp.$bp-md;
+
+:host {
+  @include mix.main-host();
+}
+
+.user-finder {
+  @include mix.main-wrapper();
+
+  gap: var(--space-2, 1rem);
+}
+
+.content {
+  display: flex;
+  width: min($min-content, 100%);
+  flex-direction: column;
+  gap: var(--space-1-5);
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-1);
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.footnote {
+  margin: 0;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  color: var(--color-muted);
+}
+
+.spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+@include bp.mobile-sm {
+  .filters {
+    grid-template-columns: 1fr;
+  }
+}

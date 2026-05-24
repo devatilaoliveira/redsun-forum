@@ -1,0 +1,21 @@
+<button
+  [attr.type]="type()"
+  [attr.form]="form()"
+  [attr.data-testid]="testId() ?? null"
+  class="rs-button"
+  [class.is-busy]="inProgress()"
+  [disabled]="disabled()"
+  [attr.aria-busy]="inProgress()"
+  [attr.data-variant]="variant()"
+  [attr.data-size]="size()"
+  (click)="onClick()"
+>
+  @if (inProgress()) {
+    <rs-spinner [variant]="EVariant.SECONDARY" aria-hidden="true" />
+  } @else {
+    <div class="content" [ngStyle]="customStyle()">
+      <ng-content select="[rsButtonIcon]"></ng-content>
+      <span class="label"><ng-content></ng-content></span>
+    </div>
+  }
+</button>

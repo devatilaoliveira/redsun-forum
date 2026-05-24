@@ -1,0 +1,36 @@
+<div class="rs-select">
+  @if (label()) {
+    <label class="label" [attr.for]="selectId()">
+      <span class="label-text">{{ label() }}</span>
+      @if (required()) {
+        <span class="required" aria-hidden="true">*</span>
+      }
+    </label>
+  }
+
+  <div class="field" [class.is-blocked]="disabled()">
+    <select
+      class="control"
+      [id]="selectId()"
+      [value]="currentValue() ?? ''"
+      [disabled]="disabled()"
+      [attr.aria-required]="required()"
+      (change)="onChange($event)"
+    >
+      @if (allowNull()) {
+        <option
+          value=""
+          [disabled]="!!placeholder() && !nullOptionLabel()"
+          [selected]="!currentValue()"
+        >
+          {{ nullOptionLabel() ?? placeholder() ?? "" }}
+        </option>
+      }
+      @for (option of options(); track option) {
+        <option [value]="option" [selected]="option === currentValue()">
+          {{ `${localizationPrefix()}${option.toUpperCase()}` | translate }}
+        </option>
+      }
+    </select>
+  </div>
+</div>

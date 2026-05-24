@@ -1,0 +1,17 @@
+<nav class="public-legal-footer" [attr.aria-label]="'LEGAL_NAV_ARIA' | translate">
+  <rs-button-text kind="link" variant="muted" [size]="ESize.S" [routePath]="privacyRoute">
+    {{ "LEGAL_NAV_PRIVACY" | translate }}
+  </rs-button-text>
+  <rs-button-text kind="link" variant="muted" [size]="ESize.S" [routePath]="termsRoute">
+    {{ "LEGAL_NAV_TERMS" | translate }}
+  </rs-button-text>
+  <rs-button-text kind="link" variant="muted" [size]="ESize.S" [routePath]="cookiesRoute">
+    {{ "LEGAL_NAV_COOKIES" | translate }}
+  </rs-button-text>
+  <rs-button-text kind="link" variant="muted" [size]="ESize.S" [routePath]="dataProtectionRoute">
+    {{ "LEGAL_NAV_DATA_PROTECTION" | translate }}
+  </rs-button-text>
+  <rs-button-text kind="link" variant="muted" [size]="ESize.S" [routePath]="reportContentRoute">
+    {{ "LEGAL_NAV_REPORT_CONTENT" | translate }}
+  </rs-button-text>
+</nav>

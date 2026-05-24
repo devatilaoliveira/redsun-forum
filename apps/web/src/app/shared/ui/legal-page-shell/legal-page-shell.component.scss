@@ -1,0 +1,45 @@
+@use "../../../../styles/breakpoints" as bp;
+@use "../../../../styles/mixins" as mix;
+
+$min-content: bp.$bp-sm;
+
+:host {
+  @include mix.main-host();
+}
+
+.cover {
+  @include mix.main-wrapper();
+  gap: var(--space-2, 1rem);
+  min-height: calc(100vh - 2 * (var(--space-1-5)));
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1, 1rem);
+  width: min($min-content, 100%);
+  margin: 0 auto;
+
+  @include bp.mobile-sm {
+    gap: var(--space-0-5, 0.5rem);
+  }
+}
+
+.brand {
+  width: min(220px, 100%);
+
+  @include bp.mobile-sm {
+    width: min(180px, 100%);
+  }
+}
+
+.content {
+  width: min($min-content, 100%);
+  margin: 0 auto;
+}
+
+.legal-footer-wrapper {
+  width: 100%;
+  margin-top: auto;
+}

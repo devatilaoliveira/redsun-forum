@@ -1,0 +1,34 @@
+@mixin legal-document() {
+  :host {
+    display: block;
+    width: 100%;
+  }
+
+  .legal-document {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2, 2rem);
+    width: 100%;
+  }
+
+  .header,
+  .legal-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-0-5, 0.5rem);
+  }
+
+  .header {
+    gap: var(--space-1, 1rem);
+  }
+
+  .legal-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-0-5, 0.5rem);
+    margin: 0;
+    padding-left: var(--space-1-5, 1.5rem);
+    color: var(--color-text);
+    line-height: var(--line-height-normal);
+  }
+}

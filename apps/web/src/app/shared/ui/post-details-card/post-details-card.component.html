@@ -1,0 +1,44 @@
+<article class="post-details" [class.inactive]="isInactive()">
+  <div class="header">
+    <rs-avatar [src]="post().author.characterImageUrl || ''" [userName]="post().author.characterName" [size]="40" />
+    <div class="post-meta">
+      <h2 class="author-name">{{ authorName() }}</h2>
+      <p class="post-date muted">
+        @if (post().creationDate) {
+          {{ post().creationDate | date:'y MMM d' }}
+        } @else {
+          -
+        }
+      </p>
+      @if (isInactive()) {
+        <div class="inactive-controls">
+          <rs-badge
+            [label]="'POST_STATUS_INACTIVE' | translate"
+            [variant]="EVariant.ACCENT"
+          />
+          <rs-round-icon-button
+            class="visibility-toggle"
+            [iconSrc]="isContentVisible() ? '/assets/svgs/visibility.svg' : '/assets/svgs/visibility_off.svg'"
+            [ariaLabel]="isContentVisible() ? 'Hide content' : 'Show content'"
+
+            (pressed)="toggleContentVisibility()"
+          />
+        </div>
+      }
+    </div>
+    @if (hasOptions()) {
+      <rs-more-options
+        class="post-options"
+        [options]="options()"
+        (actionSelected)="onOptionSelected($event)"
+      ></rs-more-options>
+    }
+    </div>
+  <div class="content" [class.is-visible]="contentVisible()">
+    <div class="content-inner">
+      <p class="post-content" [attr.aria-hidden]="!contentVisible()">
+        {{ post().content }}
+      </p>
+    </div>
+  </div>
+</article>

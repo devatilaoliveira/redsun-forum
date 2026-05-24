@@ -1,0 +1,106 @@
+<article class="user-card">
+  <div class="top">
+    <div class="avatar">
+      <rs-avatar
+        [src]="user().imageURL"
+        [userName]="user().username"
+        [alt]="user().username"
+        [size]="72"
+      />
+    </div>
+
+    <div class="main">
+      <header class="header">
+        <div class="copy">
+          <div class="name-row">
+            <h3>{{ user().username }}</h3>
+          </div>
+
+          <p>{{ user().description || ('NO_DESCRIPTION' | translate) }}</p>
+        </div>
+
+        <div class="actions">
+          <rs-button
+            [disabled]="alreadyContact() || currentUser()"
+            [inProgress]="inProgress()"
+            (pressed)="onAddContactPressed()"
+          >
+            {{
+              currentUser()
+                ? ('PROFILE' | translate)
+                : alreadyContact()
+                  ? ('ALREADY_A_CONTACT' | translate)
+                  : ('ADD_TO_CONTACTS' | translate)
+            }}
+          </rs-button>
+
+          @if (hasMenuOptions()) {
+            <rs-more-options
+              [options]="menuOptions()"
+              [disabled]="inProgress()"
+              (actionSelected)="onMenuOptionSelected($event)"
+            />
+          }
+        </div>
+      </header>
+
+      <rs-divider class="divider" />
+
+      <section class="details">
+        <div class="detail">
+          <span class="label">
+            {{ 'ROLE' | translate }}{{ roleCount() > 1 ? ' (' + roleCount() + ')' : '' }}
+          </span>
+          <div class="chips">
+            @if (user().favoriteRole?.length) {
+              @for (role of user().favoriteRole!; track role) {
+                <rs-badge
+                  [label]="('ROLE_' + role) | translate"
+                  [variant]="EVariant.SECONDARY"
+                />
+              }
+            } @else {
+              <span class="empty">{{ 'NO_DESCRIPTION' | translate }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="detail wide">
+          <span class="label">
+            {{ 'RULES' | translate }}{{ ruleCount() > 0 ? ' (' + ruleCount() + ')' : '' }}
+          </span>
+          <div class="chips">
+            @if (user().favoriteRules?.length) {
+              @for (rule of user().favoriteRules!; track rule) {
+                <rs-badge
+                  [label]="('SYSTEM_RULE_' + rule) | translate"
+                  [variant]="EVariant.SECONDARY"
+                />
+              }
+            } @else {
+              <span class="empty">{{ 'NO_DESCRIPTION' | translate }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="detail">
+          <span class="label">
+            {{ 'LANGUAGE' | translate }}{{ languageCount() > 0 ? ' (' + languageCount() + ')' : '' }}
+          </span>
+          <div class="chips">
+            @if (user().favoriteLanguage?.length) {
+              @for (language of user().favoriteLanguage!; track language) {
+                <rs-badge
+                  [label]="('LANGUAGE_' + language) | translate"
+                  [variant]="EVariant.SECONDARY"
+                />
+              }
+            } @else {
+              <span class="empty">{{ 'NO_DESCRIPTION' | translate }}</span>
+            }
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</article>

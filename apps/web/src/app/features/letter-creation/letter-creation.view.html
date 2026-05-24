@@ -1,0 +1,48 @@
+<section class="letter-view">
+  <rs-view-header
+    [title]="'SEND_LETTER' | translate"
+    [subTittle]="'LETTER_SUBTITLE' | translate"
+  />
+
+  <div class="content">
+    <form class="form" [formGroup]="letterFormGroup" (submit)="$event.preventDefault(); onSubmit()">
+      @if (!hasContactId()) {
+        <rs-contacts-multi-select
+          [label]="'LETTER_RECIPIENTS' | translate"
+          [placeholder]="'LETTER_RECIPIENTS_PLACEHOLDER' | translate"
+          [contacts]="myContacts()"
+          [value]="letterControls.recipientsIds.value"
+          [required]="true"
+          (valueChanged)="onRecipientsChange($event)"
+        />
+      }
+
+      <rs-input
+        [label]="'LETTER_SUBJECT' | translate"
+        [placeholder]="'LETTER_SUBJECT_PLACEHOLDER' | translate"
+        [required]="true"
+        [value]="letterControls.subject.value"
+        (valueChanged)="onSubjectChange($event)"
+      />
+
+      <rs-textarea
+        [label]="'LETTER_CONTENT' | translate"
+        [placeholder]="'LETTER_CONTENT_PLACEHOLDER' | translate"
+        [maxLength]="UTIL_CONSTANTS.EXTRA_LONG_TEXT_LENGTH"
+        [required]="true"
+        [value]="letterControls.content.value"
+        (valueChanged)="onContentChange($event)"
+      />
+
+      <div class="cta-btn">
+        <rs-button
+          [inProgress]="inProgress()"
+          [disabled]="letterFormGroup.invalid || inProgress()"
+          (pressed)="onSubmit()"
+        >
+          {{ 'SEND' | translate }}
+        </rs-button>
+      </div>
+    </form>
+  </div>
+</section>

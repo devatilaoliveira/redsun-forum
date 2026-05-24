@@ -1,0 +1,41 @@
+<div class="rs-textarea" [class.is-blocked]="blocked()">
+  @if (label()) {
+    <label class="label" [attr.for]="textareaId()">
+      <span class="label-text">{{ label() }}</span>
+      @if (required()) {
+        <span class="required">*</span>
+      }
+    </label>
+  }
+
+  <textarea
+    [class.is-invalid]="isInvalid()"
+    [id]="textareaId()"
+    [attr.placeholder]="placeholder()"
+    [attr.maxlength]="maxLengthAttr()"
+    [attr.rows]="rows()"
+    [attr.aria-invalid]="isInvalid()"
+    [attr.aria-describedby]="showError() ? errorId() : null"
+    [attr.readonly]="blocked() ? '' : null"
+    [attr.aria-readonly]="blocked()"
+    [value]="currentValue()"
+    (input)="onInput($event)"
+    (blur)="onBlur()"
+  ></textarea>
+
+  <div class="meta">
+    <p
+      class="error"
+      [class.is-visible]="showError()"
+      [id]="errorId()"
+      [attr.aria-live]="showError() ? 'polite' : null"
+    >
+      {{ showError() ? validationError() : "" }}
+    </p>
+    @if (maxLengthAttr()) {
+      <p class="counter">
+        {{ currentLength() }}/{{ maxLengthAttr() }}
+      </p>
+    }
+  </div>
+</div>

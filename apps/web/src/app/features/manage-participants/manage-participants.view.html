@@ -1,0 +1,96 @@
+<section class="manage-participants-view">
+  <div class="content">
+    <rs-view-header [title]="'MANAGE_PARTICIPANTS' | translate" />
+    <form class="form" (submit)="$event.preventDefault(); onAddParticipant()">
+      <rs-input
+        [label]="'ADD_MEMBER_BY_EMAIL_OR_USERNAME' | translate"
+        [value]="inviteIdentifier()"
+        (valueChanged)="onInviteIdentifierChange($event)"
+      />
+      <rs-button
+        [type]="'submit'"
+        [inProgress]="inviteInProgress()"
+        [disabled]="!inviteIdentifier().trim() || inviteInProgress()"
+      >
+        {{ 'INVITE_ADD' | translate }}
+      </rs-button>
+    </form>
+
+    @if (isLoading()) {
+      <div class="status">
+        <rs-spinner [variant]="EVariant.PRIMARY" />
+      </div>
+    } @else if (!hasParticipants()) {
+      <div class="status">
+        <p>{{ 'NO_PARTICIPANTS' | translate }}</p>
+      </div>
+    } @else {
+      <div class="table">
+        <div class="header">
+          <div class="avatar-column"></div>
+          <div class="name-column">{{ 'CHARACTER_NAME' | translate }}</div>
+          <div class="role-column">{{ 'ROLE' | translate }}</div>
+          <div class="actions-column">{{ 'ACTIONS' | translate }}</div>
+        </div>
+
+        <div class="body">
+          @for (contact of participantsState(); track contact.id) {
+            @let options = isTaleOwner(contact)
+              ? []
+              : [
+                { text: ('ASSIGN_TALE_OWNER' | translate), action: EAction.TRANSFER },
+                { text: ('DELETE' | translate), action: EAction.DELETE }
+              ];
+            <button class="row" (click)="onParticipantPressed(contact)">
+              <div class="avatar-column">
+                <div class="avatar">
+                  @if (contact.characterImageUrl) {
+                    <img [src]="contact.characterImageUrl" [alt]="characterName(contact)" />
+                  } @else {
+                    <span class="avatar-fallback">{{ characterInitials(contact) }}</span>
+                  }
+                </div>
+              </div>
+              <div class="name-column">
+                {{ characterName(contact) }}
+              </div>
+              <div class="role-column">
+                {{ roleLabelKey(contact.role) | translate }}
+              </div>
+              <div class="actions-column">
+                <rs-more-options
+                  [options]="options"
+                  [disabled]="isRemoving() || transferInProgress() || options.length === 0"
+                  (actionSelected)="onOptionSelected(contact, $event)"
+                ></rs-more-options>
+              </div>
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</section>
+
+@if (transferDialogOpen()) {
+  <rs-dialog-modal
+    [title]="'ASSIGN_TALE_OWNER' | translate"
+    [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.SECONDARY, disabled: transferInProgress() }"
+    [ctaBtnTwo]="{ label: ('CONFIRM' | translate), variant: EVariant.WARNING, disabled: !canConfirmTransfer() || transferInProgress(), inProgress: transferInProgress() }"
+    (closePressed)="closeTransferDialog()"
+    (ctaBtnOnePressed)="closeTransferDialog()"
+    (ctaBtnTwoPressed)="confirmTransferOwnership()"
+  >
+    <ng-template>
+      <p>{{ 'ASSIGN_TALE_OWNER_WARNING' | translate }}</p>
+      <rs-input
+        [label]="'ASSIGN_TALE_OWNER_CONFIRM_LABEL' | translate"
+        [placeholder]="'ASSIGN_TALE_OWNER_CONFIRM_PLACEHOLDER' | translate"
+        [value]="transferUsernameValue()"
+        [required]="true"
+        [blocked]="transferInProgress()"
+        (valueChanged)="onTransferUsernameChange($event)"
+      />
+    </ng-template>
+  </rs-dialog-modal>
+}

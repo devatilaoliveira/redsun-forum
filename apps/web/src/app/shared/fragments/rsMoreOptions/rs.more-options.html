@@ -1,0 +1,27 @@
+<div
+  class="more-options"
+  [class.open]="isOpen()"
+  [class.disabled]="disabled()"
+>
+  <rs-round-icon-button
+    [iconSrc]="'/assets/svgs/more-vertical.svg'"
+    aria-label="More options"
+    [disabled]="disabled()"
+    (pressed)="toggle()"
+  ></rs-round-icon-button>
+
+  @if (isOpen()) {
+    <div class="menu" role="menu">
+      @for (option of items(); track option.action) {
+        <button
+          type="button"
+          class="item"
+          role="menuitem"
+          (click)="selectOption(option)"
+        >
+          {{ option.text }}
+        </button>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,83 @@
+<div class="rs-input">
+  @if (label()) {
+    <label class="label" [for]="inputId()">
+      {{ label() }}
+      @if (required()) {
+        <span class="required" aria-hidden="true">*</span>
+      }
+    </label>
+  }
+
+  <div class="field" [class.is-invalid]="isInvalid()" [class.is-blocked]="blocked()">
+    <input
+      class="control"
+      [id]="inputId()"
+      [type]="inputType()"
+      [attr.data-testid]="testId() ?? null"
+      [placeholder]="placeholder()"
+      [value]="currentValue()"
+      [attr.maxlength]="maxLength()"
+      [attr.readonly]="blocked() ? '' : null"
+      [attr.required]="required() ? '' : null"
+      [attr.autocomplete]="autocomplete() ?? null"
+      [attr.pattern]="patternAttr()"
+      [attr.aria-invalid]="isInvalid()"
+      [attr.aria-required]="required()"
+      [attr.aria-readonly]="blocked()"
+      [attr.aria-errormessage]="showError() ? errorId() : null"
+      [attr.aria-describedby]="showError() ? errorId() : null"
+      (input)="onInput($any($event.target).value)"
+      (blur)="onBlur()"
+    />
+
+    @if (showPasswordToggle()) {
+      <button
+        type="button"
+        class="toggle"
+        [attr.data-testid]="testId() ? testId() + '-toggle' : null"
+        [attr.aria-label]="(passwordVisible() ? 'RS_INPUT_HIDE_PASSWORD' : 'RS_INPUT_SHOW_PASSWORD') | translate"
+        [attr.aria-pressed]="passwordVisible()"
+        (click)="togglePassword()"
+      >
+        <img
+          [src]="passwordVisible()
+          ? '/assets/svgs/visibility.svg'
+          : '/assets/svgs/visibility_off.svg'"
+          aria-hidden="true"
+          [alt]="passwordVisible() ? 'Hide password' : 'Show password'"
+        />
+      </button>
+    }
+
+    @if (suffixActionIcon().length > 0) {
+      <button
+        type="button"
+        class="toggle"
+        [attr.data-testid]="testId() ? testId() + '-suffix-action' : null"
+        [disabled]="blocked()"
+        (click)="onSuffixActionPressed()"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          focusable="false"
+          class="toggle"
+        >
+          <use [attr.href]="suffixActionIcon()"></use>
+        </svg>
+      </button>
+    }
+  </div>
+
+  @if (!hideErrorMessages()) {
+    <p
+      class="error"
+      [class.is-visible]="showError()"
+      [id]="errorId()"
+      [attr.data-testid]="testId() ? testId() + '-error' : null"
+      [attr.aria-live]="showError() ? 'polite' : null"
+    >
+      {{ showError() ? validationError() : "" }}
+    </p>
+  }
+</div>

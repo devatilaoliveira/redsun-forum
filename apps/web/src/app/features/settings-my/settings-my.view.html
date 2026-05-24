@@ -1,0 +1,23 @@
+<section class="settings">
+  @if (selectedLanguage(); as lang) {
+    <rs-select
+      [label]="'LANGUAGE' | translate"
+      [optionsEnum]="ELanguage"
+      [value]="lang"
+      [allowNull]="false"
+      (valueChanged)="onLangChange($event)"
+      [localizationPrefix]="'LANGUAGE_'"
+    />
+  }
+
+  @if (selectedTheme(); as theme) {
+    <rs-select
+      [label]="'THEME' | translate"
+      [optionsEnum]="EThemeApplication"
+      [value]="theme"
+      [allowNull]="false"
+      (valueChanged)="onThemeChange($event)"
+      [localizationPrefix]="'THEME_'"
+    />
+  }
+</section>

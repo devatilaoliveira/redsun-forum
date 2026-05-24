@@ -1,0 +1,18 @@
+<button
+  class="wrapper"
+  type="button"
+  [disabled]="!clickable()"
+  (click)="onContactPressed()"
+>
+  <div class="contact-card">
+    <rs-avatar
+      [src]="avatarSrc()"
+      [userName]="displayName()"
+      [alt]="displayName()"
+      [size]="avatarSize()"
+    />
+    @if (!hideLabel()) {
+      <span class="label">{{ displayName() }}</span>
+    }
+  </div>
+</button>

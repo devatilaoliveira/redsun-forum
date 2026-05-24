@@ -1,0 +1,61 @@
+@use "../../../styles/mixins" as mix;
+@use "../../../styles/breakpoints" as bp;
+
+$min-content: bp.$bp-sm;
+
+:host {
+  @include mix.main-host();
+  height: calc(100vh - 55px);
+  padding-bottom: 0;
+}
+
+.tale-manager {
+  @include mix.main-wrapper();
+  gap: var(--space-2, 1rem);
+}
+
+.content {
+  width: min($min-content, 100%);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 1rem);
+  margin-bottom: var(--space-1-5);
+}
+
+.check-box {
+  align-self: flex-start;
+}
+
+.cta-btn {
+  display: grid;
+  gap: var(--space-1);
+  padding-bottom: var(--space-1-5);
+  width: 100%;
+  margin-top: auto;
+}
+
+.archive-btn {
+  align-self: flex-start;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64px;
+}
+
+.cover-cropper {
+  width: min($min-content, 100%);
+  margin: 0 auto;
+
+  image-cropper {
+    display: block;
+    width: 100%;
+    max-height: min(70vh, 520px);
+    overflow-y: auto;
+  }
+}

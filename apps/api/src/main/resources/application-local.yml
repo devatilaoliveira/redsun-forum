@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://127.0.0.1:54322/postgres}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+
+supabase:
+  url: ${SUPABASE_URL:http://127.0.0.1:54321}
+  service-role-key: ${SUPABASE_SERVICE_ROLE_KEY}
+  storage-url: ${SUPABASE_STORAGE_URL:http://127.0.0.1:54321/storage/v1/object/public/}

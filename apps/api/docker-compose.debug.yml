@@ -1,0 +1,8 @@
+name: redsun-api
+services:
+  api:
+    environment:
+      # Enable remote JVM debugging on port 5005
+      JAVA_OPTS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+    ports:
+      - "5005:5005"

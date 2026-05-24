@@ -1,0 +1,5 @@
+@use "../../../../styles/mixins" as mix;
+
+.toast-container {
+  @include mix.toast-container();
+}

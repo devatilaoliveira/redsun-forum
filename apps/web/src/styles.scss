@@ -1,0 +1,63 @@
+/* You can add global styles to this file, and also import other style files */
+@use "./styles/reset";
+@use "./styles/breakpoints";
+@use "./styles/colors";
+@use "./styles/layout";
+@use "./styles/typography";
+
+body {
+  font-family: var(--font-family-body), serif;
+  font-size: var(--p-size);
+  line-height: var(--line-height-normal);
+  color: var(--color-text);
+  background-color: var(--color-background);
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.app-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+:root {
+  --scrollbar-thumb: var(--color-border);
+  --scrollbar-thumb-hover: var(--color-muted);
+  --scrollbar-track: transparent;
+}
+
+:root[data-theme='light'] {
+  --scrollbar-thumb: #B8BBC4;
+  --scrollbar-thumb-hover: var(--color-muted);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}

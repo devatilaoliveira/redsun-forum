@@ -1,0 +1,29 @@
+@use "../../../styles/mixins" as mix;
+@use "../../../styles/breakpoints" as bp;
+
+$min-content: bp.$bp-sm;
+
+:host {
+  @include mix.main-host();
+}
+
+.letter-view {
+  @include mix.main-wrapper();
+  gap: var(--space-2, 1rem);
+}
+
+.content {
+  width: min($min-content, 100%);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 1rem);
+  /* Padding top + header height + gap + padding bottom */
+  min-height: calc(100vh - (var(--space-4, 2rem) + 58px + var(--space-2, 1rem) + var(--space-4, 2rem) + 58px));
+}
+
+.cta-btn {
+  margin-top: auto;
+}
