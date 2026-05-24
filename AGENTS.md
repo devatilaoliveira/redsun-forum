@@ -21,6 +21,7 @@ Use `scripts/rsAgents.ps1` from the repository root to start a layered Codex ses
 - `-App web` activates the shared core, `redsun-web`, and `angular` layers.
 - `-App api` activates the shared core, `redsun-api`, `domain-map`, `spring-boot`, and `persistence-storage` layers.
 - `-App all` activates the shared core, both project layers, and both stack layers.
+- `-App repo` activates only the shared core layer for repository-level tasks.
 
 The launcher accepts `-Core`, `-Project`, `-Stack`, and `-Skill` overrides for explicit sessions.
 

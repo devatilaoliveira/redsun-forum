@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
-  [ValidateSet("all", "web", "api")]
-  [string]$App = "all",
+  [ValidateSet("all", "web", "api", "repo")]
+  [string]$App = "repo",
   [string[]]$Core = @("methodical"),
   [string[]]$Project,
   [string[]]$Stack,
@@ -95,6 +95,7 @@ function Get-DefaultProjects {
   switch ($App) {
     "web" { return @("redsun-web") }
     "api" { return @("redsun-api", "domain-map") }
+    "repo" { return @() }
     default { return @("redsun-web", "redsun-api", "domain-map") }
   }
 }
@@ -103,6 +104,7 @@ function Get-DefaultStacks {
   switch ($App) {
     "web" { return @("angular") }
     "api" { return @("spring-boot", "persistence-storage") }
+    "repo" { return @() }
     default { return @("angular", "spring-boot", "persistence-storage") }
   }
 }

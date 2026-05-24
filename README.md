@@ -19,11 +19,13 @@ Unless noted otherwise, commands in this README start from the repository root.
 Use the root launcher to start a layered Codex session:
 
 ```powershell
+.\scripts\rsAgents.ps1 -App repo
 .\scripts\rsAgents.ps1 -App api
 .\scripts\rsAgents.ps1 -App web
 .\scripts\rsAgents.ps1 -App all
 ```
 
+`-App repo` loads only the shared core layer for repository-level tasks.
 `-App api` loads the shared core, API project, domain map, Spring Boot, and persistence/storage layers.
 `-App web` loads the shared core, web project, and Angular layers.
 `-App all` loads both app layer sets.
