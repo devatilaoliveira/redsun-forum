@@ -10,47 +10,9 @@ Unless noted otherwise, commands in this README start from the repository root.
 
 ## Prerequisites
 
-- Java 21 and Maven wrapper support for the API.
+- Docker and the Docker Compose plugin for the API.
 - Node.js 22 and npm for the web app.
-- Docker for containerized runs.
 - PostgreSQL command line tools for database scripts (`psql`, `pg_dump`, `pg_restore`).
-
-## Production Deploy
-
-Production deploys are handled by GitHub Actions on pushes to `main`.
-The workflow builds `apps/api/Dockerfile` and `apps/web/Dockerfile`, pushes both images to AWS ECR, then connects to the EC2 host and runs the root Compose file from the deployed clone.
-
-Create these ECR repositories before the first deploy:
-
-- `redsun-api`
-- `redsun-web`
-
-Configure GitHub with these repository variables or secrets:
-
-- `AWS_REGION`, for example `sa-east-1`
-- `AWS_ROLE_TO_ASSUME`, the GitHub OIDC role allowed to push to ECR
-- `ECR_REGISTRY`, for example `<account-id>.dkr.ecr.<region>.amazonaws.com`
-- `DEPLOY_PATH`, optional, defaults to `/opt/redsun`
-
-Configure these as GitHub secrets:
-
-- `EC2_HOST`
-- `EC2_USER`
-- `EC2_SSH_KEY`
-
-On the EC2 host, install Docker, the Docker Compose plugin, Git, and AWS CLI. Clone the repository at `/opt/redsun` or the configured `DEPLOY_PATH`, attach an IAM role with read-only ECR permissions, and create a root `.env` file outside Git:
-
-```env
-ECR_REGISTRY=<account-id>.dkr.ecr.<region>.amazonaws.com
-IMAGE_TAG=latest
-API_ENV_FILE=apps/api/.env.prod
-BASE_URL=http://<ec2-host>:4200
-API_BASE_URL=http://<ec2-host>:8080
-SUPABASE_URL=<supabase-url>
-SUPABASE_ANON_KEY=<supabase-anon-key>
-```
-
-Keep production secrets in the API env file referenced by `API_ENV_FILE`; do not commit `.env`, `.env.local`, `.env.prod`, private keys, or cloud credentials.
 
 ## Codex Agent Sessions
 
@@ -101,41 +63,61 @@ Environment files, Docker Compose files, SQL files, and database scripts are app
 - `apps/api/db/*.sql`
 - `apps/api/scripts/*.ps1`
 
-### Run Locally
+### Local Environment
+
+Create an app-local environment file before running the API:
 
 ```powershell
-Push-Location apps\api
-.\mvnw spring-boot:run
-Pop-Location
+Copy-Item apps\api\.env.template apps\api\.env.local
 ```
 
-The default Spring profile is `local`. Override it when needed:
-
-```powershell
-$env:SPRING_PROFILES_ACTIVE = "prod"
-Push-Location apps\api
-.\mvnw spring-boot:run
-Pop-Location
-```
+Edit `apps/api/.env.local` with the Supabase, database, JWT, and email values for the target environment.
 
 ### Docker
 
-The API Compose file expects the external Docker network `rs-net`:
+Run these commands from `apps/api`, not from the repository root. The root Compose file is production-only.
+In PowerShell, type only the command text. Do not paste the prompt prefix such as `PS C:\...\redsun>`.
+
+The API Compose file expects the external Docker network `rs-net`. Create it once:
 
 ```powershell
 docker network create rs-net
 ```
 
-Run the API container:
+Build the API image from a clean Docker state with no layer cache:
 
 ```powershell
 Push-Location apps\api
-docker compose build --no-cache
+docker compose build --no-cache --pull
+Pop-Location
+```
+
+Run the already-built API container:
+
+```powershell
+Push-Location apps\api
 docker compose up -d
 Pop-Location
 ```
 
-Use another app-local env file by setting `APP_ENV_FILE` before running Compose:
+Build and run the API container in one command:
+
+```powershell
+Push-Location apps\api
+docker compose up -d --build
+Pop-Location
+```
+
+Build from a clean Docker state and then run:
+
+```powershell
+Push-Location apps\api
+docker compose build --no-cache --pull
+docker compose up -d
+Pop-Location
+```
+
+Use another app-local env file by setting `APP_ENV_FILE` before running Compose. The path is resolved from `apps/api`:
 
 ```powershell
 $env:APP_ENV_FILE = ".env.prod"
@@ -147,7 +129,7 @@ Remove-Item env:APP_ENV_FILE -ErrorAction SilentlyContinue
 
 ### Debug With IntelliJ
 
-Start the API with the debug override:
+Start the API container with the debug override:
 
 ```powershell
 Push-Location apps\api
@@ -159,6 +141,15 @@ Create an IntelliJ Remote JVM Debug configuration:
 
 - Host: `localhost`
 - Port: `5005`
+
+To rebuild the debug container without Docker layer cache:
+
+```powershell
+Push-Location apps\api
+docker compose -f docker-compose.yml -f docker-compose.debug.yml build --no-cache --pull
+docker compose -f docker-compose.yml -f docker-compose.debug.yml up -d
+Pop-Location
+```
 
 ### Database Reset
 
