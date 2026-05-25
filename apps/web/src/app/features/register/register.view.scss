@@ -5,6 +5,7 @@
   @include mix.main-wrapper();
   padding: var(--space-6) 0;
   min-height: 100vh;
+  min-height: 100dvh;
 
   @include bp.desktop {
     padding: var(--space-3) 0;

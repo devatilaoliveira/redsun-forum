@@ -66,6 +66,7 @@ apps/web/__screenshots__/
 
 ### Java, Maven, and build output ###
 apps/api/HELP.md
+**/.m2/
 **/target/
 **/build/
 **/.mvn/wrapper/maven-wrapper.jar
