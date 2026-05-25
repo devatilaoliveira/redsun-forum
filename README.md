@@ -261,6 +261,21 @@ Pop-Location
 
 Open `http://localhost:4200/`.
 
+### Test On Mobile
+
+To open the Angular dev server from a phone on the same Wi-Fi network, serve the web app on all network interfaces:
+
+```powershell
+npx ng serve --host 0.0.0.0 --port 4200
+Pop-Location
+```
+
+Then open the network URL on the phone:
+
+```text
+Network: http://192.168.178.80:4200/
+```
+
 ### Runtime Config
 
 The app reads runtime values from `apps/web/public/env.js` through `window.__env`:
