@@ -61,8 +61,9 @@ export class RsInput {
   protected onInput(value: string): void {
     if (this.blocked()) return;
     this.currentValue.set(value);
-    this.touched.set(true);
-    this.validationError.set(this._validate(value));
+    if (this.touched()) {
+      this.validationError.set(this._validate(value));
+    }
     this.valueChanged.emit(value);
   }
 
