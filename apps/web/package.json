@@ -5,6 +5,8 @@
     "ng": "ng",
     "start": "ng serve --port 4200",
     "build": "ng build",
+    "build:local": "ng build --configuration local-production",
+    "start:local": "ng serve --configuration local-production --port 4200",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
