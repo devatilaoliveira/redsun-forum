@@ -2,7 +2,6 @@ import {HttpErrorResponse} from "@angular/common/http";
 import {Component, DestroyRef, OnInit, inject, WritableSignal, signal} from "@angular/core";
 import {fromEvent, finalize, switchMap} from "rxjs";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
-import {GoogleButton} from "../../shared/fragments/googleButton/google.button";
 import {Router} from "@angular/router";
 import {ROUTE_PATHS} from "../../../interface/constants/route-path.constants";
 import {environment} from "../../../environments/environment";
@@ -27,7 +26,7 @@ import {PublicLegalFooterComponent} from "../../shared/ui/public-legal-footer/pu
 @Component({
   selector: "rs-login",
   standalone: true,
-  imports: [GoogleButton, RedsunTitle, NgOptimizedImage, TranslatePipe, RsInput, RsButton, RsButtonText, PublicLegalFooterComponent],
+  imports: [RedsunTitle, NgOptimizedImage, TranslatePipe, RsInput, RsButton, RsButtonText, PublicLegalFooterComponent],
   templateUrl: "./login.view.html",
   styleUrl: "./login.view.scss"
 })
