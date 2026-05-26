@@ -2,15 +2,25 @@
   <rs-title />
 
   <div class="content">
-    <h2>{{ "VERIFIED_TITLE" | translate }}</h2>
-    <p>{{ "VERIFIED_SUBTITLE" | translate }}</p>
+    @if (inProgress()) {
+      <h2>{{ "AUTHENTICATING" | translate }}</h2>
+      <p>{{ "VERIFIED_AUTHENTICATING" | translate }}</p>
+    } @else if (errorMessage(); as errorMessage) {
+      <h2>{{ "ERROR" | translate }}</h2>
+      <p>{{ errorMessage }}</p>
+    } @else {
+      <h2>{{ "VERIFIED_TITLE" | translate }}</h2>
+      <p>{{ "VERIFIED_SUBTITLE" | translate }}</p>
+    }
   </div>
 
-  <div class="cta-btn">
-    <rs-button [variant]="EVariant.PRIMARY" (pressed)="onGoToLogin()">
-      {{ "LOG_IN" | translate }}
-    </rs-button>
-  </div>
+  @if (!inProgress()) {
+    <div class="cta-btn">
+      <rs-button [variant]="EVariant.PRIMARY" (pressed)="onGoToLogin()">
+        {{ "LOG_IN" | translate }}
+      </rs-button>
+    </div>
+  }
 
   <div class="legal-footer-wrapper">
     <rs-public-legal-footer />

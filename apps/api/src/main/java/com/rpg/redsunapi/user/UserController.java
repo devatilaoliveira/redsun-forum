@@ -2,7 +2,6 @@ package com.rpg.redsunapi.user;
 
 import com.rpg.redsunapi.authentication.AuthenticatedUser;
 import com.rpg.redsunapi.user.dto.AddContactByEmailRequestDTO;
-import com.rpg.redsunapi.user.dto.ChangePasswordRequestDto;
 import com.rpg.redsunapi.user.dto.LegalAcknowledgementRequestDto;
 import com.rpg.redsunapi.user.dto.MeRequestDto;
 import com.rpg.redsunapi.user.dto.MeResponseDto;
@@ -56,15 +55,6 @@ public class UserController {
     User updatedUser = userService.updateMe(principal.user().getId(), request);
     List<UserAsContactDTO> contacts = userService.getContactsForUser(updatedUser.getId());
     return ResponseEntity.ok(userService.toMeResponse(updatedUser, contacts));
-  }
-
-  @PatchMapping("/me/password")
-  public ResponseEntity<String> changePassword(
-    @AuthenticationPrincipal AuthenticatedUser principal,
-    @Valid @RequestBody ChangePasswordRequestDto request
-  ) {
-    userService.changePassword(principal.user().getId(), request.oldPassword(), request.newPassword());
-    return ResponseEntity.ok("Password updated.");
   }
 
   @PostMapping("/me/legal-acknowledgement")

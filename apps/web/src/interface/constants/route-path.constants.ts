@@ -26,7 +26,7 @@ export const ROUTE_PATHS = {
   letters: "letters",
   letterId: "letterId",
   profileDetails: "profile-details",
-  changeEmail: "profile-details/change-email",
+  changePassword: "profile-details/change-email",
   support: "support",
   privacy: "privacy",
   terms: "terms",

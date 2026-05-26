@@ -3,10 +3,8 @@ import {Injectable, inject} from "@angular/core";
 import {ITranslateService, TranslateService} from "@ngx-translate/core";
 import {from, Observable} from "rxjs";
 import {catchError, switchMap} from "rxjs/operators";
-import {SupabaseProvider} from "./supabase.provider";
 import {AuthService, IAuthService} from "./auth.service";
-import {IUserProfileService, UserProfileService} from "./user-profile.service";
-import {ILocalStoreService, LocalStoreService} from "./local-store.service";
+import {ISupabaseAuthClient, SupabaseAuthClientAdapter} from "./supabase-auth-client.adapter";
 import {IPrinter, Printer} from "../infra/miscellaneous/printer.handler";
 import {environment} from "../environments/environment";
 import {ROUTE_PATHS} from "../interface/constants/route-path.constants";
@@ -18,10 +16,8 @@ import {AuthCallbackResult} from "../interface/models/iauth-callback-result";
 
 @Injectable({providedIn: "root"})
 export class AuthCallbackService {
-  private readonly _supabase: SupabaseProvider = inject(SupabaseProvider);
   private readonly _authService: IAuthService = inject(AuthService);
-  private readonly _userProfileService: IUserProfileService = inject(UserProfileService);
-  private readonly _localStore: ILocalStoreService = inject(LocalStoreService);
+  private readonly _supabaseAuthClient: ISupabaseAuthClient = inject(SupabaseAuthClientAdapter);
   private readonly _printer: IPrinter = inject(Printer);
   private readonly _translate: ITranslateService = inject(TranslateService);
   private readonly _parentOrigin: string = new URL(environment.baseUrl).origin;
@@ -46,61 +42,45 @@ export class AuthCallbackService {
       });
     }
 
-    return from(
-      this._supabase.getClient().auth.exchangeCodeForSession(code)
-    ).pipe(
-      switchMap(({data, error: supabaseError}): Observable<AuthCallbackResult> => {
-        // Defensive programming to ensure data and supabaseError are defined before accessing their properties
-        if (supabaseError) {
-          this._printer.error(
-            "Supabase error while exchanging code for session",
-            supabaseError
-          );
-          return this._handleLoginFailure({
-            authError: this._translate.instant("UNEXPECTED_ERROR")
-          });
-        }
-
-        if (!data?.session) {
-          return this._handleLoginFailure({
-            authError: this._translate.instant("COULD_NOT_CREATE_SESSION")
-          });
-        }
-
-        return this._userProfileService.upsertCurrentUser().pipe(switchMap((me: MeResponseDTO): Observable<AuthCallbackResult> =>
-          this._authService.recordSessionEstablished().pipe(
-            switchMap((): Observable<AuthCallbackResult> => {
-              const sent = this._notifyOpener(undefined, me);
-              if (sent) {
-                return from([
-                  {
-                    status: EStatus.SUCCESS,
-                    sentToOpener: true
-                  } as AuthCallbackResult
-                ]);
-              }
-
+    return from(this._supabaseAuthClient.exchangeCodeForSession(code)).pipe(
+      switchMap((): Observable<AuthCallbackResult> => {
+        return this._authService.completeSignIn().pipe(
+          switchMap((me: MeResponseDTO): Observable<AuthCallbackResult> => {
+            const sent = this._notifyOpener(undefined, me);
+            if (sent) {
               return from([
                 {
                   status: EStatus.SUCCESS,
-                  redirectUrl: `/${ROUTE_PATHS.home}`
+                  sentToOpener: true
                 } as AuthCallbackResult
               ]);
-            })
-          )
-        ),
-        catchError(httpError => {
-          this._printer.error("Backend could not complete OAuth sign-in", httpError);
+            }
 
-          return from(this._authService.logout()).pipe(
-            switchMap((): Observable<AuthCallbackResult> =>
-              this._handleLoginFailure({
-                authError: this._resolveBackendLoginError(httpError)
-              })
-            )
-          );
-        })
+            return from([
+              {
+                status: EStatus.SUCCESS,
+                redirectUrl: `/${ROUTE_PATHS.home}`
+              } as AuthCallbackResult
+            ]);
+          }),
+          catchError(httpError => {
+            this._printer.error("Backend could not complete OAuth sign-in", httpError);
+
+            return from(this._authService.logout()).pipe(
+              switchMap((): Observable<AuthCallbackResult> =>
+                this._handleLoginFailure({
+                  authError: this._resolveBackendLoginError(httpError)
+                })
+              )
+            );
+          })
         );
+      }),
+      catchError((error: unknown): Observable<AuthCallbackResult> => {
+        this._printer.error("Supabase error while exchanging code for session", error);
+        return this._handleLoginFailure({
+          authError: this._translate.instant("UNEXPECTED_ERROR")
+        });
       })
     );
   }

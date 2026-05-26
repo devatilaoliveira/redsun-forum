@@ -45,11 +45,6 @@ public class UserRepositoryAdapter implements UserRepository {
   }
 
   @Override
-  public Optional<User> findByVerificationToken(String verificationToken) {
-    return jpaUserRepository.findByVerificationToken(verificationToken);
-  }
-
-  @Override
   public Optional<User> findByUsername(String username) {
     return jpaUserRepository.findByUsernameIgnoreCase(username);
   }

@@ -1,6 +1,45 @@
-import { expect } from "@playwright/test";
+import { expect, Page, Route } from "@playwright/test";
 import { ROUTE_PATHS } from "../../src/interface/constants/route-path.constants";
 import { test } from "./register.view.fixture";
+
+const CORS_HEADERS = {
+  "access-control-allow-origin": "*",
+  "access-control-allow-headers": "*",
+  "access-control-allow-methods": "GET,POST,PATCH,DELETE,OPTIONS",
+};
+
+const isSupabaseSignUp = (url: URL): boolean => url.pathname.endsWith("/auth/v1/signup");
+
+async function mockSupabaseSignUp(page: Page, email: string): Promise<void> {
+  await page.route(isSupabaseSignUp, async (route: Route) => {
+    if (route.request().method() === "OPTIONS") {
+      await route.fulfill({ status: 204, headers: CORS_HEADERS });
+      return;
+    }
+
+    const now = new Date().toISOString();
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      headers: CORS_HEADERS,
+      body: JSON.stringify({
+        id: "00000000-0000-4000-8000-000000000002",
+        aud: "authenticated",
+        role: "authenticated",
+        email,
+        confirmation_sent_at: now,
+        app_metadata: {
+          provider: "email",
+          providers: ["email"],
+        },
+        user_metadata: {},
+        identities: [],
+        created_at: now,
+        updated_at: now,
+      }),
+    });
+  });
+}
 
 test.describe("Register workflow", () => {
   test.beforeEach(async ({ page }) => {
@@ -39,41 +78,25 @@ test.describe("Register workflow", () => {
     await expect(page).toHaveURL((url) => url.pathname === `/${ROUTE_PATHS.privacy}`);
   });
 
-  test("should verify registration and redirect to auth verified", async ({
-    e2eTestApi,
+  test("should request Supabase signup and show email confirmation message", async ({
     page,
     registerViewE2e,
     registerTestUser,
   }) => {
-    const registrationRequestPromise = registerViewE2e.waitForRegistrationRequest();
+    await mockSupabaseSignUp(page, registerTestUser.email);
+    const signUpRequestPromise = registerViewE2e.waitForSupabaseSignUpRequest();
 
-    registerTestUser.markForCleanup();
     await registerViewE2e.register(registerTestUser.email, registerTestUser.password);
 
-    const registrationRequest = await registrationRequestPromise;
-    expect(registrationRequest.postDataJSON()).toEqual({
+    const signUpRequest = await signUpRequestPromise;
+    const signUpUrl = new URL(signUpRequest.url());
+    expect(signUpRequest.postDataJSON()).toEqual(expect.objectContaining({
       email: registerTestUser.email,
       password: registerTestUser.password,
-      acceptedTerms: true,
-      acknowledgedPrivacy: true,
-    });
+    }));
+    expect(signUpUrl.searchParams.get("redirect_to")).toContain(`/${ROUTE_PATHS.authVerified}`);
 
-    await registerViewE2e.waitForVerificationCodeInput();
-    const verificationCode = await e2eTestApi.getVerificationCode(registerTestUser.email);
-
-    await registerViewE2e.fillVerificationCode(verificationCode);
-
-    await expect.poll(() => registerViewE2e.getVerificationCodeInputValue()).toBe(verificationCode);
-
-    const verifyEmailCodeRequestPromise = registerViewE2e.waitForVerifyEmailCodeRequest();
-
-    await registerViewE2e.submitVerificationCode();
-
-    const verifyEmailCodeRequest = await verifyEmailCodeRequestPromise;
-    expect(verifyEmailCodeRequest.postDataJSON()).toEqual({
-      email: registerTestUser.email,
-      code: verificationCode,
-    });
-    await expect(page).toHaveURL((url) => url.pathname === `/${ROUTE_PATHS.authVerified}`);
+    await registerViewE2e.waitForCheckEmailMessage();
+    await expect(page).toHaveURL((url) => url.pathname === `/${ROUTE_PATHS.register}`);
   });
 });

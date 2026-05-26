@@ -14,13 +14,19 @@ import java.util.List;
 public class JwtAuthenticator {
 
   private final UserService userService;
+  private final JwtPrincipalResolver jwtPrincipalResolver;
 
-  public JwtAuthenticator(UserService userService) {
+  public JwtAuthenticator(UserService userService, JwtPrincipalResolver jwtPrincipalResolver) {
     this.userService = userService;
+    this.jwtPrincipalResolver = jwtPrincipalResolver;
   }
 
   public UsernamePasswordAuthenticationToken authenticate(String token, HttpServletRequest request) {
-    User user = userService.upsertUser(token);
+    VerifiedJwtPrincipal verifiedPrincipal = jwtPrincipalResolver.resolve(token);
+    User user = userService.upsertUser(
+      verifiedPrincipal.userId(),
+      verifiedPrincipal.email()
+    );
     AuthenticatedUser principal = new AuthenticatedUser(user);
 
     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

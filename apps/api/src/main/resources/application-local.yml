@@ -6,5 +6,5 @@ spring:
 
 supabase:
   url: ${SUPABASE_URL:http://127.0.0.1:54321}
-  service-role-key: ${SUPABASE_SERVICE_ROLE_KEY}
+  secret-key: ${SUPABASE_SECRET_KEY}
   storage-url: ${SUPABASE_STORAGE_URL:http://127.0.0.1:54321/storage/v1/object/public/}

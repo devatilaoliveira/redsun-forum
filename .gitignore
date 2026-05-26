@@ -67,6 +67,7 @@ apps/web/__screenshots__/
 ### Java, Maven, and build output ###
 apps/api/HELP.md
 **/.m2/
+**/.m2-repo/
 **/target/
 **/build/
 **/.mvn/wrapper/maven-wrapper.jar
@@ -89,6 +90,8 @@ __screenshots__/
 
 ### Agent and temporary files ###
 .agents/tmp/
+.agents/skills/supabase
+.agents/skills/supabase-postgres-best-practices
 .agents/cache/
 .agents/sessions/
 **/.codex/

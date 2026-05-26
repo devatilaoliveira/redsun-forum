@@ -26,18 +26,12 @@ CREATE TABLE public.users (
   image_url varchar(500),
   deleted boolean NOT NULL DEFAULT FALSE,
   deleted_at timestamptz,
-  password_hash varchar(60),
-  verified boolean NOT NULL DEFAULT FALSE,
-  verification_token varchar(36),
-  verification_token_expiry timestamptz,
-  auth_provider varchar(20) NOT NULL DEFAULT 'GOOGLE' CHECK (auth_provider IN ('GOOGLE', 'EMAIL')),
   terms_accepted_at timestamptz,
   terms_version varchar(20),
   privacy_acknowledged_at timestamptz,
   privacy_version varchar(20),
   last_sign_in_at timestamptz
 );
-CREATE INDEX idx_users_verification_token ON public.users(verification_token) WHERE verification_token IS NOT NULL;
 
 -- User preferences
 CREATE TABLE public.user_favorite_languages (

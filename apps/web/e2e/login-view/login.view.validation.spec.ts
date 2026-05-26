@@ -21,7 +21,6 @@ test.describe('Login validation', () => {
     await expect.poll(() => loginViewE2e.isEmailTypeMismatch()).toBe(true);
     await expect.poll(() => loginViewE2e.isSubmitDisabled()).toBe(true);
     await expect(page).toHaveURL((url) => url.pathname === '/login');
-    await expect.poll(() => loginViewE2e.getStoredAuthToken()).toBeNull();
     await expect.poll(() => loginViewE2e.getStoredUser()).toBeNull();
   });
 

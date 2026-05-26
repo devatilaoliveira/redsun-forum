@@ -1,6 +1,5 @@
-import {HttpErrorResponse} from "@angular/common/http";
 import {Component, DestroyRef, OnInit, inject, WritableSignal, signal} from "@angular/core";
-import {fromEvent, finalize, switchMap} from "rxjs";
+import {from, fromEvent, finalize, switchMap} from "rxjs";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {Router} from "@angular/router";
 import {ROUTE_PATHS} from "../../../interface/constants/route-path.constants";
@@ -13,20 +12,18 @@ import {ITranslateService, TranslatePipe, TranslateService} from "@ngx-translate
 import {RsInput} from "../../shared/fragments/rsInput/rs.input";
 import {RsButton} from "../../shared/fragments/rsButton/rs.button";
 import {EVariant} from "../../../interface/enums/EVariant";
-import {IEmailAuthService, EmailAuthService} from "../../../services/email-auth.service";
 import {IAuthService, AuthService} from "../../../services/auth.service";
-import {IUserProfileService, UserProfileService} from "../../../services/user-profile.service";
-import {LoginRequestDTO} from "../../../interface/dtos/auth/LoginRequestDTO";
-import {AuthenticationResponseDTO} from "../../../interface/dtos/auth/AuthenticationResponseDTO";
 import {MeResponseDTO} from "../../../interface/dtos/user/MeResponseDTO";
 import {RsButtonText} from "../../shared/fragments/rsButtonText/rs.button-text";
 import {EMAIL_PATTERN} from "../../../interface/constants/pattern-validators";
 import {PublicLegalFooterComponent} from "../../shared/ui/public-legal-footer/public-legal-footer.component";
+import {ISupabaseAuthClient, SupabaseAuthClientAdapter} from "../../../services/supabase-auth-client.adapter";
+import {GoogleButton} from "../../shared/fragments/googleButton/google.button";
 
 @Component({
   selector: "rs-login",
   standalone: true,
-  imports: [RedsunTitle, NgOptimizedImage, TranslatePipe, RsInput, RsButton, RsButtonText, PublicLegalFooterComponent],
+  imports: [RedsunTitle, NgOptimizedImage, TranslatePipe, RsInput, RsButton, RsButtonText, PublicLegalFooterComponent, GoogleButton],
   templateUrl: "./login.view.html",
   styleUrl: "./login.view.scss"
 })
@@ -36,9 +33,8 @@ export class LoginView implements OnInit {
   private readonly _localStoreService: ILocalStoreService = inject(LocalStoreService);
   private readonly _destroyRef: DestroyRef = inject(DestroyRef);
   private readonly _translateService: ITranslateService = inject(TranslateService);
-  private readonly _emailAuthService: IEmailAuthService = inject(EmailAuthService);
   private readonly _authService: IAuthService = inject(AuthService);
-  private readonly _userProfileService: IUserProfileService = inject(UserProfileService);
+  private readonly _supabaseAuthClient: ISupabaseAuthClient = inject(SupabaseAuthClientAdapter);
   protected errorMessage: WritableSignal<string | null> = signal<string | null>(null);
   protected inProgress: WritableSignal<boolean> = signal<boolean>(false);
   protected email: string = "";
@@ -75,23 +71,17 @@ export class LoginView implements OnInit {
       return;
     }
 
-    const payload: LoginRequestDTO = {
-      email: this.email.trim(),
-      password: this.password
-    };
+    const email: string = this.email.trim();
 
-    if (!this.emailPattern.test(payload.email) || !payload.password) {
+    if (!this.emailPattern.test(email) || !this.password) {
       this.errorMessage.set(this._translateService.instant("LOGIN_VALIDATION_ERROR"));
       return;
     }
 
     this.errorMessage.set(null);
     this.inProgress.set(true);
-    this._emailAuthService.login(payload).pipe(
-      switchMap((response: AuthenticationResponseDTO) => {
-        this._authService.setApiToken(response.token);
-        return this._userProfileService.upsertCurrentUser();
-      }),
+    from(this._supabaseAuthClient.signInWithPassword({email, password: this.password})).pipe(
+      switchMap(() => this._authService.completeSignIn()),
       finalize(() => this.inProgress.set(false))
     ).subscribe({
       next: (me: MeResponseDTO) => {
@@ -99,8 +89,7 @@ export class LoginView implements OnInit {
         void this._router.navigate(["/"], {replaceUrl: true});
       },
       error: (error: unknown) => {
-        this._authService.setApiToken("");
-        this._localStoreService.removeUser();
+        void this._authService.logout();
         this.errorMessage.set(this._resolveLoginError(error));
       }
     });
@@ -115,14 +104,16 @@ export class LoginView implements OnInit {
   }
 
   private _resolveLoginError(error: unknown): string {
-    if (error instanceof HttpErrorResponse) {
-      if (error.status === 400) {
-        return this._translateService.instant("LOGIN_VALIDATION_ERROR");
-      }
-      if (error.status === 401) {
-        return this._translateService.instant("LOGIN_INVALID_CREDENTIALS");
-      }
+    const message: string = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+
+    if (message.includes("email not confirmed")) {
+      return this._translateService.instant("LOGIN_EMAIL_NOT_CONFIRMED");
     }
+
+    if (message.includes("invalid login credentials")) {
+      return this._translateService.instant("LOGIN_INVALID_CREDENTIALS");
+    }
+
     return this._translateService.instant("LOGIN_FAILED");
   }
 }

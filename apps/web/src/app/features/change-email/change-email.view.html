@@ -1,58 +1,66 @@
 <section class="change-email-view">
-  <form class="form" (submit)="$event.preventDefault(); onSubmit()">
-    <h3>{{ "CHANGE_PASSWORD_TITLE" | translate }}</h3>
-    <rs-input
-      [label]="'OLD_PASSWORD' | translate"
-      type="password"
-      [value]="oldPassword()"
-      [required]="true"
-      [pattern]="passwordPattern"
-      [errorMessage]="'PASSWORD_REQUIREMENTS' | translate"
-      autocomplete="current-password"
-      [blocked]="inProgress()"
-      (valueChanged)="onOldPasswordChange($event)"
-    />
-    <rs-input
-      [label]="'NEW_PASSWORD' | translate"
-      type="password"
-      [value]="newPassword()"
-      [required]="true"
-      [pattern]="passwordPattern"
-      [errorMessage]="'PASSWORD_REQUIREMENTS' | translate"
-      autocomplete="new-password"
-      [blocked]="inProgress()"
-      (valueChanged)="onNewPasswordChange($event)"
-    />
-    <rs-input
-      [label]="'CONFIRM_PASSWORD' | translate"
-      type="password"
-      [value]="confirmNewPassword()"
-      [required]="true"
-      [pattern]="getConfirmPasswordPattern()"
-      [errorMessage]="passwordPattern.test(newPassword()) ? ('PASSWORDS_DO_NOT_MATCH' | translate) : ('PASSWORD_REQUIREMENTS' | translate)"
-      autocomplete="new-password"
-      [blocked]="inProgress()"
-      (valueChanged)="onConfirmNewPasswordChange($event)"
-    />
-    @if (errorMessage(); as errorMessage) {
-      <p class="error_msg">{{ errorMessage }}</p>
-    }
-    <div class="cta-btn">
-      <rs-button
-        [variant]="EVariant.SECONDARY"
-        [disabled]="inProgress()"
-        (pressed)="onBack()"
-      >
-        {{ "CANCEL" | translate }}
-      </rs-button>
-      <rs-button
-        [variant]="EVariant.PRIMARY"
-        [disabled]="!canSubmit()"
-        [inProgress]="inProgress()"
-        [type]="'submit'"
-      >
-        {{ "CHANGE_PASSWORD_BUTTON" | translate }}
-      </rs-button>
+  @if (checkingSession()) {
+    <div class="form">
+      <h3>{{ "CHANGE_PASSWORD_TITLE" | translate }}</h3>
+      <p>{{ "AUTHENTICATING" | translate }}</p>
     </div>
-  </form>
+  } @else if (!sessionReady()) {
+    <div class="form">
+      <h3>{{ "CHANGE_PASSWORD_TITLE" | translate }}</h3>
+      @if (errorMessage(); as errorMessage) {
+        <p class="error_msg">{{ errorMessage }}</p>
+      }
+      <div class="cta-btn">
+        <rs-button [variant]="EVariant.PRIMARY" (pressed)="onBackToLogin()">
+          {{ "BACK_TO_LOGIN" | translate }}
+        </rs-button>
+      </div>
+    </div>
+  } @else {
+    <form class="form" (submit)="$event.preventDefault(); onSubmit()">
+      <h3>{{ "CHANGE_PASSWORD_TITLE" | translate }}</h3>
+      <rs-input
+        [label]="'NEW_PASSWORD' | translate"
+        type="password"
+        [value]="newPassword()"
+        [required]="true"
+        [pattern]="passwordPattern"
+        [errorMessage]="'PASSWORD_REQUIREMENTS' | translate"
+        autocomplete="new-password"
+        [blocked]="inProgress()"
+        (valueChanged)="onNewPasswordChange($event)"
+      />
+      <rs-input
+        [label]="'CONFIRM_PASSWORD' | translate"
+        type="password"
+        [value]="confirmNewPassword()"
+        [required]="true"
+        [pattern]="getConfirmPasswordPattern()"
+        [errorMessage]="passwordPattern.test(newPassword()) ? ('PASSWORDS_DO_NOT_MATCH' | translate) : ('PASSWORD_REQUIREMENTS' | translate)"
+        autocomplete="new-password"
+        [blocked]="inProgress()"
+        (valueChanged)="onConfirmNewPasswordChange($event)"
+      />
+      @if (errorMessage(); as errorMessage) {
+        <p class="error_msg">{{ errorMessage }}</p>
+      }
+      <div class="cta-btn">
+        <rs-button
+          [variant]="EVariant.SECONDARY"
+          [disabled]="inProgress()"
+          (pressed)="onBack()"
+        >
+          {{ "CANCEL" | translate }}
+        </rs-button>
+        <rs-button
+          [variant]="EVariant.PRIMARY"
+          [disabled]="!canSubmit()"
+          [inProgress]="inProgress()"
+          [type]="'submit'"
+        >
+          {{ "CHANGE_PASSWORD_BUTTON" | translate }}
+        </rs-button>
+      </div>
+    </form>
+  }
 </section>

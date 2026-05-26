@@ -3,6 +3,7 @@ import {environment} from "../environments/environment";
 import {Session} from "@supabase/supabase-js";
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
+import {map, switchMap} from "rxjs/operators";
 import {ILocalStoreService, LocalStoreService} from "./local-store.service";
 import {AuthSessionService, IAuthSessionService} from "./session.service";
 import {IPrinter, Printer} from "../infra/miscellaneous/printer.handler";
@@ -11,16 +12,17 @@ import {ELoginProvider} from "../interface/enums/ELoginProvider";
 import {IOAuthPopupHandler, OAuthPopupHandler} from "../infra/miscellaneous/oauth-popup.handler";
 import {IOAuthOptions} from "../interface/models/ioauth-options";
 import {ISupabaseAuthClient, SupabaseAuthClientAdapter} from "./supabase-auth-client.adapter";
-import {AUTH_TOKEN_STORE_KEY} from "../interface/constants/store.constants";
+import {IUserProfileService, UserProfileService} from "./user-profile.service";
+import {MeResponseDTO} from "../interface/dtos/user/MeResponseDTO";
 
 export interface IAuthService {
   loginWithProvider(provider: ELoginProvider): Promise<void>;
 
   recordSessionEstablished(): Observable<void>;
 
-  logout(): Promise<void>;
+  completeSignIn(): Observable<MeResponseDTO>;
 
-  setApiToken(token: string): void;
+  logout(): Promise<void>;
 
   getCurrentSession(): Promise<Session | null>;
 }
@@ -31,6 +33,7 @@ export class AuthService implements IAuthService {
   private readonly _authSessionService: IAuthSessionService = inject(AuthSessionService);
   private readonly _supabaseAuthClient: ISupabaseAuthClient = inject(SupabaseAuthClientAdapter);
   private readonly _localStoreService: ILocalStoreService = inject(LocalStoreService);
+  private readonly _userProfileService: IUserProfileService = inject(UserProfileService);
   private readonly _printer: IPrinter = inject(Printer);
   private readonly _oauthPopupHandler: IOAuthPopupHandler = inject(OAuthPopupHandler);
 
@@ -60,10 +63,20 @@ export class AuthService implements IAuthService {
     );
   }
 
+  public completeSignIn(): Observable<MeResponseDTO> {
+    return this._userProfileService.upsertCurrentUser().pipe(
+      switchMap((me: MeResponseDTO) => this.recordSessionEstablished().pipe(
+        map((): MeResponseDTO => {
+          this._localStoreService.storeUser(me);
+          return me;
+        })
+      ))
+    );
+  }
+
   public async logout(): Promise<void> {
     this._oauthPopupHandler.reset();
     this._authSessionService.clearCachedSession();
-    localStorage.removeItem(AUTH_TOKEN_STORE_KEY);
     this._localStoreService.removeUser();
 
     try {
@@ -73,27 +86,8 @@ export class AuthService implements IAuthService {
     }
   }
 
-  public setApiToken(token: string): void {
-    const normalizedToken: string = token.trim();
-    if (!normalizedToken) {
-      localStorage.removeItem(AUTH_TOKEN_STORE_KEY);
-      return;
-    }
-    localStorage.setItem(AUTH_TOKEN_STORE_KEY, normalizedToken);
-  }
-
   public async getCurrentSession(): Promise<Session | null> {
-    const supabaseSession: Session | null = await this._authSessionService.getCurrentSession();
-    if (supabaseSession?.access_token) {
-      return supabaseSession;
-    }
-
-    const apiToken: string | null = localStorage.getItem(AUTH_TOKEN_STORE_KEY);
-    if (!apiToken) {
-      return null;
-    }
-
-    return {access_token: apiToken} as Session;
+    return this._authSessionService.getCurrentSession();
   }
 
   private _getOAuthOptions(provider: ELoginProvider): IOAuthOptions {

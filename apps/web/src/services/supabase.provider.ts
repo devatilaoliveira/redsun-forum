@@ -9,7 +9,7 @@ export class SupabaseProvider {
   constructor() {
     this._supabaseClient = createClient(
       environment.supabaseUrl,
-      environment.supabaseAnonKey, {
+      environment.supabasePublishableKey, {
         auth: {
           flowType: "pkce",
           detectSessionInUrl: false
