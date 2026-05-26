@@ -283,28 +283,27 @@ The app reads runtime values from `apps/web/public/env.js` through `window.__env
 - `BASE_URL`
 - `API_BASE_URL`
 - `SUPABASE_URL`
-- `SUPABASE_ANON_KEY`
+- `SUPABASE_PUBLISHABLE_KEY`
 
 For local development, placeholder values in `public/env.js` fall back to defaults in `src/environments/environment.ts`.
+`npm run build` regenerates `public/env.js` from environment variables before Angular builds.
 
-### Docker
+### Cloudflare Pages
 
-The web Compose file expects the external Docker network `rs-net`:
+Deploy the web app with Cloudflare Pages:
 
-```powershell
-docker network create rs-net
-```
+- Root directory: `apps/web`
+- Build command: `npm ci && npm run build`
+- Output directory: `dist/redsun-web/browser`
 
-Run the web container:
+Set only public frontend values in Cloudflare Pages environment variables:
 
-```powershell
-Push-Location apps\web
-docker compose build --no-cache
-docker compose up -d
-Pop-Location
-```
+- `BASE_URL`
+- `API_BASE_URL`
+- `SUPABASE_URL`
+- `SUPABASE_PUBLISHABLE_KEY`
 
-The app is available at `http://localhost:4200/`.
+Direct route refreshes are handled by `public/_redirects`.
 
 ### Other Web Scripts
 
