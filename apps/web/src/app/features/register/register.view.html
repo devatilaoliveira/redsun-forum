@@ -84,23 +84,10 @@
       </rs-button>
     </div>
   } @else {
-    <div class="register-form result">
+    <div class="register-form result" data-testid="register-check-email">
       <h2>{{ "CHECK_EMAIL_TITLE" | translate }}</h2>
       <p>{{ infoMessage() }}</p>
       <p>{{ "CHECK_EMAIL_SENT_TO" | translate:{email: submittedEmail()} }}</p>
-
-      <rs-input
-        testId="register-verification-code-input"
-        [label]="'VERIFICATION_CODE' | translate"
-        type="text"
-        [value]="verificationCode()"
-        [required]="true"
-        [maxLength]="6"
-        [pattern]="verificationCodePattern"
-        [errorMessage]="'VERIFY_CODE_VALIDATION_ERROR' | translate"
-        autocomplete="one-time-code"
-        (valueChanged)="onVerificationCodeChange($event)"
-      />
     </div>
 
     @if (errorMessage(); as errorMessage) {
@@ -108,23 +95,6 @@
     }
 
     <div class="register-form cta-btn">
-      <rs-button
-        testId="register-verify-code-submit"
-        [disabled]="!canVerify()"
-        [inProgress]="verifyInProgress()"
-        [variant]="EVariant.PRIMARY"
-        (pressed)="onVerifyCode()"
-      >
-        {{ "VERIFY_CODE" | translate }}
-      </rs-button>
-      <rs-button
-        [disabled]="!canResend()"
-        [inProgress]="resendInProgress()"
-        [variant]="EVariant.PRIMARY"
-        (pressed)="onResendVerification()"
-      >
-        {{ getResendButtonText() }}
-      </rs-button>
       <rs-button
         [variant]="EVariant.PRIMARY"
         (pressed)="onEditEmail()"

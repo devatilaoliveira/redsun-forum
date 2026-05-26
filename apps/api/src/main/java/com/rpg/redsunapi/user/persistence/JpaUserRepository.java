@@ -15,8 +15,6 @@ public interface JpaUserRepository extends JpaRepository<User, UUID> {
 
   Optional<User> findByUsernameIgnoreCase(String username);
 
-  Optional<User> findByVerificationToken(String verificationToken);
-
   @Query(value = "select private.next_username(?1)", nativeQuery = true)
   String nextUsername(String prefix);
 

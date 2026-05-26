@@ -1,5 +1,5 @@
 import { Locator, Page } from '@playwright/test';
-import { AUTH_TOKEN_STORE_KEY, USER_STORE_KEY } from '../../src/interface/constants/store.constants';
+import { USER_STORE_KEY } from '../../src/interface/constants/store.constants';
 
 export class LoginViewE2e {
   private page: Page;
@@ -90,10 +90,6 @@ export class LoginViewE2e {
 
   async isSubmitDisabled(): Promise<boolean> {
     return this.loginSubmitBtn.isDisabled();
-  }
-
-  async getStoredAuthToken(): Promise<string | null> {
-    return this.page.evaluate((key: string) => window.localStorage.getItem(key), AUTH_TOKEN_STORE_KEY);
   }
 
   async getStoredUser(): Promise<string | null> {

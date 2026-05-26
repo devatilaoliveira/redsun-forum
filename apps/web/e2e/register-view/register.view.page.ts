@@ -9,8 +9,7 @@ export class RegisterViewE2e {
   private registerAcceptedLegalInput: Locator;
   private registerTermsLink: Locator;
   private registerPrivacyLink: Locator;
-  private registerVerificationCodeInput: Locator;
-  private registerVerifyCodeSubmitBtn: Locator;
+  private registerCheckEmail: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -21,8 +20,7 @@ export class RegisterViewE2e {
     this.registerAcceptedLegalInput = page.getByTestId('register-accepted-legal');
     this.registerTermsLink = page.getByTestId('register-terms-link');
     this.registerPrivacyLink = page.getByTestId('register-privacy-link');
-    this.registerVerificationCodeInput = page.getByTestId('register-verification-code-input');
-    this.registerVerifyCodeSubmitBtn = page.getByTestId('register-verify-code-submit');
+    this.registerCheckEmail = page.getByTestId('register-check-email');
   }
 
   async navigateToRegisterView() {
@@ -65,24 +63,12 @@ export class RegisterViewE2e {
     await this.registerPrivacyLink.click();
   }
 
-  async fillVerificationCode(verificationCode: string) {
-    await this.registerVerificationCodeInput.fill(verificationCode);
-  }
-
   async submit() {
     await this.registerSubmitBtn.click();
   }
 
-  async submitVerificationCode() {
-    await this.registerVerifyCodeSubmitBtn.click();
-  }
-
-  async waitForVerificationCodeInput() {
-    await this.registerVerificationCodeInput.waitFor({ state: 'visible' });
-  }
-
-  async getVerificationCodeInputValue(): Promise<string> {
-    return this.registerVerificationCodeInput.inputValue();
+  async waitForCheckEmailMessage() {
+    await this.registerCheckEmail.waitFor({ state: 'visible' });
   }
 
   async isSubmitDisabled(): Promise<boolean> {
@@ -97,17 +83,10 @@ export class RegisterViewE2e {
     return this.registerAcceptedLegalInput.evaluate((input: HTMLInputElement) => input.validity.valueMissing);
   }
 
-  async waitForRegistrationRequest(): Promise<Request> {
+  async waitForSupabaseSignUpRequest(): Promise<Request> {
     return this.page.waitForRequest((request) => {
       const url = new URL(request.url());
-      return request.method() === 'POST' && url.pathname.endsWith('/authentication/register');
-    });
-  }
-
-  async waitForVerifyEmailCodeRequest(): Promise<Request> {
-    return this.page.waitForRequest((request) => {
-      const url = new URL(request.url());
-      return request.method() === 'POST' && url.pathname.endsWith('/authentication/verify-email-code');
+      return request.method() === 'POST' && url.pathname.endsWith('/auth/v1/signup');
     });
   }
 }

@@ -4,6 +4,7 @@
 .legal-acceptance {
   @include mix.main-wrapper();
   min-height: 100vh;
+  min-height: 100dvh;
   padding: var(--space-6) 0 var(--space-2);
 
   @include bp.mobile {

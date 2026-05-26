@@ -1,7 +1,6 @@
 package com.rpg.redsunapi.user;
 
 import com.rpg.redsunapi.authentication.AuthenticationConstants;
-import com.rpg.redsunapi.jwt.JwtTokenService;
 import com.rpg.redsunapi.legal.LegalDocumentService;
 import com.rpg.redsunapi.storage.AvatarStorageService;
 import com.rpg.redsunapi.subscription.Subscription;
@@ -25,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,31 +48,29 @@ public class UserService {
   private final AvatarStorageService avatarStorageService;
   private final UserRepository userRepository;
   private final SubscriptionRepository subscriptionRepository;
-  private final JwtTokenService jwtTokenService;
   private final SupabaseAuthAdminClient supabaseAuthAdminClient;
-  private final PasswordEncoder passwordEncoder;
   private final LegalDocumentService legalDocumentService;
 
   public UserService(
       UserRepository userRepository,
       SubscriptionRepository subscriptionRepository,
-      JwtTokenService jwtTokenService,
       AvatarStorageService avatarStorageService,
       SupabaseAuthAdminClient supabaseAuthAdminClient,
-      PasswordEncoder passwordEncoder,
       LegalDocumentService legalDocumentService) {
     this.userRepository = userRepository;
     this.subscriptionRepository = subscriptionRepository;
-    this.jwtTokenService = jwtTokenService;
     this.avatarStorageService = avatarStorageService;
     this.supabaseAuthAdminClient = supabaseAuthAdminClient;
-    this.passwordEncoder = passwordEncoder;
     this.legalDocumentService = legalDocumentService;
   }
 
   @Transactional
-  public User upsertUser(String token) {
-    UUID userId = UUID.fromString(jwtTokenService.extractUserId(token));
+  public User upsertUser(UUID userId, String email) {
+    String normalizedEmail = GeneralUtil.normalizeEmail(email);
+    if (normalizedEmail == null || normalizedEmail.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required");
+    }
+
     User user = userRepository.findById(userId).orElse(null);
     if (user != null) {
       if (user.isDeleted()) {
@@ -82,20 +78,16 @@ public class UserService {
       }
       return user;
     }
-    return createUser(token);
+    return createUser(userId, normalizedEmail);
   }
 
-  private User createUser(String token) {
-    UUID userId = UUID.fromString(jwtTokenService.extractUserId(token));
-    String email = jwtTokenService.extractEmail(token);
+  private User createUser(UUID userId, String email) {
     String userName = userRepository.nextUsername(AuthenticationConstants.USERNAME_PREFIX);
 
     User user = new User();
     user.setId(userId);
     user.setEmail(email);
     user.setUsername(userName);
-    user.setVerified(true);
-    user.setAuthProvider(AuthProvider.GOOGLE);
 
     User savedUser = userRepository.save(user);
     subscriptionRepository.save(new Subscription(savedUser));
@@ -400,28 +392,6 @@ public class UserService {
   }
 
   @Transactional
-  public void changePassword(UUID userId, String oldPassword, String newPassword) {
-    User user = userRepository.findById(userId)
-      .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-    ensureActiveUser(user);
-
-    if (user.getAuthProvider() != AuthProvider.EMAIL || user.getPasswordHash() == null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password change is only available for email accounts");
-    }
-
-    if (!passwordEncoder.matches(oldPassword, user.getPasswordHash())) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Current password is invalid");
-    }
-
-    if (passwordEncoder.matches(newPassword, user.getPasswordHash())) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "New password must be different from the current password");
-    }
-
-    user.setPasswordHash(passwordEncoder.encode(newPassword));
-    userRepository.save(user);
-  }
-
-  @Transactional
   public boolean deleteMe(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -430,15 +400,13 @@ public class UserService {
       return true;
     }
 
-    if (shouldDeleteFromSupabase(user)) {
-      try {
-        supabaseAuthAdminClient.deleteUser(userId);
-      } catch (SupabaseAuthException ex) {
-        throw new ResponseStatusException(
-            HttpStatus.BAD_GATEWAY,
-            "Unable to delete user from authentication service",
-            ex);
-      }
+    try {
+      supabaseAuthAdminClient.deleteUser(userId);
+    } catch (SupabaseAuthException ex) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_GATEWAY,
+          "Unable to delete user from authentication service",
+          ex);
     }
 
     String imageUrl = user.getImageURL();
@@ -535,11 +503,6 @@ public class UserService {
 
   private static String buildDeletedEmail(UUID userId) {
     return "deleted+" + userId + "@" + DELETED_EMAIL_DOMAIN;
-  }
-
-  private static boolean shouldDeleteFromSupabase(User user) {
-    AuthProvider provider = user.getAuthProvider();
-    return provider == null || provider == AuthProvider.GOOGLE;
   }
 
   private static ERole parseRole(String role) {

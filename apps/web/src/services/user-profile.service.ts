@@ -4,7 +4,6 @@ import {MeResponseDTO} from "../interface/dtos/user/MeResponseDTO";
 import {MeRequestDTO} from "../interface/dtos/user/MeRequestDTO";
 import {environment} from "../environments/environment";
 import {HttpClient} from "@angular/common/http";
-import {ChangePasswordRequestDTO} from "../interface/dtos/user/ChangePasswordRequestDTO";
 import {LegalAcknowledgementRequestDTO} from "../interface/dtos/user/LegalAcknowledgementRequestDTO";
 
 export interface IUserProfileService {
@@ -19,8 +18,6 @@ export interface IUserProfileService {
   acknowledgeLegalDocuments(request: LegalAcknowledgementRequestDTO): Observable<MeResponseDTO>;
 
   deleteMe(): Observable<boolean>;
-
-  changePassword(request: ChangePasswordRequestDTO): Observable<string>;
 }
 
 @Injectable({providedIn: "root"})
@@ -58,11 +55,5 @@ export class UserProfileService {
 
   public deleteMe(): Observable<boolean> {
     return this._httpClient.delete<boolean>(`${environment.apiBaseUrl}/user/me`);
-  }
-
-  public changePassword(request: ChangePasswordRequestDTO): Observable<string> {
-    return this._httpClient.patch(`${environment.apiBaseUrl}/user/me/password`, request, {
-      responseType: "text"
-    });
   }
 }

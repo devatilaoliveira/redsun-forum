@@ -19,11 +19,11 @@ public class SupabaseStorageClient implements StorageClient {
 
   private final RestClient client;
 
-  public SupabaseStorageClient(String baseUrl, String serviceKey) {
+  public SupabaseStorageClient(String baseUrl, String secretKey) {
     this.client = RestClient.builder()
       .baseUrl(baseUrl + "/storage/v1")
-      .defaultHeader("apikey", serviceKey)
-      .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + serviceKey)
+      .defaultHeader("apikey", secretKey)
+      .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + secretKey)
       .build();
   }
 

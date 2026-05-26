@@ -13,16 +13,16 @@ public class SupabaseConfig {
   @Bean
   public StorageClient supabaseStorageClient(
     @Value("${supabase.url}") String supabaseUrl,
-    @Value("${supabase.service-role-key}") String serviceRoleKey
+    @Value("${supabase.secret-key}") String secretKey
   ) {
-    return new SupabaseStorageClient(supabaseUrl, serviceRoleKey);
+    return new SupabaseStorageClient(supabaseUrl, secretKey);
   }
 
   @Bean
   public SupabaseAuthAdminClient supabaseAuthAdminClient(
     @Value("${supabase.url}") String supabaseUrl,
-    @Value("${supabase.service-role-key}") String serviceRoleKey
+    @Value("${supabase.secret-key}") String secretKey
   ) {
-    return new SupabaseAuthAdminClient(supabaseUrl, serviceRoleKey);
+    return new SupabaseAuthAdminClient(supabaseUrl, secretKey);
   }
 }

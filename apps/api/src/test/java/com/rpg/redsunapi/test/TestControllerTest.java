@@ -1,6 +1,5 @@
 package com.rpg.redsunapi.test;
 
-import com.rpg.redsunapi.authentication.RegistrationService;
 import com.rpg.redsunapi.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,13 +24,12 @@ class TestControllerTest {
 
   @BeforeEach
   void setUp() {
-    RegistrationService registrationService = mock(RegistrationService.class);
     userService = mock(UserService.class);
 
     LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
     validator.afterPropertiesSet();
 
-    mockMvc = standaloneSetup(new TestController(registrationService, userService))
+    mockMvc = standaloneSetup(new TestController(userService))
         .setValidator(validator)
         .build();
   }

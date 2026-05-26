@@ -1,12 +1,11 @@
-import {HttpErrorResponse} from "@angular/common/http";
-import {Component, computed, inject, Signal, signal, WritableSignal} from "@angular/core";
+import {Component, computed, inject, OnInit, Signal, signal, WritableSignal} from "@angular/core";
 import {Router} from "@angular/router";
 import {ITranslateService, TranslatePipe, TranslateService} from "@ngx-translate/core";
-import {finalize} from "rxjs";
+import {finalize, from, firstValueFrom} from "rxjs";
 import {ROUTE_PATHS} from "../../../interface/constants/route-path.constants";
-import {ChangePasswordRequestDTO} from "../../../interface/dtos/user/ChangePasswordRequestDTO";
 import {EVariant} from "../../../interface/enums/EVariant";
-import {IUserProfileService, UserProfileService} from "../../../services/user-profile.service";
+import {IAuthService, AuthService} from "../../../services/auth.service";
+import {ISupabaseAuthClient, SupabaseAuthClientAdapter} from "../../../services/supabase-auth-client.adapter";
 import {RsButton} from "../../shared/fragments/rsButton/rs.button";
 import {RsInput} from "../../shared/fragments/rsInput/rs.input";
 
@@ -17,19 +16,21 @@ import {RsInput} from "../../shared/fragments/rsInput/rs.input";
   templateUrl: "./change-email.view.html",
   styleUrl: "./change-email.view.scss"
 })
-export class ChangeEmailView {
-  private readonly _userProfileService: IUserProfileService = inject(UserProfileService);
+export class ChangeEmailView implements OnInit {
+  private readonly _authService: IAuthService = inject(AuthService);
+  private readonly _supabaseAuthClient: ISupabaseAuthClient = inject(SupabaseAuthClientAdapter);
   private readonly _translateService: ITranslateService = inject(TranslateService);
   private readonly _router: Router = inject(Router);
 
-  protected readonly oldPassword: WritableSignal<string> = signal<string>("");
   protected readonly newPassword: WritableSignal<string> = signal<string>("");
   protected readonly confirmNewPassword: WritableSignal<string> = signal<string>("");
+  protected readonly checkingSession: WritableSignal<boolean> = signal<boolean>(true);
+  protected readonly sessionReady: WritableSignal<boolean> = signal<boolean>(false);
   protected readonly inProgress: WritableSignal<boolean> = signal<boolean>(false);
   protected readonly errorMessage: WritableSignal<string | null> = signal<string | null>(null);
   protected readonly passwordPattern: RegExp = /^.{8,100}$/;
   protected readonly canSubmit: Signal<boolean> = computed<boolean>(() =>
-    this.passwordPattern.test(this.oldPassword())
+    this.sessionReady()
       && this.passwordPattern.test(this.newPassword())
       && this.passwordPattern.test(this.confirmNewPassword())
       && this.newPassword() === this.confirmNewPassword()
@@ -37,9 +38,8 @@ export class ChangeEmailView {
   );
   protected readonly EVariant = EVariant;
 
-  protected onOldPasswordChange(value: string): void {
-    this.oldPassword.set(value);
-    this.errorMessage.set(null);
+  ngOnInit(): void {
+    void this._prepareSession();
   }
 
   protected onNewPasswordChange(value: string): void {
@@ -58,17 +58,14 @@ export class ChangeEmailView {
       return;
     }
 
-    const payload: ChangePasswordRequestDTO = {
-      oldPassword: this.oldPassword(),
-      newPassword: this.newPassword()
-    };
-
     this.errorMessage.set(null);
     this.inProgress.set(true);
-    this._userProfileService.changePassword(payload).pipe(
+    from(this._supabaseAuthClient.updatePassword(this.newPassword())).pipe(
       finalize(() => this.inProgress.set(false))
     ).subscribe({
       next: () => {
+        this.newPassword.set("");
+        this.confirmNewPassword.set("");
         void this._router.navigate(["/", ROUTE_PATHS.profileDetails], {replaceUrl: true});
       },
       error: (error: unknown) => {
@@ -81,29 +78,55 @@ export class ChangeEmailView {
     void this._router.navigate(["/", ROUTE_PATHS.profileDetails]);
   }
 
+  protected onBackToLogin(): void {
+    void this._router.navigate(["/", ROUTE_PATHS.login]);
+  }
+
+  private async _prepareSession(): Promise<void> {
+    const url: URL = new URL(window.location.href);
+    const error: string | null = url.searchParams.get("error");
+    const code: string | null = url.searchParams.get("code");
+
+    if (error) {
+      this.errorMessage.set(this._translateService.instant("CHANGE_PASSWORD_RESET_LINK_FAILED"));
+      this.checkingSession.set(false);
+      return;
+    }
+
+    try {
+      if (code) {
+        await this._supabaseAuthClient.exchangeCodeForSession(code);
+        window.history.replaceState({}, "", `/${ROUTE_PATHS.changePassword}`);
+        await firstValueFrom(this._authService.completeSignIn());
+      }
+
+      const session = await this._authService.getCurrentSession();
+      if (!session) {
+        this.errorMessage.set(this._translateService.instant("CHANGE_PASSWORD_SESSION_REQUIRED"));
+        return;
+      }
+
+      this.sessionReady.set(true);
+    } catch {
+      await this._authService.logout();
+      this.errorMessage.set(this._translateService.instant("CHANGE_PASSWORD_RESET_LINK_FAILED"));
+    } finally {
+      this.checkingSession.set(false);
+    }
+  }
+
   private _resolveError(error: unknown): string {
-    if (!(error instanceof HttpErrorResponse)) {
-      return this._translateService.instant("CHANGE_PASSWORD_FAILED");
+    const message: string = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+
+    if (message.includes("session")) {
+      return this._translateService.instant("CHANGE_PASSWORD_SESSION_REQUIRED");
     }
 
-    const errorMessage: string = typeof error.error === "string"
-      ? error.error
-      : (error.error?.message ?? "");
-    const normalizedMessage: string = errorMessage.toLowerCase();
-
-    if (error.status === 400 && normalizedMessage.includes("current password is invalid")) {
-      return this._translateService.instant("CHANGE_PASSWORD_OLD_INVALID");
-    }
-
-    if (error.status === 400 && normalizedMessage.includes("only available for email accounts")) {
-      return this._translateService.instant("CHANGE_PASSWORD_NOT_AVAILABLE");
-    }
-
-    if (error.status === 400 && normalizedMessage.includes("must be different")) {
+    if (message.includes("different")) {
       return this._translateService.instant("CHANGE_PASSWORD_SAME_AS_OLD");
     }
 
-    if (error.status === 400) {
+    if (message.includes("password")) {
       return this._translateService.instant("CHANGE_PASSWORD_VALIDATION_ERROR");
     }
 

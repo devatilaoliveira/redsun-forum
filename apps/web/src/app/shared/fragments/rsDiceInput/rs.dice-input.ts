@@ -237,6 +237,7 @@ export class RsDiceInput {
   }
 
   protected diceCountValue(entry: DiceEntry): string {
+    if (entry.value.diceCount <= 0) return "";
     return `${entry.value.diceCount}`;
   }
 

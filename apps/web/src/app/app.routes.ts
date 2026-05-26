@@ -59,6 +59,14 @@ export const routes: Routes = [
     }
   },
   {
+    path: ROUTE_PATHS.changePassword,
+    loadComponent: () => import("./features/change-email/change-email.view").then((module) => module.ChangeEmailView),
+    title: "CHANGE_PASSWORD",
+    data: {
+      hideTopBar: true
+    }
+  },
+  {
     path: UTIL_CONSTANTS.OAUTH_CALLBACK_PATH,
     loadComponent: () => import("./features/auth-callback/auth-callback.view").then((module) => module.AuthCallbackView),
     title: "AUTHENTICATING"
@@ -119,11 +127,6 @@ export const routes: Routes = [
         path: ROUTE_PATHS.profileDetails,
         loadComponent: () => import("./features/profile-details/profile-details.view").then((module) => module.ProfileDetailsView),
         title: "PROFILE"
-      },
-      {
-        path: ROUTE_PATHS.changeEmail,
-        loadComponent: () => import("./features/change-email/change-email.view").then((module) => module.ChangeEmailView),
-        title: "CHANGE_PASSWORD"
       },
       {
         path: ROUTE_PATHS.support,

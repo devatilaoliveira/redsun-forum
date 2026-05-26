@@ -308,7 +308,7 @@ export class ProfileDetailsView {
   }
 
   protected navigateToChangeEmail(): void {
-    void this._router.navigate(["/", ROUTE_PATHS.changeEmail]);
+    void this._router.navigate(["/", ROUTE_PATHS.changePassword]);
   }
 
   protected confirmDeleteAccount(): void {

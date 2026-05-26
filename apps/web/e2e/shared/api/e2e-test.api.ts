@@ -27,21 +27,6 @@ export class E2eTestApi {
     this.assertEveryEmailWasReported(emails, cleanupResult);
   }
 
-  async getVerificationCode(email: string): Promise<string> {
-    const response = await this.request.get(`${this.apiBaseUrl}/test/verificationCode`, {
-      headers: this.getTestHeaders(),
-      params: { email },
-    });
-
-    if (!response.ok()) {
-      throw new Error(
-        `Could not get verification code from /test/verificationCode. Status: ${response.status()}`,
-      );
-    }
-
-    return (await response.text()).trim();
-  }
-
   private getTestHeaders(): Record<string, string> {
     return {
       "X-Test-Cleanup-Token": getRequiredE2eCleanupToken(),

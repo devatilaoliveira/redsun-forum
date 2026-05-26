@@ -3,17 +3,37 @@ import {SupabaseProvider} from "./supabase.provider";
 import {ELoginProvider} from "../interface/enums/ELoginProvider";
 import {IOAuthOptions} from "../interface/models/ioauth-options";
 import {IPrinter, Printer} from "../infra/miscellaneous/printer.handler";
-import {SupabaseAuthClient} from "@supabase/supabase-js/dist/main/lib/SupabaseAuthClient";
+import {Session} from "@supabase/supabase-js";
+
+export interface SupabaseEmailCredentials {
+  email: string;
+  password: string;
+}
+
+export interface SupabaseSignUpCredentials extends SupabaseEmailCredentials {
+  emailRedirectTo: string;
+}
+
+export interface SupabasePasswordResetRequest {
+  email: string;
+  redirectTo: string;
+}
 
 export interface ISupabaseAuthClient {
   signInWithOAuth(input: { provider: ELoginProvider, options: IOAuthOptions }): Promise<{ url: string }>;
+  signInWithPassword(input: SupabaseEmailCredentials): Promise<void>;
+  signUp(input: SupabaseSignUpCredentials): Promise<void>;
+  resetPasswordForEmail(input: SupabasePasswordResetRequest): Promise<void>;
+  updatePassword(password: string): Promise<void>;
+  exchangeCodeForSession(code: string): Promise<Session>;
+  getSession(): Promise<Session | null>;
   signOut(): Promise<void>;
 }
 
 @Injectable({providedIn: "root"})
 export class SupabaseAuthClientAdapter implements ISupabaseAuthClient {
   private readonly _printer: IPrinter = inject(Printer);
-  private readonly _supabaseAuthClient: SupabaseAuthClient = inject(SupabaseProvider).getClient().auth;
+  private readonly _supabaseAuthClient = inject(SupabaseProvider).getClient().auth;
 
   public async signInWithOAuth(input: { provider: ELoginProvider, options: IOAuthOptions }): Promise<{ url: string }> {
     const {data, error} = await this._supabaseAuthClient.signInWithOAuth({provider: input.provider, options: input.options});
@@ -25,6 +45,73 @@ export class SupabaseAuthClientAdapter implements ISupabaseAuthClient {
     }
 
     return {url: data.url};
+  }
+
+  public async signInWithPassword(input: SupabaseEmailCredentials): Promise<void> {
+    const {error} = await this._supabaseAuthClient.signInWithPassword({
+      email: input.email,
+      password: input.password
+    });
+
+    if (error) {
+      throw error;
+    }
+  }
+
+  public async signUp(input: SupabaseSignUpCredentials): Promise<void> {
+    const {error} = await this._supabaseAuthClient.signUp({
+      email: input.email,
+      password: input.password,
+      options: {
+        emailRedirectTo: input.emailRedirectTo
+      }
+    });
+
+    if (error) {
+      throw error;
+    }
+  }
+
+  public async resetPasswordForEmail(input: SupabasePasswordResetRequest): Promise<void> {
+    const {error} = await this._supabaseAuthClient.resetPasswordForEmail(input.email, {
+      redirectTo: input.redirectTo
+    });
+
+    if (error) {
+      throw error;
+    }
+  }
+
+  public async updatePassword(password: string): Promise<void> {
+    const {error} = await this._supabaseAuthClient.updateUser({password});
+
+    if (error) {
+      throw error;
+    }
+  }
+
+  public async exchangeCodeForSession(code: string): Promise<Session> {
+    const {data, error} = await this._supabaseAuthClient.exchangeCodeForSession(code);
+
+    if (error) {
+      throw error;
+    }
+
+    if (!data.session) {
+      throw new Error("Missing Supabase session");
+    }
+
+    return data.session;
+  }
+
+  public async getSession(): Promise<Session | null> {
+    const {data, error} = await this._supabaseAuthClient.getSession();
+
+    if (error) {
+      throw error;
+    }
+
+    return data.session;
   }
 
   public async signOut(): Promise<void> {

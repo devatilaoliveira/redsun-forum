@@ -15,8 +15,6 @@ public interface UserRepository {
 
   Optional<User> findByEmail(String email);
 
-  Optional<User> findByVerificationToken(String verificationToken);
-
   Optional<User> findByUsername(String username);
 
   Optional<User> findMyContact(UUID userId, UUID contactId);

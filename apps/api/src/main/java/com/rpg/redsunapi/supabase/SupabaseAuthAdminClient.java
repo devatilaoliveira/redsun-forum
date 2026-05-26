@@ -13,11 +13,11 @@ public class SupabaseAuthAdminClient {
 
   private final RestClient client;
 
-  public SupabaseAuthAdminClient(String baseUrl, String serviceKey) {
+  public SupabaseAuthAdminClient(String baseUrl, String secretKey) {
     this.client = RestClient.builder()
       .baseUrl(baseUrl + "/auth/v1")
-      .defaultHeader("apikey", serviceKey)
-      .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + serviceKey)
+      .defaultHeader("apikey", secretKey)
+      .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + secretKey)
       .build();
   }
 

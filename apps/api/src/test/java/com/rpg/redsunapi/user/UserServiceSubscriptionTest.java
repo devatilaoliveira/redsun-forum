@@ -1,7 +1,6 @@
 package com.rpg.redsunapi.user;
 
 import com.rpg.redsunapi.authentication.AuthenticationConstants;
-import com.rpg.redsunapi.jwt.JwtTokenService;
 import com.rpg.redsunapi.legal.LegalDocumentService;
 import com.rpg.redsunapi.storage.AvatarStorageService;
 import com.rpg.redsunapi.subscription.Subscription;
@@ -18,7 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,16 +41,10 @@ class UserServiceSubscriptionTest {
   private SubscriptionRepository subscriptionRepository;
 
   @Mock
-  private JwtTokenService jwtTokenService;
-
-  @Mock
   private AvatarStorageService avatarStorageService;
 
   @Mock
   private SupabaseAuthAdminClient supabaseAuthAdminClient;
-
-  @Mock
-  private PasswordEncoder passwordEncoder;
 
   @Mock
   private LegalDocumentService legalDocumentService;
@@ -63,36 +55,32 @@ class UserServiceSubscriptionTest {
   @Test
   void upsertUserCreatesSubscriptionWhenUserIsCreated() {
     UUID userId = UUID.randomUUID();
-    String token = "token";
 
-    when(jwtTokenService.extractUserId(token)).thenReturn(userId.toString());
-    when(jwtTokenService.extractEmail(token)).thenReturn("new-user@example.com");
     when(userRepository.findById(userId)).thenReturn(Optional.empty());
     when(userRepository.nextUsername(AuthenticationConstants.USERNAME_PREFIX)).thenReturn("Aventureiro1");
     when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-    User createdUser = userService.upsertUser(token);
+    User createdUser = userService.upsertUser(userId, "New-User@Example.com");
 
     ArgumentCaptor<Subscription> subscriptionCaptor = ArgumentCaptor.forClass(Subscription.class);
     verify(subscriptionRepository).save(subscriptionCaptor.capture());
 
     assertThat(createdUser.getId()).isEqualTo(userId);
+    assertThat(createdUser.getEmail()).isEqualTo("new-user@example.com");
     assertThat(subscriptionCaptor.getValue().getUser()).isSameAs(createdUser);
   }
 
   @Test
   void upsertUserDoesNotCreateSubscriptionForExistingUser() {
     UUID userId = UUID.randomUUID();
-    String token = "token";
     User existingUser = new User();
     existingUser.setId(userId);
     existingUser.setEmail("existing-user@example.com");
     existingUser.setUsername("redsun1");
 
-    when(jwtTokenService.extractUserId(token)).thenReturn(userId.toString());
     when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
 
-    User user = userService.upsertUser(token);
+    User user = userService.upsertUser(userId, "existing-user@example.com");
 
     assertThat(user).isSameAs(existingUser);
     verify(subscriptionRepository, never()).findByUserId(userId);

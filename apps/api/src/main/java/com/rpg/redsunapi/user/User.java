@@ -34,22 +34,6 @@ public class User {
   @Column(name = "deleted_at")
   private OffsetDateTime deletedAt;
 
-  @Column(name = "password_hash", length = 60)
-  private String passwordHash;
-
-  @Column(nullable = false)
-  private boolean verified = false;
-
-  @Column(name = "verification_token", length = 36)
-  private String verificationToken;
-
-  @Column(name = "verification_token_expiry")
-  private OffsetDateTime verificationTokenExpiry;
-
-  @Enumerated(EnumType.STRING)
-  @Column(name = "auth_provider", length = 20, nullable = false)
-  private AuthProvider authProvider = AuthProvider.GOOGLE;
-
   @Column(name = "terms_accepted_at")
   private OffsetDateTime termsAcceptedAt;
 
@@ -108,8 +92,6 @@ public class User {
     this.contactsList = contactsList != null ? contactsList : new HashSet<>();
     this.deleted = false;
     this.deletedAt = null;
-    this.verified = true; // Default for backward compatibility
-    this.authProvider = AuthProvider.GOOGLE;
   }
 
   public UUID getId() {
@@ -166,46 +148,6 @@ public class User {
 
   public void setDeletedAt(OffsetDateTime deletedAt) {
     this.deletedAt = deletedAt;
-  }
-
-  public String getPasswordHash() {
-    return passwordHash;
-  }
-
-  public void setPasswordHash(String passwordHash) {
-    this.passwordHash = passwordHash;
-  }
-
-  public boolean isVerified() {
-    return verified;
-  }
-
-  public void setVerified(boolean verified) {
-    this.verified = verified;
-  }
-
-  public String getVerificationToken() {
-    return verificationToken;
-  }
-
-  public void setVerificationToken(String verificationToken) {
-    this.verificationToken = verificationToken;
-  }
-
-  public OffsetDateTime getVerificationTokenExpiry() {
-    return verificationTokenExpiry;
-  }
-
-  public void setVerificationTokenExpiry(OffsetDateTime verificationTokenExpiry) {
-    this.verificationTokenExpiry = verificationTokenExpiry;
-  }
-
-  public AuthProvider getAuthProvider() {
-    return authProvider;
-  }
-
-  public void setAuthProvider(AuthProvider authProvider) {
-    this.authProvider = authProvider;
   }
 
   public OffsetDateTime getTermsAcceptedAt() {

@@ -2,11 +2,11 @@ type RuntimeEnv = Partial<{
   BASE_URL: string;
   API_BASE_URL: string;
   SUPABASE_URL: string;
-  SUPABASE_ANON_KEY: string;
+  SUPABASE_PUBLISHABLE_KEY: string;
   baseUrl: string;
   apiBaseUrl: string;
   supabaseUrl: string;
-  supabaseAnonKey: string;
+  supabasePublishableKey: string;
 }>;
 
 const runtimeEnv: RuntimeEnv = (globalThis as {__env?: RuntimeEnv}).__env ?? {};
@@ -30,8 +30,8 @@ export const environment = {
     runtimeEnv.SUPABASE_URL ?? runtimeEnv.supabaseUrl,
     "https://your-project-id.supabase.co"
   ),
-  supabaseAnonKey: resolveEnvValue(
-    runtimeEnv.SUPABASE_ANON_KEY ?? runtimeEnv.supabaseAnonKey,
-    "YOUR_SUPABASE_ANON_KEY"
+  supabasePublishableKey: resolveEnvValue(
+    runtimeEnv.SUPABASE_PUBLISHABLE_KEY ?? runtimeEnv.supabasePublishableKey,
+    "YOUR_SUPABASE_PUBLISHABLE_KEY"
   ),
 };
