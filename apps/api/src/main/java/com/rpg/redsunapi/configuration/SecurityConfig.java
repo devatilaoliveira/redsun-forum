@@ -42,6 +42,7 @@ public class SecurityConfig {
         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
         .requestMatchers("/error").permitAll()
         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+        .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**").permitAll()
         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
         .requestMatchers("/test/**").permitAll()
         .requestMatchers(HttpMethod.GET, "/legal/documents/current").permitAll()
