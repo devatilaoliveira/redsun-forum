@@ -303,7 +303,7 @@ Set only public frontend values in Cloudflare Pages environment variables:
 - `SUPABASE_URL`
 - `SUPABASE_PUBLISHABLE_KEY`
 
-Direct route refreshes are handled by `public/_redirects`.
+Direct route refreshes are handled by `not_found_handling = "single-page-application"` in `apps/web/wrangler.toml`.
 
 ### Other Web Scripts
 
