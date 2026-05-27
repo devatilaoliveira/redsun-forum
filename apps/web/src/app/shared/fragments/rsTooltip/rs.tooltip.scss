@@ -1,0 +1,124 @@
+:host {
+  --rs-tooltip-delay: 450ms;
+  display: inline-flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+.rs-tooltip__bubble {
+  position: absolute;
+  z-index: 1000;
+  width: max-content;
+  max-width: min(12rem, calc(100vw - 2rem));
+  padding: 0.375rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+  opacity: 0;
+  pointer-events: none;
+  overflow-wrap: break-word;
+  text-align: center;
+  transition: opacity 120ms ease, visibility 120ms ease, transform 120ms ease;
+  visibility: hidden;
+  white-space: normal;
+}
+
+:host(:hover) .rs-tooltip__bubble,
+:host(:focus-within) .rs-tooltip__bubble {
+  opacity: 1;
+  transition-delay: var(--rs-tooltip-delay);
+  visibility: visible;
+}
+
+.rs-tooltip__bubble[data-position="top"] {
+  bottom: calc(100% + 0.5rem);
+  left: 50%;
+  transform: translate(-50%, 0.25rem);
+}
+
+:host(:hover) .rs-tooltip__bubble[data-position="top"],
+:host(:focus-within) .rs-tooltip__bubble[data-position="top"] {
+  transform: translate(-50%, 0);
+}
+
+.rs-tooltip__bubble[data-position="top"][data-align="start"] {
+  left: 0;
+  transform: translate(0, 0.25rem);
+}
+
+:host(:hover) .rs-tooltip__bubble[data-position="top"][data-align="start"],
+:host(:focus-within) .rs-tooltip__bubble[data-position="top"][data-align="start"] {
+  transform: translate(0, 0);
+}
+
+.rs-tooltip__bubble[data-position="top"][data-align="end"] {
+  left: auto;
+  right: 0;
+  transform: translate(0, 0.25rem);
+}
+
+:host(:hover) .rs-tooltip__bubble[data-position="top"][data-align="end"],
+:host(:focus-within) .rs-tooltip__bubble[data-position="top"][data-align="end"] {
+  transform: translate(0, 0);
+}
+
+.rs-tooltip__bubble[data-position="bottom"] {
+  top: calc(100% + 0.5rem);
+  left: 50%;
+  transform: translate(-50%, -0.25rem);
+}
+
+:host(:hover) .rs-tooltip__bubble[data-position="bottom"],
+:host(:focus-within) .rs-tooltip__bubble[data-position="bottom"] {
+  transform: translate(-50%, 0);
+}
+
+.rs-tooltip__bubble[data-position="bottom"][data-align="start"] {
+  left: 0;
+  transform: translate(0, -0.25rem);
+}
+
+:host(:hover) .rs-tooltip__bubble[data-position="bottom"][data-align="start"],
+:host(:focus-within) .rs-tooltip__bubble[data-position="bottom"][data-align="start"] {
+  transform: translate(0, 0);
+}
+
+.rs-tooltip__bubble[data-position="bottom"][data-align="end"] {
+  left: auto;
+  right: 0;
+  transform: translate(0, -0.25rem);
+}
+
+:host(:hover) .rs-tooltip__bubble[data-position="bottom"][data-align="end"],
+:host(:focus-within) .rs-tooltip__bubble[data-position="bottom"][data-align="end"] {
+  transform: translate(0, 0);
+}
+
+.rs-tooltip__bubble[data-position="left"] {
+  top: 50%;
+  right: calc(100% + 0.5rem);
+  transform: translate(0.25rem, -50%);
+}
+
+:host(:hover) .rs-tooltip__bubble[data-position="left"],
+:host(:focus-within) .rs-tooltip__bubble[data-position="left"] {
+  transform: translate(0, -50%);
+}
+
+.rs-tooltip__bubble[data-position="right"] {
+  top: 50%;
+  left: calc(100% + 0.5rem);
+  transform: translate(-0.25rem, -50%);
+}
+
+:host(:hover) .rs-tooltip__bubble[data-position="right"],
+:host(:focus-within) .rs-tooltip__bubble[data-position="right"] {
+  transform: translate(0, -50%);
+}
