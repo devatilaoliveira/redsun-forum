@@ -8,6 +8,7 @@ import {EVariant} from "../../../../interface/enums/EVariant";
   styleUrl: "./rs.badge.scss"
 })
 export class RsBadge {
-  public readonly label: InputSignal<string> = input.required<string>();
+  public readonly label: InputSignal<string | null> = input<string | null>(null);
+  public readonly iconSrc: InputSignal<string | null> = input<string | null>(null);
   public readonly variant: InputSignal<EVariant> = input<EVariant>(EVariant.PRIMARY);
 }

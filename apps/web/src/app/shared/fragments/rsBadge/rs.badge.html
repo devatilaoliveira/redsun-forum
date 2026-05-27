@@ -1,3 +1,14 @@
 <div class="rs-badge" [attr.data-variant]="variant()">
-  {{ label() }}
+  @let iSrc = iconSrc();
+  @if (iSrc) {
+    <span
+      class="rs-badge-icon"
+      aria-hidden="true"
+      [style.--rs-badge-icon-src]="'url(' + iSrc + ')'"
+    ></span>
+  }
+  @let lbl = label();
+  @if (lbl) {
+    <span class="rs-badge-label">{{ lbl }}</span>
+  }
 </div>
