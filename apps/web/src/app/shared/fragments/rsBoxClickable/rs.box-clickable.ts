@@ -6,7 +6,11 @@ import {Component, computed, input, InputSignal, output, OutputEmitterRef, Signa
   templateUrl: "./rs.box-clickable.html",
   styleUrl: "./rs.box-clickable.scss",
   host: {
+    role: "button",
+    tabindex: "0",
     "(click)": "onClick()",
+    "(keydown.enter)": "onClick()",
+    "(keydown.space)": "onSpaceKeydown($event)",
     "[style.min-height]": "minHeightCss()"
   }
 })
@@ -22,5 +26,10 @@ export class RsBoxClickable {
 
   protected onClick(): void {
     this.pressed.emit();
+  }
+
+  protected onSpaceKeydown(event: Event): void {
+    event.preventDefault();
+    this.onClick();
   }
 }
