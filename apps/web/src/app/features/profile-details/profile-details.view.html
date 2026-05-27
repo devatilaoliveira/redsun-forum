@@ -95,7 +95,7 @@
 
     <div class="danger-zone">
       <rs-button
-        [variant]="EVariant.WARNING"
+        [variant]="EVariant.DANGER"
         [disabled]="isSaving() || deleteInProgress()"
         (pressed)="openDeleteDialog()"
       >
@@ -131,7 +131,7 @@
 @if (avatarCropOpen()) {
   <rs-dialog-modal
     [title]="'CROP_IMAGE' | translate"
-    [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.SECONDARY, disabled: avatarUploading() }"
+    [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.PRIMARY, disabled: avatarUploading() }"
     [ctaBtnTwo]="{ label: ('SAVE' | translate), variant: EVariant.PRIMARY, disabled: !avatarCropBlob() || avatarUploading(), inProgress: avatarUploading() }"
     (closePressed)="closeAvatarCrop()"
     (ctaBtnOnePressed)="closeAvatarCrop()"
