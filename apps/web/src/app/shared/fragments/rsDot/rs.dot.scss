@@ -22,6 +22,22 @@
   background: #D0D5DD;
 }
 
+.rs-dot[data-variant="primary"] {
+  background: var(--color-primary);
+}
+
+.rs-dot[data-variant="success"] {
+  background: var(--color-success);
+}
+
+.rs-dot[data-variant="warning"] {
+  background: var(--color-warning);
+}
+
+.rs-dot[data-variant="danger"] {
+  background: var(--color-danger);
+}
+
 .rs-dot[data-active="true"] {
   background: var(--color-primary);
 }

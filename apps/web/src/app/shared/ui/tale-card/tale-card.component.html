@@ -1,17 +1,12 @@
-<rs-box-clickable class="tale-card" [minHeight]="320" (pressed)="onCardPressed()">
+<rs-box-clickable class="tale-card" [minHeight]="392" (pressed)="onCardPressed()">
   <div class="cover">
-    <rs-badge
-      class="visibility-badge"
-      [label]="badgeLabelKey | translate"
-      [variant]="badgeVariant"
-    />
-
     @if (hasImage) {
       <img
         class="card-image"
         [src]="tale.imageUrl!"
         [alt]="tale.taleName + ' cover'"
         loading="lazy"
+        decoding="async"
         (load)="onImageLoad()"
         [class.loaded]="imageLoaded"
       />
@@ -20,38 +15,74 @@
         <span class="initials">{{ initials }}</span>
       </div>
     }
+
+    <div class="badge-rail">
+      <rs-badge
+        class="rules-badge"
+        [label]="('SYSTEM_RULE_' + tale.rules) | translate"
+        iconSrc="/assets/svgs/auto_stories.svg"
+        [variant]="EVariant.SECONDARY"
+      />
+      <rs-tooltip [text]="badgeLabelKey | translate" [position]="'bottom'">
+        <rs-badge
+          class="visibility-badge"
+          [label]="''"
+          [iconSrc]="visibilityIconSrc"
+          [variant]="badgeVariant"
+        />
+      </rs-tooltip>
+    </div>
+
+    <div class="cover-heading">
+      <rs-tooltip [text]="'PARTICIPANTS' | translate" [position]="'bottom'">
+        <rs-badge
+          class="participant-count"
+          [label]="participantsCount.toString()"
+          iconSrc="/assets/svgs/contacts.svg"
+          [variant]="EVariant.BLACK"
+        />
+      </rs-tooltip>
+      <h3 class="title" [title]="tale.taleName">{{ tale.taleName }}</h3>
+    </div>
   </div>
 
   <div class="body">
-    <div class="title-row">
-      <h3 class="title">{{ tale.taleName }}</h3>
-      <rs-badge
-        [label]="('SYSTEM_RULE_' + tale.rules) | translate"
-        [variant]="EVariant.SECONDARY"
-      />
-    </div>
-
     <p class="description">
       {{ tale.description || ('NO_DESCRIPTION' | translate) }}
     </p>
 
-    <div class="info">
-      <div class="stat">
-        <span class="stat-label">{{ 'PARTICIPANTS' | translate }}</span>
-        <span class="stat-value">{{ participantsCount }}</span>
-      </div>
+    <div class="timeline">
+      <rs-divider
+        class="timeline-divider"
+        type="gradient"
+        [theme]="ETheme.DARK"
+      />
 
       @if (tale.creationDate) {
-        <div class="stat">
-          <span class="stat-label">{{ 'CREATED_ON' | translate }}</span>
-          <span class="stat-value">{{ tale.creationDate | date:'y MMMM d' }}</span>
+        <div class="timeline-item">
+          <span class="timeline-dot-slot">
+            <rs-dot [variant]="EVariant.PRIMARY" />
+          </span>
+          <div class="timeline-copy">
+            <span class="stat-label">{{ 'CREATED_ON' | translate }}</span>
+            <time class="stat-value" [dateTime]="tale.creationDate">
+              {{ tale.creationDate | date:'y MMM d' }}
+            </time>
+          </div>
         </div>
       }
 
       @if (tale.lastTimeActive) {
-        <div class="stat">
-          <span class="stat-label">{{ 'LAST_ACTIVE' | translate }}</span>
-          <span class="stat-value">{{ tale.lastTimeActive | date:'y MMMM d' }}</span>
+        <div class="timeline-item">
+          <span class="timeline-dot-slot">
+            <rs-dot [variant]="lastActiveVariant" />
+          </span>
+          <div class="timeline-copy">
+            <span class="stat-label">{{ 'LAST_ACTIVE' | translate }}</span>
+            <time class="stat-value" [dateTime]="tale.lastTimeActive">
+              {{ tale.lastTimeActive | date:'y MMM d' }}
+            </time>
+          </div>
         </div>
       }
     </div>
