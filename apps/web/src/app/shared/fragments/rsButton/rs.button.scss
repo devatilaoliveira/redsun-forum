@@ -4,23 +4,27 @@
 }
 
 .rs-button {
-  --rs-text-fc: var(--color-black);
   --rs-button-height: 32px;
+  --rs-button-accent: var(--color-primary);
+  --rs-button-text: var(--rs-button-accent);
+  --rs-button-bg: color-mix(in srgb, var(--rs-button-accent) 12%, transparent);
+  --rs-button-border: color-mix(in srgb, var(--rs-button-accent) 78%, transparent);
 
   display: flex;
+  box-sizing: border-box;
   width: 100%;
   height: var(--rs-button-height);
-  border: none;
+  border: 1px solid var(--rs-button-border);
   border-radius: var(--radius-md);
   align-items: center;
   justify-content: center;
   font-family: var(--font-family-body), serif;
   font-size: var(--text-normal);
   font-weight: var(--font-weight-regular);
-  color: var(--rs-text-fc);
+  color: var(--rs-button-text);
   background-color: var(--rs-button-bg);
   cursor: pointer;
-  transition: background-color 120ms ease, opacity 120ms ease;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
   padding: 7px 14px;
 }
 
@@ -33,49 +37,72 @@
 }
 
 .rs-button[data-variant="primary"] {
-  --rs-button-bg: var(--color-primary);
+  --rs-button-accent: var(--color-primary);
 }
 
 .rs-button[data-variant="secondary"] {
-  --rs-button-bg: var(--color-secondary);
+  --rs-button-accent: var(--color-secondary);
 }
 
 .rs-button[data-variant="accent"] {
-  --rs-button-bg: var(--color-accent);
-  --rs-text-fc: var(--color-text-light);
+  --rs-button-accent: var(--color-border);
+  --rs-button-text: var(--color-text);
+  --rs-button-bg: color-mix(in srgb, var(--color-text) 8%, transparent);
+  --rs-button-border: var(--color-border);
 }
 
 .rs-button[data-variant="success"] {
-  --rs-button-bg: var(--color-success);
+  --rs-button-accent: var(--color-success);
 }
 
 .rs-button[data-variant="danger"] {
-  --rs-button-bg: var(--color-danger);
-  --rs-text-fc: var(--color-white);
+  --rs-button-accent: var(--color-danger);
 }
 
 .rs-button[data-variant="warning"] {
-  --rs-button-bg: var(--color-warning);
+  --rs-button-accent: var(--color-warning);
 }
 
 .rs-button[data-variant="black"] {
+  --rs-button-accent: var(--color-border);
+  --rs-button-text: var(--color-button-neutral-text);
   --rs-button-bg: var(--color-button-neutral-bg);
-  --rs-text-fc: var(--color-button-neutral-text);
+  --rs-button-border: transparent;
+}
+
+.rs-button:not(:disabled):hover,
+.rs-button:not(:disabled):focus-visible {
+  --rs-button-bg: color-mix(in srgb, var(--rs-button-accent) 18%, transparent);
+  --rs-button-border: var(--rs-button-accent);
+}
+
+.rs-button:not(:disabled):focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--rs-button-accent) 72%, transparent);
+  outline-offset: 2px;
+}
+
+.rs-button:not(:disabled):active,
+:host(.is-active) .rs-button:not(:disabled) {
+  --rs-button-bg: color-mix(in srgb, var(--rs-button-accent) 26%, transparent);
+  --rs-button-border: var(--rs-button-accent);
 }
 
 .rs-button[data-variant="black"]:not(:disabled):hover {
   --rs-button-bg: var(--color-button-neutral-hover);
+  --rs-button-border: transparent;
 }
 
 :host(.is-active) .rs-button[data-variant="black"]:not(:disabled) {
   --rs-button-bg: var(--color-button-neutral-active);
+  --rs-button-border: transparent;
 }
 
 .rs-button:disabled {
-  opacity: 0.6;
+  --rs-button-bg: var(--color-disabled-bg);
+  --rs-button-border: var(--color-border);
+  --rs-button-text: var(--color-muted);
+
   cursor: not-allowed;
-  background-color: var(--color-disabled-bg);
-  color: var(--color-muted);
 }
 
 .rs-button.is-busy {
