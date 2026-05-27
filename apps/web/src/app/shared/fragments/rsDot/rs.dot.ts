@@ -1,4 +1,5 @@
 import {Component, input, InputSignal} from "@angular/core";
+import {EVariant} from "../../../../interface/enums/EVariant";
 import {ETheme} from "../../../../interface/enums/ETheme";
 
 @Component({
@@ -13,4 +14,5 @@ import {ETheme} from "../../../../interface/enums/ETheme";
 export class RsDot {
   public readonly active: InputSignal<boolean> = input<boolean>(false);
   public readonly theme: InputSignal<ETheme> = input<ETheme>(ETheme.DARK);
+  public readonly variant: InputSignal<EVariant | null> = input<EVariant | null>(null);
 }
