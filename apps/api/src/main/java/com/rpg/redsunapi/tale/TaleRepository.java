@@ -2,6 +2,7 @@ package com.rpg.redsunapi.tale;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import com.rpg.redsunapi.tale.enums.ELanguage;
 import com.rpg.redsunapi.tale.enums.ERuleSystem;
 
 import java.time.OffsetDateTime;
@@ -19,7 +20,7 @@ public interface TaleRepository {
 
   Page<Tale> findAllPublic(Pageable pageable);
 
-  Page<Tale> findAllPublic(Pageable pageable, String language, ERuleSystem rules);
+  Page<Tale> findAllPublic(Pageable pageable, ELanguage language, ERuleSystem rules);
 
   List<Tale> findAllSleepTalesOlderThan(OffsetDateTime cutoff);
 

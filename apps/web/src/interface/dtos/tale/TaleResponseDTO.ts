@@ -1,5 +1,6 @@
 import {ETaleStatus} from "../../enums/ETaleStatus";
 import {ERuleSystem} from "../../enums/ERuleSystem";
+import {ELanguage} from "../../enums/ELanguage";
 
 
 export interface TaleResponseDTO {
@@ -7,7 +8,7 @@ export interface TaleResponseDTO {
   taleName: string;
   isPublic: boolean;
   description: string;
-  language: string;
+  language: ELanguage | null;
   status: ETaleStatus;
   imageUrl: string | null;
   rules: ERuleSystem;

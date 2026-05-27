@@ -1,6 +1,7 @@
 package com.rpg.redsunapi.tale;
 
 import com.rpg.redsunapi.characterSheet.BasicSheet;
+import com.rpg.redsunapi.tale.enums.ELanguage;
 import com.rpg.redsunapi.tale.enums.ERuleSystem;
 import com.rpg.redsunapi.tale.enums.ETaleStatus;
 import com.rpg.redsunapi.user.User;
@@ -47,8 +48,9 @@ public class Tale {
   @Column(length = 4000)
   private String description;
 
-  @Column(name = "language", length = 50)
-  private String language;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "language", length = 10)
+  private ELanguage language;
 
   @Enumerated(EnumType.STRING)
   @Column(length = 15, nullable = false)
@@ -81,7 +83,7 @@ public class Tale {
     Boolean isPublic,
     String imageURL,
     String description,
-    String language,
+    ELanguage language,
     ERuleSystem rules,
     OffsetDateTime creationDate,
     OffsetDateTime lastTimeActive,
@@ -179,11 +181,11 @@ public class Tale {
     this.description = description;
   }
 
-  public String getLanguage() {
+  public ELanguage getLanguage() {
     return language;
   }
 
-  public void setLanguage(String language) {
+  public void setLanguage(ELanguage language) {
     this.language = language;
   }
 

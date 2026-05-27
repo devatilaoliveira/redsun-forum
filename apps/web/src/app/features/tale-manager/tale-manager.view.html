@@ -25,13 +25,13 @@
           (valueChanged)="onDescriptionChange($event)"
         />
 
-        <rs-data-list
+        <rs-select
           [label]="'LANGUAGE' | translate"
-          [optionsEnum]="ETaleLanguageSuggestion"
+          [optionsEnum]="ELanguage"
           [value]="controls.language.value"
           [required]="false"
           [allowNull]="true"
-          [localizationPrefix]="'TALE_LANGUAGE_OPTION_'"
+          [localizationPrefix]="'LANGUAGE_'"
           (valueChanged)="onLanguageChange($event)"
         />
 
