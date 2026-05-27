@@ -1,4 +1,14 @@
 export class UtilFunctions {
+  public static getAppOrigin(fallbackBaseUrl: string): string {
+    return globalThis.location?.origin ?? new URL(fallbackBaseUrl).origin;
+  }
+
+  public static buildAppUrl(path: string, fallbackBaseUrl: string): string {
+    const normalizedPath: string = path.replace(/^\/+/, "");
+
+    return `${UtilFunctions.getAppOrigin(fallbackBaseUrl)}/${normalizedPath}`;
+  }
+
   public static getInitials(input: string | null | undefined): string {
     const trimmed: string = input?.trim() ?? "";
     if (!trimmed) return "RS";

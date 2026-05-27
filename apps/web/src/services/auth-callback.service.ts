@@ -13,6 +13,7 @@ import {IOAuthResult} from "../interface/models/ioauth-result-message";
 import {EStatus} from "../interface/enums/EStatus";
 import {IAuthCallbackState} from "../interface/models/iauth-callback-state";
 import {AuthCallbackResult} from "../interface/models/iauth-callback-result";
+import {UtilFunctions} from "../infra/miscellaneous/util.functions";
 
 @Injectable({providedIn: "root"})
 export class AuthCallbackService {
@@ -20,7 +21,7 @@ export class AuthCallbackService {
   private readonly _supabaseAuthClient: ISupabaseAuthClient = inject(SupabaseAuthClientAdapter);
   private readonly _printer: IPrinter = inject(Printer);
   private readonly _translate: ITranslateService = inject(TranslateService);
-  private readonly _parentOrigin: string = new URL(environment.baseUrl).origin;
+  private readonly _parentOrigin: string = UtilFunctions.getAppOrigin(environment.baseUrl);
 
   handle(urlString: string): Observable<AuthCallbackResult> {
     const url: URL = new URL(urlString);

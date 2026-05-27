@@ -19,6 +19,7 @@ import {EMAIL_PATTERN} from "../../../interface/constants/pattern-validators";
 import {PublicLegalFooterComponent} from "../../shared/ui/public-legal-footer/public-legal-footer.component";
 import {ISupabaseAuthClient, SupabaseAuthClientAdapter} from "../../../services/supabase-auth-client.adapter";
 import {GoogleButton} from "../../shared/fragments/googleButton/google.button";
+import {UtilFunctions} from "../../../infra/miscellaneous/util.functions";
 
 @Component({
   selector: "rs-login",
@@ -42,7 +43,7 @@ export class LoginView implements OnInit {
   protected readonly EVariant = EVariant;
   protected readonly forgotPasswordRoute: string = `/${ROUTE_PATHS.forgotPassword}`;
   protected readonly registerRoute: string = `/${ROUTE_PATHS.register}`;
-  private readonly _targetOrigin: string = new URL(environment.baseUrl).origin;
+  private readonly _targetOrigin: string = UtilFunctions.getAppOrigin(environment.baseUrl);
   private readonly _onOAuthMessage = (event: MessageEvent<IOAuthResult>): void => {
     if (event.origin !== this._targetOrigin) return;
 

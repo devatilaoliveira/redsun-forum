@@ -14,6 +14,7 @@ import {IOAuthOptions} from "../interface/models/ioauth-options";
 import {ISupabaseAuthClient, SupabaseAuthClientAdapter} from "./supabase-auth-client.adapter";
 import {IUserProfileService, UserProfileService} from "./user-profile.service";
 import {MeResponseDTO} from "../interface/dtos/user/MeResponseDTO";
+import {UtilFunctions} from "../infra/miscellaneous/util.functions";
 
 export interface IAuthService {
   loginWithProvider(provider: ELoginProvider): Promise<void>;
@@ -91,16 +92,18 @@ export class AuthService implements IAuthService {
   }
 
   private _getOAuthOptions(provider: ELoginProvider): IOAuthOptions {
+    const redirectTo: string = UtilFunctions.buildAppUrl(UTIL_CONSTANTS.OAUTH_CALLBACK_PATH, environment.baseUrl);
+
     switch (provider) {
     case ELoginProvider.GOOGLE:
       return {
-        redirectTo: `${environment.baseUrl}/${UTIL_CONSTANTS.OAUTH_CALLBACK_PATH}`,
+        redirectTo,
         skipBrowserRedirect: true,
         scopes: "openid profile email"
       };
     default:
       return {
-        redirectTo: `${environment.baseUrl}/${UTIL_CONSTANTS.OAUTH_CALLBACK_PATH}`,
+        redirectTo,
         skipBrowserRedirect: true
       };
     }
