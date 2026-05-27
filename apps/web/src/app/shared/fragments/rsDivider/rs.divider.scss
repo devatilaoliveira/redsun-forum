@@ -10,3 +10,15 @@ hr {
   border: 0;
   background: var(--color-border);
 }
+
+hr[data-type="solid"] {
+  background: var(--color-primary);
+}
+
+hr[data-type="gradient"][data-theme="dark"] {
+  background: linear-gradient(90deg, var(--color-primary), rgba(58, 56, 63, 0.72) 58%, rgba(58, 56, 63, 0.18));
+}
+
+hr[data-type="gradient"][data-theme="light"] {
+  background: linear-gradient(90deg, var(--color-primary), rgba(208, 213, 221, 0.72) 58%, rgba(208, 213, 221, 0.18));
+}
