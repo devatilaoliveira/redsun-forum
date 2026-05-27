@@ -269,7 +269,7 @@
   "LOCATION_POSTS": "Posts",
   "MANAGE_TALE": "Manage tale",
   "MANAGE_PARTICIPANTS": "Manage participants",
-  "MANAGE_CHARACTER": "Manage character",
+  "MANAGE_PROFILE": "Manage profile",
   "CHARACTER_SHEET_SUBTITLE": "Set your character profile for this tale.",
   "CHARACTER_SHEET_LOAD_ERROR": "Could not load character sheet. Please try again.",
   "CHARACTER_SHEET_SAVE_ERROR": "Could not save character sheet. Please try again.",

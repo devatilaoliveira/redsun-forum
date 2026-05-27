@@ -279,7 +279,7 @@
   "LOCATION_POSTS": "Beiträge",
   "MANAGE_TALE": "Geschichte verwalten",
   "MANAGE_PARTICIPANTS": "Teilnehmer verwalten",
-  "MANAGE_CHARACTER": "Charakter verwalten",
+  "MANAGE_PROFILE": "Profil verwalten",
   "CHARACTER_SHEET_SUBTITLE": "Lege dein Charakterprofil für diese Geschichte fest.",
   "CHARACTER_SHEET_LOAD_ERROR": "Charakterbogen konnte nicht geladen werden. Bitte versuche es erneut.",
   "CHARACTER_SHEET_SAVE_ERROR": "Charakterbogen konnte nicht gespeichert werden. Bitte versuche es erneut.",
