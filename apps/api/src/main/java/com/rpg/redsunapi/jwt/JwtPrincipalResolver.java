@@ -2,6 +2,7 @@ package com.rpg.redsunapi.jwt;
 
 import com.rpg.redsunapi.authentication.Provider;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
@@ -20,6 +21,7 @@ public class JwtPrincipalResolver {
 
   private final JwtDecoder supabaseJwtDecoder;
 
+  @Autowired
   public JwtPrincipalResolver(@Value("${supabase.url}") String supabaseUrl) {
     this(createSupabaseJwtDecoder(supabaseUrl));
   }

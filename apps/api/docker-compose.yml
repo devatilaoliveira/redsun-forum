@@ -11,11 +11,6 @@ services:
     ports:
       - "8080:8080"
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL","exec 3<>/dev/tcp/127.0.0.1/8080 || exit 1"]  # no bash if not needed
-      interval: 30s
-      timeout: 5s
-      retries: 3
     networks:
       - rs-net
 

@@ -20,18 +20,27 @@ const resolveEnvValue = (value: string | undefined, fallback: string): string =>
   return trimmed;
 };
 
+const requireEnvValue = (value: string | undefined, name: string): string => {
+  const trimmed = value?.trim();
+  if (!trimmed || trimmed.startsWith("__")) {
+    throw new Error(`Missing required runtime environment value: ${name}`);
+  }
+
+  return trimmed;
+};
+
 const baseUrlFallback = globalThis.location?.origin ?? "http://localhost:4200";
 
 export const environment = {
   production: true,
   baseUrl: resolveEnvValue(runtimeEnv.BASE_URL ?? runtimeEnv.baseUrl, baseUrlFallback),
   apiBaseUrl: resolveEnvValue(runtimeEnv.API_BASE_URL ?? runtimeEnv.apiBaseUrl, "http://localhost:8080"),
-  supabaseUrl: resolveEnvValue(
+  supabaseUrl: requireEnvValue(
     runtimeEnv.SUPABASE_URL ?? runtimeEnv.supabaseUrl,
-    "https://your-project-id.supabase.co"
+    "SUPABASE_URL"
   ),
-  supabasePublishableKey: resolveEnvValue(
+  supabasePublishableKey: requireEnvValue(
     runtimeEnv.SUPABASE_PUBLISHABLE_KEY ?? runtimeEnv.supabasePublishableKey,
-    "YOUR_SUPABASE_PUBLISHABLE_KEY"
+    "SUPABASE_PUBLISHABLE_KEY"
   ),
 };

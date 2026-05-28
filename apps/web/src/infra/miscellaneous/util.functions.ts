@@ -1,6 +1,16 @@
 import {EVariant} from "../../interface/enums/EVariant";
 
 export class UtilFunctions {
+  public static getAppOrigin(fallbackBaseUrl: string): string {
+    return globalThis.location?.origin ?? new URL(fallbackBaseUrl).origin;
+  }
+
+  public static buildAppUrl(path: string, fallbackBaseUrl: string): string {
+    const normalizedPath: string = path.replace(/^\/+/, "");
+
+    return `${UtilFunctions.getAppOrigin(fallbackBaseUrl)}/${normalizedPath}`;
+  }
+
   private static readonly FOUR_HOURS_MS: number = 4 * 60 * 60 * 1000;
   private static readonly SEVEN_DAYS_MS: number = 7 * 24 * 60 * 60 * 1000;
   private static readonly THIRTY_DAYS_MS: number = 30 * 24 * 60 * 60 * 1000;

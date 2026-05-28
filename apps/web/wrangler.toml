@@ -1,3 +1,6 @@
-name = "redsun-web"
-pages_build_output_dir = "./dist/redsun-web/browser"
+name = 'redsun-forum'
 compatibility_date = "2026-05-26"
+
+[assets]
+directory = "./dist/redsun-web/browser"
+not_found_handling = "single-page-application"

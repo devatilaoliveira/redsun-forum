@@ -2,18 +2,16 @@ name: redsun
 
 services:
   api:
-    image: ${ECR_REGISTRY:?Set ECR_REGISTRY}/redsun-api:${IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    image: redsun-api:${IMAGE_TAG:-latest}
     container_name: redsun-api
     env_file:
       - ${API_ENV_FILE:-apps/api/.env.prod}
     ports:
       - "8080:8080"
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080 || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
     networks:
       - rs-net
 
