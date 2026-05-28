@@ -2,6 +2,7 @@ package com.rpg.redsunapi.user;
 
 import com.rpg.redsunapi.tale.enums.ELanguage;
 import com.rpg.redsunapi.tale.enums.ERuleSystem;
+import com.rpg.redsunapi.authentication.Provider;
 import jakarta.persistence.*;
 
 import java.time.OffsetDateTime;
@@ -21,6 +22,10 @@ public class User {
 
   @Column(nullable = false, unique = true, length = 254)
   private String email;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 20)
+  private Provider provider = Provider.EMAIL;
 
   @Column(length = 2000)
   private String description;
@@ -81,12 +86,14 @@ public class User {
       UUID id,
       String username,
       String email,
+      Provider provider,
       String description,
       String imageURL,
       Set<User> contactsList) {
     this.id = id;
     this.username = username;
     this.email = email;
+    this.provider = Objects.requireNonNull(provider, "provider");
     this.description = description;
     this.imageURL = imageURL;
     this.contactsList = contactsList != null ? contactsList : new HashSet<>();
@@ -116,6 +123,14 @@ public class User {
 
   public void setEmail(String email) {
     this.email = email;
+  }
+
+  public Provider getProvider() {
+    return provider;
+  }
+
+  public void setProvider(Provider provider) {
+    this.provider = Objects.requireNonNull(provider, "provider");
   }
 
   public String getDescription() {

@@ -1,5 +1,6 @@
 package com.rpg.redsunapi.tale.dto;
 
+import com.rpg.redsunapi.authentication.Provider;
 import com.rpg.redsunapi.characterSheet.BasicSheet;
 import com.rpg.redsunapi.tale.Tale;
 import com.rpg.redsunapi.user.ERole;
@@ -76,7 +77,7 @@ class TaleParticipantProfileDTOTest {
   }
 
   private static User user(UUID id) {
-    return new User(id, "player", "player@example.com", null, null, Set.of());
+    return new User(id, "player", "player@example.com", Provider.EMAIL, null, null, Set.of());
   }
 
   private static Tale tale(BasicSheet sheet) {
