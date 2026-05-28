@@ -22,6 +22,7 @@ CREATE TABLE public.users (
   id uuid PRIMARY KEY,
   username varchar(20) NOT NULL UNIQUE,
   email varchar(254) NOT NULL UNIQUE,
+  provider varchar(20) NOT NULL DEFAULT 'EMAIL' CHECK (provider IN ('EMAIL','GOOGLE')),
   description varchar(2000),
   image_url varchar(500),
   deleted boolean NOT NULL DEFAULT FALSE,
