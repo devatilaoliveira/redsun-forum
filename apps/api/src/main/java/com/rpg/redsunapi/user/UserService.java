@@ -1,6 +1,7 @@
 package com.rpg.redsunapi.user;
 
 import com.rpg.redsunapi.authentication.AuthenticationConstants;
+import com.rpg.redsunapi.authentication.Provider;
 import com.rpg.redsunapi.legal.LegalDocumentService;
 import com.rpg.redsunapi.storage.AvatarStorageService;
 import com.rpg.redsunapi.subscription.Subscription;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -65,7 +67,8 @@ public class UserService {
   }
 
   @Transactional
-  public User upsertUser(UUID userId, String email) {
+  public User upsertUser(UUID userId, String email, Provider provider) {
+    Objects.requireNonNull(provider, "provider");
     String normalizedEmail = GeneralUtil.normalizeEmail(email);
     if (normalizedEmail == null || normalizedEmail.isBlank()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required");
@@ -76,17 +79,22 @@ public class UserService {
       if (user.isDeleted()) {
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is deleted");
       }
+      if (user.getProvider() != provider) {
+        user.setProvider(provider);
+        return userRepository.save(user);
+      }
       return user;
     }
-    return createUser(userId, normalizedEmail);
+    return createUser(userId, normalizedEmail, provider);
   }
 
-  private User createUser(UUID userId, String email) {
+  private User createUser(UUID userId, String email, Provider provider) {
     String userName = userRepository.nextUsername(AuthenticationConstants.USERNAME_PREFIX);
 
     User user = new User();
     user.setId(userId);
     user.setEmail(email);
+    user.setProvider(provider);
     user.setUsername(userName);
 
     User savedUser = userRepository.save(user);

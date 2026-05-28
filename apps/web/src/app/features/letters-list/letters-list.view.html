@@ -6,26 +6,32 @@
     />
     <div class="input-toggle">
       <div>
-        <rs-round-icon-button
-          [iconSrc]="'/assets/svgs/edit.svg'"
-          [ariaLabel]="'Compose a new letter'"
-          [disabled]="isLoading()"
-          (pressed)="onComposeLetter()"
-        />
+        <rs-tooltip text="Compose a new letter" align="start">
+          <rs-round-icon-button
+            [iconSrc]="'/assets/svgs/edit.svg'"
+            [ariaLabel]="'Compose a new letter'"
+            [disabled]="isLoading()"
+            (pressed)="onComposeLetter()"
+          />
+        </rs-tooltip>
       </div>
       <div>
-        <rs-round-icon-button
-          [iconSrc]="'/assets/svgs/inbox.svg'"
-          [ariaLabel]="'Show received letters'"
-          [disabled]="isLoading()"
-          (pressed)="onShowReceived()"
-        />
-        <rs-round-icon-button
-          [iconSrc]="'/assets/svgs/send.svg'"
-          [ariaLabel]="'Show sent letters'"
-          [disabled]="isLoading()"
-          (pressed)="onShowSent()"
-        />
+        <rs-tooltip text="Show received letters" align="end">
+          <rs-round-icon-button
+            [iconSrc]="'/assets/svgs/inbox.svg'"
+            [ariaLabel]="'Show received letters'"
+            [disabled]="isLoading()"
+            (pressed)="onShowReceived()"
+          />
+        </rs-tooltip>
+        <rs-tooltip text="Show sent letters" align="end">
+          <rs-round-icon-button
+            [iconSrc]="'/assets/svgs/send.svg'"
+            [ariaLabel]="'Show sent letters'"
+            [disabled]="isLoading()"
+            (pressed)="onShowSent()"
+          />
+        </rs-tooltip>
       </div>
     </div>
 

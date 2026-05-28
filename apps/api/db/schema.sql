@@ -22,6 +22,7 @@ CREATE TABLE public.users (
   id uuid PRIMARY KEY,
   username varchar(20) NOT NULL UNIQUE,
   email varchar(254) NOT NULL UNIQUE,
+  provider varchar(20) NOT NULL DEFAULT 'EMAIL' CHECK (provider IN ('EMAIL','GOOGLE')),
   description varchar(2000),
   image_url varchar(500),
   deleted boolean NOT NULL DEFAULT FALSE,
@@ -85,7 +86,7 @@ CREATE TABLE public.tales (
   is_public boolean NOT NULL DEFAULT FALSE,
   image_url varchar(500),
   description varchar(4000),
-  language varchar(50) CHECK (language IS NULL OR char_length(btrim(language)) <= 50),
+  language varchar(10) CHECK (language IS NULL OR language IN ('EN','DE','PT')),
   rules varchar(15) NOT NULL CHECK (rules IN (
     'DND_5E','STORYTELLER','PATHFINDER_2E','BRP','GURPS','SWADE','OTHER','CUSTOM','FIM_DO_MUNDO'
   )),

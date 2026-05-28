@@ -1,6 +1,7 @@
 package com.rpg.redsunapi.tale.persistence;
 
 import com.rpg.redsunapi.tale.Tale;
+import com.rpg.redsunapi.tale.enums.ELanguage;
 import com.rpg.redsunapi.tale.enums.ERuleSystem;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +40,7 @@ public interface JpaTaleRepository extends JpaRepository<Tale, UUID> {
         AND (:rules IS NULL OR t.rules = :rules)
       """
   )
-  Page<Tale> findAllPublic(Pageable pageable, String language, ERuleSystem rules);
+  Page<Tale> findAllPublic(Pageable pageable, ELanguage language, ERuleSystem rules);
 
   @Query("SELECT t FROM Tale t WHERE t.status = com.rpg.redsunapi.tale.enums.ETaleStatus.SLEEP AND t.lastTimeActive < :cutoff")
   List<Tale> findAllSleepTalesOlderThan(OffsetDateTime cutoff);

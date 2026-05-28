@@ -91,6 +91,7 @@ __screenshots__/
 ### Agent and temporary files ###
 .agents/tmp/
 .agents/skills/supabase
+.agents/skills/impeccable
 .agents/skills/supabase-postgres-best-practices
 .agents/cache/
 .agents/sessions/

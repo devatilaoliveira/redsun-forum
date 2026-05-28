@@ -11,7 +11,7 @@ export const ROUTE_PATHS = {
   create: "create",
   manage: "manage",
   participants: "participants",
-  character: "character",
+  profile: "profile",
   locations: "locations",
   locationId: "locationId",
   myTales: "my-tales",

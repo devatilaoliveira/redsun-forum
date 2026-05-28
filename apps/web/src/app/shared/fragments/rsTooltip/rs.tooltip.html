@@ -1,0 +1,12 @@
+<ng-content />
+
+@if (tooltipText(); as text) {
+  <span
+    class="rs-tooltip__bubble"
+    [attr.data-position]="position()"
+    [attr.data-align]="align()"
+    role="tooltip"
+  >
+    {{ text }}
+  </span>
+}

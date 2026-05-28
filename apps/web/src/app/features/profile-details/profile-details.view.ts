@@ -27,6 +27,7 @@ import {RsCheckbox} from "../../shared/fragments/rsCheckbox/rs.checkbox";
 import {EProfileLanguage} from "../../../interface/enums/EProfileLanguage";
 import {ERuleSystem} from "../../../interface/enums/ERuleSystem";
 import {ERole} from "../../../interface/enums/ERole";
+import {EProvider} from "../../../interface/enums/EProvider";
 
 type ProfileDetailsFormGroup = FormGroup<{
   username: FormControl<string>;
@@ -66,6 +67,7 @@ export class ProfileDetailsView {
   private readonly _authService: IAuthService = inject(AuthService);
   private readonly _router: Router = inject(Router);
 
+  protected readonly EProvider = EProvider;
   protected readonly authenticatedUser: Signal<MeResponseDTO | null> = this._localStoreService.user;
   protected readonly isEditMode: WritableSignal<boolean> = signal<boolean>(false);
   protected readonly hasChanges: WritableSignal<boolean> = signal<boolean>(false);

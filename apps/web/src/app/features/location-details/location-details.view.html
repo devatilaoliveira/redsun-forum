@@ -111,7 +111,7 @@
         <rs-dialog-modal
           [title]="'DELETE_POST' | translate"
           [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.PRIMARY }"
-          [ctaBtnTwo]="{ label: ('CONFIRM_DELETION' | translate), variant: EVariant.WARNING }"
+          [ctaBtnTwo]="{ label: ('CONFIRM_DELETION' | translate), variant: EVariant.DANGER }"
           (closePressed)="closeDeleteConfirm()"
           (ctaBtnOnePressed)="closeDeleteConfirm()"
           (ctaBtnTwoPressed)="confirmDeletePost()"

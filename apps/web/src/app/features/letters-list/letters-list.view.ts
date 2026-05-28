@@ -4,6 +4,7 @@ import {TranslatePipe} from "@ngx-translate/core";
 import {finalize} from "rxjs";
 import {RsSpinner} from "../../shared/fragments/rsSpinner/rs.spinner";
 import {RsRoundIconButton} from "../../shared/fragments/rsRoundIconButton/rs.round-icon-button";
+import {RsTooltip} from "../../shared/fragments/rsTooltip/rs.tooltip";
 import {RsViewHeader} from "../../shared/fragments/rsViewHeader/rs.view-header";
 import {RsAvatar} from "../../shared/fragments/rsAvatar/rs.avatar";
 import {ILetterService, LetterService} from "../../../services/letter.service";
@@ -18,7 +19,7 @@ type LettersBox = "received" | "sent";
 @Component({
   selector: "rs-letters-list",
   standalone: true,
-  imports: [TranslatePipe, RsSpinner, RsRoundIconButton, RsViewHeader, RsAvatar],
+  imports: [TranslatePipe, RsSpinner, RsRoundIconButton, RsTooltip, RsViewHeader, RsAvatar],
   templateUrl: "./letters-list.view.html",
   styleUrl: "./letters-list.view.scss"
 })

@@ -1,6 +1,7 @@
 import { expect, Page, Route } from '@playwright/test';
 import { ROUTE_PATHS } from '../../src/interface/constants/route-path.constants';
 import { MeResponseDTO } from '../../src/interface/dtos/user/MeResponseDTO';
+import { EProvider } from '../../src/interface/enums/EProvider';
 import { test } from './login.view.fixture';
 
 const CORS_HEADERS = {
@@ -13,6 +14,7 @@ const buildUser = (email: string, currentLegalAcknowledgement: boolean): MeRespo
   id: 'e2e-login-user',
   username: 'e2e-login-user',
   email,
+  provider: EProvider.EMAIL,
   imageURL: '',
   favoriteLanguage: [],
   favoriteRules: [],

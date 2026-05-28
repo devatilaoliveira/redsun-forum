@@ -289,7 +289,7 @@ export class RsTopBarNavigatorComponent implements OnInit {
     const taleId: string | null = route.snapshot.paramMap.get(ROUTE_PATHS.taleId);
     if (!taleId) {
       this.manageNavItems = this.manageNavItems.filter((item) =>
-        item.label !== "MANAGE_TALE" && item.label !== "MANAGE_PARTICIPANTS" && item.label !== "MANAGE_CHARACTER"
+        item.label !== "MANAGE_TALE" && item.label !== "MANAGE_PARTICIPANTS" && item.label !== "MANAGE_PROFILE"
       );
       return;
     }
@@ -308,12 +308,12 @@ export class RsTopBarNavigatorComponent implements OnInit {
     };
     const manageCharacterItem: RsSideNavItem = {
       iconAddress: "/assets/svgs/profile.svg",
-      label: "MANAGE_CHARACTER",
-      routePath: `/${ROUTE_PATHS.tales}/${taleId}/${ROUTE_PATHS.character}`,
+      label: "MANAGE_PROFILE",
+      routePath: `/${ROUTE_PATHS.tales}/${taleId}/${ROUTE_PATHS.profile}`,
       exact: true
     };
     const otherItems = this.manageNavItems.filter((item) =>
-      item.label !== "MANAGE_TALE" && item.label !== "MANAGE_PARTICIPANTS" && item.label !== "MANAGE_CHARACTER"
+      item.label !== "MANAGE_TALE" && item.label !== "MANAGE_PARTICIPANTS" && item.label !== "MANAGE_PROFILE"
     );
     this.manageNavItems = [manageItem, participantsItem, manageCharacterItem, ...otherItems];
   }
@@ -321,17 +321,17 @@ export class RsTopBarNavigatorComponent implements OnInit {
   private updatePlayerItems(route: ActivatedRoute): void {
     const taleId: string | null = route.snapshot.paramMap.get(ROUTE_PATHS.taleId);
     if (!taleId) {
-      this.playerNavItems = this.playerNavItems.filter((item) => item.label !== "MANAGE_CHARACTER");
+      this.playerNavItems = this.playerNavItems.filter((item) => item.label !== "MANAGE_PROFILE");
       return;
     }
 
     const manageCharacterItem: RsSideNavItem = {
       iconAddress: "/assets/svgs/profile.svg",
-      label: "MANAGE_CHARACTER",
-      routePath: `/${ROUTE_PATHS.tales}/${taleId}/${ROUTE_PATHS.character}`,
+      label: "MANAGE_PROFILE",
+      routePath: `/${ROUTE_PATHS.tales}/${taleId}/${ROUTE_PATHS.profile}`,
       exact: true
     };
-    const otherItems = this.playerNavItems.filter((item) => item.label !== "MANAGE_CHARACTER");
+    const otherItems = this.playerNavItems.filter((item) => item.label !== "MANAGE_PROFILE");
     this.playerNavItems = [manageCharacterItem, ...otherItems];
   }
 

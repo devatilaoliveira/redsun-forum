@@ -1,5 +1,6 @@
 package com.rpg.redsunapi.user.dto;
 
+import com.rpg.redsunapi.authentication.Provider;
 import com.rpg.redsunapi.subscription.Subscription;
 import com.rpg.redsunapi.subscription.dto.SubscriptionDTO;
 import com.rpg.redsunapi.tale.enums.ELanguage;
@@ -14,6 +15,7 @@ public record MeResponseDto(
   String id,
   String username,
   String email,
+  Provider provider,
   String imageURL,
   String description,
   List<ELanguage> favoriteLanguage,
@@ -38,6 +40,7 @@ public record MeResponseDto(
       user.getId().toString(),
       isDeleted ? null : user.getUsername(),
       isDeleted ? null : user.getEmail(),
+      Objects.requireNonNull(user.getProvider(), "provider"),
       isDeleted ? null : user.getImageURL(),
       isDeleted ? null : user.getDescription(),
       isDeleted ? null : List.copyOf(user.getFavoriteLanguage()),

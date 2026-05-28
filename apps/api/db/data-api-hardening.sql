@@ -1,7 +1,7 @@
 -- Harden Supabase Data API access for a backend-owned database model.
 -- This script blocks Supabase Data API roles from application tables while
 -- keeping direct backend database access controlled by the configured DB_APP_ROLE.
--- It runs before db/app-role.sql in the default full reset flow.
+-- It runs before db/app-role-grants.sql in the default full reset flow.
 
 REVOKE ALL ON ALL TABLES IN SCHEMA public FROM anon, authenticated;
 REVOKE ALL ON ALL SEQUENCES IN SCHEMA public FROM anon, authenticated;
@@ -19,6 +19,9 @@ REVOKE ALL ON FUNCTIONS FROM anon, authenticated;
 ALTER TABLE IF EXISTS public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.subscriptions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.user_contacts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.user_favorite_languages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.user_favorite_rules ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.user_favorite_roles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.tales ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.tale_participants ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.basic_sheets ENABLE ROW LEVEL SECURITY;

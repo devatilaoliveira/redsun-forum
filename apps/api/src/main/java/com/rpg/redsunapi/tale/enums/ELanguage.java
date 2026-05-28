@@ -26,7 +26,7 @@ public enum ELanguage {
     }
 
     for (ELanguage language : values()) {
-      if (language.value.equalsIgnoreCase(value)) {
+      if (language.value.equals(value)) {
         return language;
       }
     }

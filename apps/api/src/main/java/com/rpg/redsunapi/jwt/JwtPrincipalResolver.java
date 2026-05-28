@@ -1,5 +1,6 @@
 package com.rpg.redsunapi.jwt;
 
+import com.rpg.redsunapi.authentication.Provider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
@@ -33,7 +34,7 @@ public class JwtPrincipalResolver {
     Jwt jwt = supabaseJwtDecoder.decode(token);
     UUID userId = UUID.fromString(jwt.getSubject());
     String email = requireEmail(jwt.getClaimAsString("email"));
-    return new VerifiedJwtPrincipal(userId, email, resolveProvider(jwt));
+    return new VerifiedJwtPrincipal(userId, email, Provider.fromJwtProvider(resolveProvider(jwt)));
   }
 
   private static @Nullable String resolveProvider(Jwt jwt) {

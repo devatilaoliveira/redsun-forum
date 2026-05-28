@@ -1,15 +1,41 @@
+:host {
+  display: inline-flex;
+  max-width: 100%;
+  min-width: 0;
+}
+
 .rs-badge {
   --rs-badge-bg: var(--color-primary);
 
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  max-width: 100%;
+  min-width: 0;
+  gap: 0.35rem;
   padding: var(--space-0-2) var(--space-0-5);
   border-radius: var(--radius-pill);
   font-size: var(--text-small);
   font-weight: var(--font-weight-regular);
+  line-height: 1;
   background: var(--rs-badge-bg);
   color: var(--color-black);
   white-space: nowrap;
+}
+
+.rs-badge-icon {
+  flex: 0 0 auto;
+  width: 0.875rem;
+  height: 0.875rem;
+  background: currentColor;
+  mask: var(--rs-badge-icon-src) center / contain no-repeat;
+  -webkit-mask: var(--rs-badge-icon-src) center / contain no-repeat;
+}
+
+.rs-badge-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .rs-badge[data-variant="primary"] {

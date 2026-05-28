@@ -5,9 +5,17 @@
 }
 
 .tale-details-card {
+  .title,
+  .stat-label,
+  .stat-value {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .cover {
     position: relative;
     aspect-ratio: 16 / 9;
+    min-height: 260px;
     height: auto;
     overflow: hidden;
     background: var(--color-background);
@@ -35,53 +43,149 @@
       background: var(--color-background);
 
       .initials {
-        font-size: 2.8rem;
+        font-size: 4rem;
         font-weight: var(--font-weight-bold);
+        line-height: 1;
         letter-spacing: 0.08em;
       }
+    }
+
+    .cover-heading {
+      position: absolute;
+      left: var(--space-1);
+      right: var(--space-1);
+      bottom: var(--space-1);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.45rem;
+    }
+
+    .title {
+      max-width: 100%;
+      margin: 0;
+      color: var(--color-text);
+      font-size: 1.75rem;
+      font-weight: var(--font-weight-bold);
+      line-height: 1.14;
+      white-space: nowrap;
     }
   }
 
   .body {
-    padding: var(--space-1);
     display: flex;
     flex-direction: column;
-    gap: var(--space-1);
     flex: 1;
-    .title-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--space-0-5);
-      .title {
-        margin: 0;
-      }
-    }
+    gap: var(--space-1);
+    padding: 1rem var(--space-1) var(--space-1);
 
     .description {
       margin: 0;
       color: var(--color-text);
+      font-size: 1rem;
+      line-height: 1.55;
     }
 
     .info {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.85rem;
       margin-top: auto;
+
+      .info-divider {
+        grid-column: 1 / -1;
+      }
+
       .stat {
+        display: grid;
+        grid-template-columns: 0.55rem minmax(0, 1fr);
+        align-items: start;
+        gap: 0.5rem;
+        min-width: 0;
+      }
+
+      button.stat {
+        border: 0;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        padding: 0;
+        text-align: left;
+      }
+
+      .stat--action {
+        cursor: pointer;
+        border-radius: var(--radius-sm);
+        transition: background-color 160ms ease, transform 160ms ease;
+      }
+
+      .stat--action:not(:disabled):hover,
+      .stat--action:not(:disabled):focus-visible {
+        background: color-mix(in srgb, var(--color-white) 10%, transparent);
+        transform: translateY(-1px);
+      }
+
+      .stat--action:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 4px;
+      }
+
+      .stat--action:disabled {
+        cursor: default;
+      }
+
+      .stat-dot-slot {
+        display: flex;
+        margin-top: 0.2rem;
+      }
+
+      .stat-copy {
         display: flex;
         flex-direction: column;
-        gap: 0.25rem;
-        .stat-label {
-          font-size: 0.75rem;
-          color: var(--color-muted);
-          letter-spacing: 0.02em;
-        }
+        min-width: 0;
+        gap: 0.2rem;
+      }
 
-        .stat-value {
-          font-size: 0.95rem;
-          font-weight: var(--font-weight-semibold);
-          color: var(--color-text);
-        }
+      .stat-label {
+        color: var(--color-muted);
+        font-size: 0.74rem;
+        line-height: 1.2;
+        white-space: nowrap;
+      }
+
+      .stat-label--action {
+        transition: color 160ms ease;
+      }
+
+      .stat--action:not(:disabled):hover .stat-label--action,
+      .stat--action:not(:disabled):focus-visible .stat-label--action {
+        color: var(--color-primary);
+      }
+
+      .stat-value {
+        color: var(--color-text);
+        font-size: 0.96rem;
+        font-weight: var(--font-weight-semibold);
+        line-height: 1.25;
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .tale-details-card {
+    .cover {
+      min-height: 220px;
+
+      .title {
+        font-size: 1.35rem;
+      }
+    }
+
+    .body {
+      .info {
+        grid-template-columns: 1fr;
       }
     }
   }
