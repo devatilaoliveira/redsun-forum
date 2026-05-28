@@ -94,6 +94,7 @@
   "BACK_TO_LOGIN": "Zurück zum Login",
   "GO_BACK": "Zurück",
   "AUTHENTICATING": "Authentifizierung läuft...",
+  "AUTH_CALLBACK_SIGNING_IN": "Du wirst angemeldet. Bitte warte...",
   "VERIFIED": "E-Mail verifiziert",
   "VERIFIED_TITLE": "E-Mail verifiziert",
   "VERIFIED_SUBTITLE": "Deine E-Mail ist verifiziert. Du kannst dich jetzt anmelden.",

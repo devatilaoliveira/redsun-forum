@@ -94,6 +94,7 @@
   "BACK_TO_LOGIN": "Voltar para o login",
   "GO_BACK": "Voltar",
   "AUTHENTICATING": "Autenticando...",
+  "AUTH_CALLBACK_SIGNING_IN": "Estamos conectando sua conta. Aguarde...",
   "VERIFIED": "E-mail verificado",
   "VERIFIED_TITLE": "E-mail verificado",
   "VERIFIED_SUBTITLE": "Seu e-mail foi verificado. Você já pode entrar.",
