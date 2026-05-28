@@ -1,4 +1,4 @@
-<rs-box class="tale-details-card" [minHeight]="320">
+<rs-box class="tale-details-card" [minHeight]="420">
   <div class="cover">
     @if (hasImage()) {
       <img
@@ -7,6 +7,7 @@
         [alt]="tale().taleName + ' cover'"
         (load)="onImageLoad()"
         loading="lazy"
+        decoding="async"
         [class.loaded]="imageLoaded"
       />
     } @else {
@@ -14,40 +15,65 @@
         <span class="initials">{{ initials() }}</span>
       </div>
     }
+    <div class="cover-heading">
+      <h2 class="title" [title]="tale().taleName">{{ tale().taleName }}</h2>
+    </div>
   </div>
 
   <div class="body">
-    <div class="title-row">
-      <h2 class="title">{{ tale().taleName }}</h2>
-      <rs-badge
-        [label]="('SYSTEM_RULE_' + tale().rules) | translate"
-        [variant]="EVariant.SECONDARY"
-      />
-    </div>
-
     <p class="description">
       {{ tale().description || ('NO_DESCRIPTION' | translate) }}
     </p>
 
     <div class="info">
+      <rs-divider
+        class="info-divider"
+        type="gradient"
+        [theme]="ETheme.DARK"
+      />
+
+      <button
+        class="stat stat--action"
+        type="button"
+        (click)="navigateToTaleOwner()"
+      >
+        <span class="stat-dot-slot">
+          <rs-dot [variant]="EVariant.PRIMARY" />
+        </span>
+        <div class="stat-copy">
+          <span class="stat-label stat-label--action">{{ 'TALE_OWNER' | translate }}</span>
+          <span class="stat-value" [title]="ownerName()">{{ ownerName() }}</span>
+        </div>
+      </button>
+
+      <button
+        class="stat stat--action"
+        type="button"
+        [disabled]="!latestActiveLocation()"
+        (click)="navigateToLatestActiveLocation()"
+      >
+        <span class="stat-dot-slot">
+          <rs-dot [variant]="lastActiveVariant()" />
+        </span>
+        <div class="stat-copy">
+          <span class="stat-label stat-label--action">{{ 'LAST_ACTIVE' | translate }}</span>
+          <time class="stat-value" [dateTime]="tale().lastTimeActive!">
+            {{ tale().lastTimeActive | date:'y MMMM d' }}
+          </time>
+        </div>
+      </button>
+
       <div class="stat">
-        <span class="stat-label">{{ 'TALE_OWNER' | translate }}</span>
-        <span class="stat-value">{{ ownerName() }}</span>
-      </div>
-
-      @if (tale().creationDate) {
-        <div class="stat">
+        <span class="stat-dot-slot">
+          <rs-dot [variant]="EVariant.PRIMARY" />
+        </span>
+        <div class="stat-copy">
           <span class="stat-label">{{ 'CREATED_ON' | translate }}</span>
-          <span class="stat-value">{{ tale().creationDate | date:'y MMMM d' }}</span>
+          <time class="stat-value" [dateTime]="tale().creationDate">
+            {{ tale().creationDate | date:'y MMMM d' }}
+          </time>
         </div>
-      }
-
-      @if (tale().lastTimeActive) {
-        <div class="stat">
-          <span class="stat-label">{{ 'LAST_ACTIVE' | translate }}</span>
-          <span class="stat-value">{{ tale().lastTimeActive | date:'y MMMM d' }}</span>
-        </div>
-      }
+      </div>
     </div>
   </div>
 </rs-box>

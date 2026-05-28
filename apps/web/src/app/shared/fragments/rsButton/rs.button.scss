@@ -6,9 +6,9 @@
 .rs-button {
   --rs-button-height: 32px;
   --rs-button-accent: var(--color-primary);
-  --rs-button-text: var(--rs-button-accent);
-  --rs-button-bg: color-mix(in srgb, var(--rs-button-accent) 12%, transparent);
-  --rs-button-border: color-mix(in srgb, var(--rs-button-accent) 78%, transparent);
+  --rs-button-text: var(--color-black);
+  --rs-button-bg: var(--rs-button-accent);
+  --rs-button-border: transparent;
 
   display: flex;
   box-sizing: border-box;
@@ -45,10 +45,8 @@
 }
 
 .rs-button[data-variant="accent"] {
-  --rs-button-accent: var(--color-border);
+  --rs-button-accent: var(--color-accent);
   --rs-button-text: var(--color-text);
-  --rs-button-bg: color-mix(in srgb, var(--color-text) 8%, transparent);
-  --rs-button-border: var(--color-border);
 }
 
 .rs-button[data-variant="success"] {
@@ -57,6 +55,7 @@
 
 .rs-button[data-variant="danger"] {
   --rs-button-accent: var(--color-danger);
+  --rs-button-text: var(--color-white);
 }
 
 .rs-button[data-variant="warning"] {
@@ -64,16 +63,13 @@
 }
 
 .rs-button[data-variant="black"] {
-  --rs-button-accent: var(--color-border);
+  --rs-button-accent: var(--color-button-neutral-bg);
   --rs-button-text: var(--color-button-neutral-text);
-  --rs-button-bg: var(--color-button-neutral-bg);
-  --rs-button-border: transparent;
 }
 
 .rs-button:not(:disabled):hover,
 .rs-button:not(:disabled):focus-visible {
-  --rs-button-bg: color-mix(in srgb, var(--rs-button-accent) 18%, transparent);
-  --rs-button-border: var(--rs-button-accent);
+  filter: brightness(0.94);
 }
 
 .rs-button:not(:disabled):focus-visible {
@@ -83,18 +79,15 @@
 
 .rs-button:not(:disabled):active,
 :host(.is-active) .rs-button:not(:disabled) {
-  --rs-button-bg: color-mix(in srgb, var(--rs-button-accent) 26%, transparent);
-  --rs-button-border: var(--rs-button-accent);
+  filter: brightness(0.88);
 }
 
 .rs-button[data-variant="black"]:not(:disabled):hover {
-  --rs-button-bg: var(--color-button-neutral-hover);
-  --rs-button-border: transparent;
+  filter: brightness(1.18);
 }
 
 :host(.is-active) .rs-button[data-variant="black"]:not(:disabled) {
-  --rs-button-bg: var(--color-button-neutral-active);
-  --rs-button-border: transparent;
+  filter: brightness(1.28);
 }
 
 .rs-button:disabled {

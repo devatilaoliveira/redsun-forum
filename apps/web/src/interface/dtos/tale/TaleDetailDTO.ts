@@ -13,8 +13,8 @@ export interface TaleDetailDTO {
   status: ETaleStatus;
   imageUrl: string | null;
   rules: ERuleSystem;
-  creationDate: string | null;
-  lastTimeActive: string | null;
+  creationDate: string;
+  lastTimeActive: string;
   participants: TaleParticipantProfileDTO[];
   author: TaleParticipantProfileDTO;
   locations: LocationDTO[];
