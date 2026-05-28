@@ -176,11 +176,10 @@ Pop-Location
 ```
 
 Production schema changes should only be run with intentional production credentials:
+This command wipes application data and reapplies schema, cleanup scripts, RLS policies, storage setup, Data API hardening, and runtime role policies:
 
 ```powershell
-Push-Location apps\api
-.\scripts\run-supabase-sql.ps1 -EnvFile .env.prod -OverrideEnv
-Pop-Location
+Push-Location apps\api; .\scripts\run-supabase-sql.ps1 -EnvFile .env.prod -OverrideEnv; Pop-Location
 ```
 
 ### Database Backup And Restore
