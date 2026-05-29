@@ -5,6 +5,7 @@ import {EVariant} from "../../interface/enums/EVariant";
 import {IToastService, ToastService} from "../../services/toast.service";
 import {AuthenticationError} from "../errors/authentication.error";
 import {IPrinter, Printer} from "./printer.handler";
+import {ErrorReporterService, IErrorReporterService} from "../../services/error-reporter.service";
 
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {
@@ -12,6 +13,7 @@ export class GlobalErrorHandler implements ErrorHandler {
   private readonly _printer: IPrinter = inject(Printer);
   private readonly _toastService: IToastService = inject(ToastService);
   private readonly _router: Router = inject(Router);
+  private readonly _errorReporterService: IErrorReporterService = inject(ErrorReporterService);
 
   handleError(error: unknown): void {
     if (error instanceof AuthenticationError) {
@@ -20,6 +22,7 @@ export class GlobalErrorHandler implements ErrorHandler {
     }
 
     this._printer.error("Global unhandled error occurred, please address the issue: ", error);
+    void this._errorReporterService.reportError(error);
     const messageUnexpectedError: string = this._translateService.instant("UNEXPECTED_ERROR");
     this._toastService.show({
       label: this._translateService.instant("ERROR"),

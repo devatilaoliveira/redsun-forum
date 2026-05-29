@@ -2,6 +2,7 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- Drop existing tables to start from scratch
+DROP TABLE IF EXISTS public.client_error_reports CASCADE;
 DROP TABLE IF EXISTS public.letter_read_by CASCADE;
 DROP TABLE IF EXISTS public.letter_recipients CASCADE;
 DROP TABLE IF EXISTS public.letters CASCADE;
@@ -77,6 +78,28 @@ CREATE TABLE public.user_contacts (
   CHECK (user_id <> contact_id)
 );
 CREATE INDEX idx_user_contacts_contact_id ON public.user_contacts(contact_id);
+
+-- Client error reports
+CREATE TABLE public.client_error_reports (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES public.users(id) ON DELETE SET NULL,
+  user_email varchar(254),
+  message varchar(2000) NOT NULL,
+  name varchar(200) NOT NULL,
+  stack varchar(10000),
+  cause varchar(2000),
+  route varchar(1000),
+  method varchar(20),
+  status_code integer CHECK (status_code IS NULL OR status_code BETWEEN 100 AND 599),
+  user_agent varchar(1000),
+  environment varchar(50),
+  client_timestamp timestamptz,
+  metadata varchar(4000),
+  reported_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_client_error_reports_user ON public.client_error_reports(user_id);
+CREATE INDEX idx_client_error_reports_reported_at ON public.client_error_reports(reported_at DESC);
+ALTER TABLE public.client_error_reports ENABLE ROW LEVEL SECURITY;
 
 -- Tales
 CREATE TABLE public.tales (
