@@ -69,7 +69,10 @@ export const routes: Routes = [
   {
     path: UTIL_CONSTANTS.OAUTH_CALLBACK_PATH,
     loadComponent: () => import("./features/auth-callback/auth-callback.view").then((module) => module.AuthCallbackView),
-    title: "AUTHENTICATING"
+    title: "AUTHENTICATING",
+    data: {
+      hideTopBar: true
+    }
   },
   {
     path: ROUTE_PATHS.home,
