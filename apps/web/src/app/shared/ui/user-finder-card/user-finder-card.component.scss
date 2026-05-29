@@ -17,6 +17,7 @@
   align-items: flex-start;
   gap: var(--space-1);
   flex-direction: column;
+  width: 100%;
 }
 
 h3, p {
@@ -46,8 +47,13 @@ rs-divider {
 
 .preferences {
   display: grid;
-  grid-template-columns: minmax(130px, 0.9fr) minmax(240px, 1.45fr) minmax(170px, 0.95fr);
+  width: 100%;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.45fr) minmax(0, 0.95fr);
   gap: var(--space-1);
+}
+
+.preference {
+  min-width: 0;
 }
 
 .preference h4 {
@@ -68,6 +74,15 @@ rs-divider {
 
   .description {
     -webkit-line-clamp: 10;
+  }
+
+  .user-card {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .preferences {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
