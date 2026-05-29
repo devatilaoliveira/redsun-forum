@@ -1,9 +1,9 @@
 <section class="profile-view">
-  @let user = authenticatedUser()!;
+  @let user = authenticatedUser();
   <div class="content">
     <rs-avatar
-      [src]="user.imageURL || null"
-      [userName]="user.username"
+      [src]="user?.imageURL || null"
+      [userName]="user?.username  || null"
       [size]="200"
       [uploadable]="true"
       (fileSelected)="onAvatarFilePicked($event)"
@@ -83,7 +83,7 @@
     </form>
 
     <div class="change-email-section">
-      @if (user.provider === EProvider.EMAIL) {
+      @if (user?.provider === EProvider.EMAIL) {
         <rs-button
           [variant]="EVariant.PRIMARY"
           [disabled]="isSaving() || deleteInProgress()"

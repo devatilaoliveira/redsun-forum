@@ -60,8 +60,8 @@ export class LocalStoreService implements ILocalStoreService {
   public getLanguage(): ELanguage {
     const saved = localStorage.getItem(LANG_STORE_KEY) as ELanguage | null;
     if (!saved) {
-      this.setLanguage(ELanguage.EN);
-      return ELanguage.EN;
+      this.setLanguage(ELanguage.PT);
+      return ELanguage.PT;
     }
     return saved;
   }

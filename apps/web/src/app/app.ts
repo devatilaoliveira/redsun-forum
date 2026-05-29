@@ -26,7 +26,7 @@ export class App {
 
   constructor() {
     this._translate.addLangs(Object.values(ELanguage));
-    this._translate.setFallbackLang(ELanguage.EN);
+    this._translate.setFallbackLang(ELanguage.PT);
 
     this._translate.use(this._LocalStoreService.getLanguage());
     this._themeHandler.init()
