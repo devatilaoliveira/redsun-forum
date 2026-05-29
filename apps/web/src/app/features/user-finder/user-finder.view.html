@@ -60,7 +60,6 @@
           <rs-user-finder-card
             [user]="user"
             [alreadyContact]="isAlreadyContact(user.id)"
-            [currentUser]="isCurrentUser(user.id)"
             [inProgress]="addingContactId() === user.id"
             (addContactPressed)="addToContacts($event)"
           />
