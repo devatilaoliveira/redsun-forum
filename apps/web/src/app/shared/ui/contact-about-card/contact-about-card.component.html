@@ -4,12 +4,12 @@
     <h2 [id]="'contact-about-title-' + contact().id">{{ 'CONTACT_ABOUT' | translate }}</h2>
   </header>
 
-  <rs-divider class="header-divider" />
+  <rs-divider type="gradient" />
 
   <p class="text">{{ description() ?? ('NO_DESCRIPTION' | translate) }}</p>
 
   @if (hasPreferences()) {
-    <rs-divider class="preferences-divider" />
+    <rs-divider type="gradient" />
 
     <div class="preferences">
       @if (favoriteRoles().length) {

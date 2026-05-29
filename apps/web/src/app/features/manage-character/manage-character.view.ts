@@ -1,4 +1,4 @@
-import {Component, inject, OnDestroy, OnInit, signal, WritableSignal} from "@angular/core";
+import {Component, computed, inject, OnDestroy, OnInit, Signal, signal, WritableSignal} from "@angular/core";
 import {ActivatedRoute, Router} from "@angular/router";
 import {FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from "@angular/forms";
 import {ITranslateService, TranslatePipe, TranslateService} from "@ngx-translate/core";
@@ -85,6 +85,7 @@ export class ManageCharacterView implements OnInit, OnDestroy {
   protected readonly avatarCropFile: WritableSignal<File | undefined> = signal<File | undefined>(undefined);
   protected readonly avatarCropBlob: WritableSignal<Blob | null> = signal<Blob | null>(null);
   protected readonly avatarUploading: WritableSignal<boolean> = signal<boolean>(false);
+  protected readonly isTaleOwner: Signal<boolean> = computed(() => this._talesContext.owner()?.id === this.characterSheetId);
   protected readonly EVariant = EVariant;
 
   public ngOnInit(): void {
@@ -188,6 +189,10 @@ export class ManageCharacterView implements OnInit, OnDestroy {
   }
 
   protected onQuitPressed(): void {
+    if (this.isTaleOwner()) {
+      return;
+    }
+
     this.confirmQuitOpen.set(true);
   }
 
@@ -196,7 +201,7 @@ export class ManageCharacterView implements OnInit, OnDestroy {
   }
 
   protected confirmQuit(): void {
-    if (this.leavingInProgress()) {
+    if (this.isTaleOwner() || this.leavingInProgress()) {
       return;
     }
 

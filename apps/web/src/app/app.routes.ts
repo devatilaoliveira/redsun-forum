@@ -69,7 +69,10 @@ export const routes: Routes = [
   {
     path: UTIL_CONSTANTS.OAUTH_CALLBACK_PATH,
     loadComponent: () => import("./features/auth-callback/auth-callback.view").then((module) => module.AuthCallbackView),
-    title: "AUTHENTICATING"
+    title: "AUTHENTICATING",
+    data: {
+      hideTopBar: true
+    }
   },
   {
     path: ROUTE_PATHS.home,
@@ -169,10 +172,10 @@ export const routes: Routes = [
                 title: "TALE_MANAGER"
               },
               {
-                path: ROUTE_PATHS.character,
+                path: ROUTE_PATHS.profile,
                 loadComponent: () => import("./features/manage-character/manage-character.view").then((module) => module.ManageCharacterView),
                 canActivate: [TaleParticipantGuard],
-                title: "MANAGE_CHARACTER"
+                title: "MANAGE_PROFILE"
               },
               {
                 path: `${ROUTE_PATHS.locations}/${ROUTE_PATHS.creation}`,

@@ -1,6 +1,6 @@
 <section class="manage-character-view">
   <rs-view-header
-    [title]="'MANAGE_CHARACTER' | translate"
+    [title]="'MANAGE_PROFILE' | translate"
     [subTittle]="'CHARACTER_SHEET_SUBTITLE' | translate"
   />
 
@@ -51,14 +51,16 @@
           </rs-button>
         </div>
 
-        <rs-button
-          class="quit-button"
-          [variant]="EVariant.WARNING"
-          [inProgress]="leavingInProgress()"
-          (pressed)="onQuitPressed()"
-        >
-          {{ 'QUIT_TALE' | translate }}
-        </rs-button>
+        @if (!isTaleOwner()) {
+          <rs-button
+            class="quit-button"
+            [variant]="EVariant.WARNING"
+            [inProgress]="leavingInProgress()"
+            (pressed)="onQuitPressed()"
+          >
+            {{ 'QUIT_TALE' | translate }}
+          </rs-button>
+        }
       </form>
     }
   </div>

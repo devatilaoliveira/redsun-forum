@@ -40,7 +40,7 @@ export class LocationsTableComponent {
   protected readonly pendingDeleteLocation: WritableSignal<LocationDTO | null> = signal<LocationDTO | null>(null);
   protected readonly pendingDeleteIndex: WritableSignal<number> = signal<number>(-1);
   protected readonly cancelCta: RsDialogCta = {label: "Cancel", variant: EVariant.PRIMARY};
-  protected readonly confirmDeleteCta: RsDialogCta = {label: "Confirm deletion", variant: EVariant.WARNING};
+  protected readonly confirmDeleteCta: RsDialogCta = {label: "Confirm deletion", variant: EVariant.DANGER};
 
   constructor() {
     effect(() => {

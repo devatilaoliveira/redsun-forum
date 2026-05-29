@@ -3,6 +3,7 @@ package com.rpg.redsunapi.tale.dto;
 import com.rpg.redsunapi.location.dto.LocationDTO;
 import com.rpg.redsunapi.location.Location;
 import com.rpg.redsunapi.tale.Tale;
+import com.rpg.redsunapi.tale.enums.ELanguage;
 import com.rpg.redsunapi.tale.enums.ERuleSystem;
 import com.rpg.redsunapi.tale.enums.ETaleStatus;
 import com.rpg.redsunapi.user.User;
@@ -42,6 +43,7 @@ public record TaleDetailDTO(
     OffsetDateTime lastActive = tale.getLastTimeActive() != null ? tale.getLastTimeActive() : creation;
     ETaleStatus status = tale.getStatus() != null ? tale.getStatus() : ETaleStatus.ACTIVE;
     ERuleSystem rulesSystem = tale.getRules();
+    ELanguage language = tale.getLanguage();
 
     List<TaleParticipantProfileDTO> participants = List.of();
     List<User> taleParticipants = tale.getParticipants() == null
@@ -72,7 +74,7 @@ public record TaleDetailDTO(
       tale.getTaleName(),
       tale.getPublic(),
       tale.getDescription(),
-      tale.getLanguage(),
+      language == null ? null : language.getValue(),
       status,
       tale.getImageURL(),
       rulesSystem,

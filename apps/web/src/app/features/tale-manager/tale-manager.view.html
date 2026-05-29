@@ -25,13 +25,13 @@
           (valueChanged)="onDescriptionChange($event)"
         />
 
-        <rs-data-list
+        <rs-select
           [label]="'LANGUAGE' | translate"
-          [optionsEnum]="ETaleLanguageSuggestion"
+          [optionsEnum]="ELanguage"
           [value]="controls.language.value"
           [required]="false"
           [allowNull]="true"
-          [localizationPrefix]="'TALE_LANGUAGE_OPTION_'"
+          [localizationPrefix]="'LANGUAGE_'"
           (valueChanged)="onLanguageChange($event)"
         />
 
@@ -70,7 +70,7 @@
         </rs-button>
         <rs-button
           class="archive-btn"
-          [variant]="EVariant.WARNING"
+          [variant]="EVariant.DANGER"
           [inProgress]="archiveInProgress()"
           [disabled]="inProgress()"
           (pressed)="openArchiveDialog()"
@@ -90,7 +90,7 @@
 @if (imageCropOpen()) {
   <rs-dialog-modal
     [title]="'CROP_IMAGE' | translate"
-    [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.SECONDARY, disabled: cropProcessing() }"
+    [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.PRIMARY, disabled: cropProcessing() }"
     [ctaBtnTwo]="{ label: ('SAVE' | translate), variant: EVariant.PRIMARY, disabled: !imageCropBlob() || cropProcessing(), inProgress: cropProcessing() }"
     (closePressed)="closeImageCrop()"
     (ctaBtnOnePressed)="closeImageCrop()"
@@ -118,8 +118,8 @@
 @if (archiveDialogOpen()) {
   <rs-dialog-modal
     [title]="'DELETE' | translate"
-    [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.SECONDARY, disabled: archiveInProgress() }"
-    [ctaBtnTwo]="{ label: ('DELETE' | translate), variant: EVariant.WARNING, disabled: !canConfirmArchive() || archiveInProgress(), inProgress: archiveInProgress() }"
+    [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.PRIMARY, disabled: archiveInProgress() }"
+    [ctaBtnTwo]="{ label: ('DELETE' | translate), variant: EVariant.DANGER, disabled: !canConfirmArchive() || archiveInProgress(), inProgress: archiveInProgress() }"
     (closePressed)="closeArchiveDialog()"
     (ctaBtnOnePressed)="closeArchiveDialog()"
     (ctaBtnTwoPressed)="confirmArchive()"
@@ -141,7 +141,7 @@
 @if (ruleChangeDialogOpen()) {
   <rs-dialog-modal
     [title]="'RULES' | translate"
-    [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.SECONDARY }"
+    [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.PRIMARY }"
     [ctaBtnTwo]="{ label: ('CONFIRM' | translate), variant: EVariant.WARNING, disabled: !canConfirmRuleChange() }"
     (closePressed)="closeRuleChangeDialog()"
     (ctaBtnOnePressed)="closeRuleChangeDialog()"

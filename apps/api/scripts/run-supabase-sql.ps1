@@ -1,10 +1,11 @@
 [CmdletBinding()]
 param(
   [string]$EnvFile = ".env.local",
-  [string[]]$SqlFiles = @("db/schema.sql", "db/private-wipe.sql", "db/rls_tale.sql", "db/rls_post.sql", "db/storage.sql", "db/storage-wipe.sql", "db/auth-wipe.sql", "db/data-api-hardening.sql", "db/app-role.sql"),
+  [string[]]$SqlFiles = @("db/schema.sql", "db/private-wipe.sql", "db/rls_tale.sql", "db/rls_post.sql", "db/storage.sql", "db/storage-wipe.sql", "db/auth-wipe.sql", "db/data-api-hardening.sql", "db/app-role-grants.sql"),
   [string]$PsqlPath,
   [string]$SslMode = "require",
-  [switch]$OverrideEnv
+  [switch]$OverrideEnv,
+  [switch]$SkipRuntimeLoginVerification
 )
 
 function Load-EnvFile {
@@ -100,6 +101,50 @@ function Get-EndpointSource {
   return "$HostVariableName/$PortVariableName"
 }
 
+function Test-RuntimeDatabaseLogin {
+  param(
+    [string]$PsqlCommand,
+    [int]$MaxAttempts = 6,
+    [int]$DelaySeconds = 5
+  )
+
+  Write-Host "Verifying runtime database login for $($env:DB_USER)..."
+  $env:PGPASSWORD = $env:DB_PASSWORD
+
+  for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++) {
+    $psqlOutput = & $PsqlCommand `
+      -h $env:DB_HOST `
+      -p $env:DB_PORT `
+      -U $env:DB_USER `
+      -d $env:DB_NAME `
+      -v ON_ERROR_STOP=1 `
+      -q `
+      -c "SELECT 1;" 2>&1
+
+    if ($LASTEXITCODE -eq 0) {
+      return
+    }
+
+    $psqlMessage = ($psqlOutput | Out-String).Trim()
+    if ($psqlMessage -match "ECIRCUITBREAKER|too many authentication failures") {
+      throw "Runtime database login hit the Supabase pooler authentication circuit breaker. Stop app instances or scripts using stale DB credentials, wait for the pooler block to clear, then verify DB_USER/DB_PASSWORD and rerun the grants or reset command."
+    }
+    if ($psqlMessage -match "password authentication failed") {
+      throw "Runtime database login failed because Supabase rejected DB_USER/DB_PASSWORD. Stop retrying, verify the runtime role password in Supabase/Postgres, then rerun only db/app-role-bootstrap.sql,db/app-role-grants.sql."
+    }
+
+    if ($attempt -lt $MaxAttempts) {
+      if ($psqlMessage) {
+        Write-Warning $psqlMessage
+      }
+      Write-Warning "Runtime database login attempt $attempt of $MaxAttempts failed. Retrying in $DelaySeconds seconds..."
+      Start-Sleep -Seconds $DelaySeconds
+    }
+  }
+
+  throw "Runtime database login failed for DB_USER after app-role grants. Confirm DB_HOST/DB_PORT and DB_ADMIN_HOST/DB_ADMIN_PORT point to the same Supabase project, wait for pooler credential propagation after any password rotation, and restart old app instances that may still be using stale credentials."
+}
+
 try {
   $loadedEnvNames = Load-EnvFile -Path $EnvFile
   if ($OverrideEnv) {
@@ -168,21 +213,14 @@ try {
     }
   }
 
-  $runsAppRoleSql = $SqlFiles | Where-Object { (Split-Path -Path $_ -Leaf) -eq "app-role.sql" }
-  if ($runsAppRoleSql) {
-    Write-Host "Verifying runtime database login for $($env:DB_USER)..."
-    $env:PGPASSWORD = $env:DB_PASSWORD
-    & $psqlCmd `
-      -h $env:DB_HOST `
-      -p $env:DB_PORT `
-      -U $env:DB_USER `
-      -d $env:DB_NAME `
-      -v ON_ERROR_STOP=1 `
-      -q `
-      -c "SELECT 1;" | Out-Null
-    if ($LASTEXITCODE -ne 0) {
-      throw "Runtime database login failed for DB_USER after app-role.sql. Confirm DB_HOST/DB_PORT point to the same project used for admin SQL and that the Supabase pooler has refreshed the role password."
-    }
+  $runsAppRoleBootstrapSql = $SqlFiles | Where-Object { (Split-Path -Path $_ -Leaf) -eq "app-role-bootstrap.sql" }
+  $runsAppRoleGrantsSql = $SqlFiles | Where-Object { (Split-Path -Path $_ -Leaf) -eq "app-role-grants.sql" }
+  if ($runsAppRoleGrantsSql -and $runsAppRoleBootstrapSql) {
+    Write-Warning "Skipped immediate runtime database login verification because app-role-bootstrap.sql ran and Supabase pooler credentials may need time to propagate. Wait a few minutes, then verify with db/app-role-grants.sql only."
+  } elseif ($runsAppRoleGrantsSql -and -not $SkipRuntimeLoginVerification) {
+    Test-RuntimeDatabaseLogin -PsqlCommand $psqlCmd
+  } elseif ($runsAppRoleGrantsSql) {
+    Write-Warning "Skipped runtime database login verification because -SkipRuntimeLoginVerification was provided."
   }
 
   Write-Host "Done."

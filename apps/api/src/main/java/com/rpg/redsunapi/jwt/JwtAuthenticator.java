@@ -25,7 +25,8 @@ public class JwtAuthenticator {
     VerifiedJwtPrincipal verifiedPrincipal = jwtPrincipalResolver.resolve(token);
     User user = userService.upsertUser(
       verifiedPrincipal.userId(),
-      verifiedPrincipal.email()
+      verifiedPrincipal.email(),
+      verifiedPrincipal.provider()
     );
     AuthenticatedUser principal = new AuthenticatedUser(user);
 

@@ -33,7 +33,9 @@ export class TaleService implements ITaleService {
     const formData = new FormData();
     formData.append("taleName", request.taleName);
     formData.append("description", request.description);
-    formData.append("language", request.language);
+    if (request.language != null) {
+      formData.append("language", request.language);
+    }
     formData.append("isPublic", String(request.isPublic));
     formData.append("rules", request.rules);
 

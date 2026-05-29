@@ -87,7 +87,7 @@ public class TaleService {
     tale.setPublic(taleDTO.isPublic() != null ? taleDTO.isPublic() : Boolean.FALSE);
     tale.setImageURL(null);
     tale.setDescription(taleDTO.description());
-    tale.setLanguage(taleDTO.language() == null ? null : GeneralUtil.trimRequired(taleDTO.language()));
+    tale.setLanguage(taleDTO.language() == null ? null : parseLanguage(taleDTO.language()));
     tale.setRules(ruleSystem);
     tale.setCreationDate(dateNow);
     tale.setLastTimeActive(dateNow);
@@ -144,7 +144,7 @@ public class TaleService {
     }
 
     if (request.language() != null) {
-      String normalizedLanguage = GeneralUtil.trimRequired(request.language());
+      ELanguage normalizedLanguage = parseLanguage(request.language());
       if (!Objects.equals(normalizedLanguage, tale.getLanguage())) {
         tale.setLanguage(normalizedLanguage);
         hasUpdate = true;
@@ -288,9 +288,11 @@ public class TaleService {
     Sort sort = Sort.by(Sort.Order.desc("lastTimeActive"), Sort.Order.desc("creationDate"));
     Pageable pageable = PageRequest.of(safePage, boundedSize, sort);
 
+    ELanguage normalizedLanguage = language == null ? null : parseLanguage(language);
+
     return taleRepository.findAllPublic(
         pageable,
-        language == null ? null : parseLanguage(language),
+        normalizedLanguage,
         rules == null ? null : parseRules(rules));
   }
 
@@ -448,9 +450,9 @@ public class TaleService {
     }
   }
 
-  private String parseLanguage(String language) {
+  private ELanguage parseLanguage(String language) {
     try {
-      return GeneralUtil.parseRequiredLanguage(language).getValue();
+      return GeneralUtil.parseRequiredLanguage(language);
     } catch (IllegalArgumentException ex) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
     }

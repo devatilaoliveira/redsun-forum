@@ -1,0 +1,43 @@
+:host {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.rs-dot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--color-border);
+}
+
+.rs-dot[data-theme="dark"] {
+  background: var(--color-border);
+}
+
+.rs-dot[data-theme="light"] {
+  background: #D0D5DD;
+}
+
+.rs-dot[data-variant="primary"] {
+  background: var(--color-primary);
+}
+
+.rs-dot[data-variant="success"] {
+  background: var(--color-success);
+}
+
+.rs-dot[data-variant="warning"] {
+  background: var(--color-warning);
+}
+
+.rs-dot[data-variant="danger"] {
+  background: var(--color-danger);
+}
+
+.rs-dot[data-active="true"] {
+  background: var(--color-primary);
+}

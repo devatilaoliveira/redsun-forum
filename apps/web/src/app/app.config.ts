@@ -17,6 +17,7 @@ import {TitleI18nHandler} from "../infra/miscellaneous/title-I18n.handler";
 import {authInterceptor} from "../infra/interceptor/auth.interceptor";
 import {ELanguage} from "../interface/enums/ELanguage";
 import {UTIL_CONSTANTS} from "../interface/constants/util.constants";
+import {ILocalStoreService, LocalStoreService} from "../services/local-store.service";
 import {firstValueFrom} from "rxjs";
 
 export const appConfig: ApplicationConfig = {
@@ -32,8 +33,8 @@ export const appConfig: ApplicationConfig = {
       useClass: GlobalErrorHandler
     },
     provideTranslateService({
-      lang: ELanguage.EN,
-      fallbackLang: ELanguage.EN,
+      lang: ELanguage.PT,
+      fallbackLang: ELanguage.PT,
       loader: provideTranslateHttpLoader({
         prefix: UTIL_CONSTANTS.I18N_PREFIX,
         suffix: UTIL_CONSTANTS.JSON_EXTENSION,
@@ -42,8 +43,8 @@ export const appConfig: ApplicationConfig = {
     }),
     provideAppInitializer((): Promise<InterpolatableTranslation> => {
       const translate: TranslateService = inject(TranslateService);
-      const browserLang: string = translate.getBrowserLang() || ELanguage.EN;
-      return firstValueFrom(translate.use(browserLang));
+      const localStoreService: ILocalStoreService = inject(LocalStoreService);
+      return firstValueFrom(translate.use(localStoreService.getLanguage() || ELanguage.PT));
     }),
     {
       provide: TitleStrategy,

@@ -1,15 +1,14 @@
 <section class="profile-view">
+  @let user = authenticatedUser();
   <div class="content">
-    @if (authenticatedUser(); as user) {
-      <rs-avatar
-        [src]="user.imageURL || null"
-        [userName]="user.username"
-        [size]="200"
-        [uploadable]="true"
-        (fileSelected)="onAvatarFilePicked($event)"
-        (imageRemoved)="onAvatarRemoved($event)"
-      />
-    }
+    <rs-avatar
+      [src]="user?.imageURL || null"
+      [userName]="user?.username  || null"
+      [size]="200"
+      [uploadable]="true"
+      (fileSelected)="onAvatarFilePicked($event)"
+      (imageRemoved)="onAvatarRemoved($event)"
+    />
     <form class="form" [formGroup]="profileFormGroup" (submit)="$event.preventDefault(); onToggleEdit()">
       <rs-input
         [label]="'USERNAME' | translate"
@@ -84,18 +83,20 @@
     </form>
 
     <div class="change-email-section">
-      <rs-button
-        [variant]="EVariant.PRIMARY"
-        [disabled]="isSaving() || deleteInProgress()"
-        (pressed)="navigateToChangeEmail()"
-      >
-        {{ "CHANGE_PASSWORD" | translate }}
-      </rs-button>
+      @if (user?.provider === EProvider.EMAIL) {
+        <rs-button
+          [variant]="EVariant.PRIMARY"
+          [disabled]="isSaving() || deleteInProgress()"
+          (pressed)="navigateToChangeEmail()"
+        >
+          {{ "CHANGE_PASSWORD" | translate }}
+        </rs-button>
+      }
     </div>
 
     <div class="danger-zone">
       <rs-button
-        [variant]="EVariant.WARNING"
+        [variant]="EVariant.DANGER"
         [disabled]="isSaving() || deleteInProgress()"
         (pressed)="openDeleteDialog()"
       >
@@ -131,7 +132,7 @@
 @if (avatarCropOpen()) {
   <rs-dialog-modal
     [title]="'CROP_IMAGE' | translate"
-    [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.SECONDARY, disabled: avatarUploading() }"
+    [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.PRIMARY, disabled: avatarUploading() }"
     [ctaBtnTwo]="{ label: ('SAVE' | translate), variant: EVariant.PRIMARY, disabled: !avatarCropBlob() || avatarUploading(), inProgress: avatarUploading() }"
     (closePressed)="closeAvatarCrop()"
     (ctaBtnOnePressed)="closeAvatarCrop()"

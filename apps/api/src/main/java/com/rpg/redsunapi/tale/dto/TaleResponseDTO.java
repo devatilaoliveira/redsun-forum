@@ -1,6 +1,7 @@
 package com.rpg.redsunapi.tale.dto;
 
 import com.rpg.redsunapi.tale.Tale;
+import com.rpg.redsunapi.tale.enums.ELanguage;
 import com.rpg.redsunapi.tale.enums.ERuleSystem;
 import com.rpg.redsunapi.tale.enums.ETaleStatus;
 
@@ -26,13 +27,14 @@ public record TaleResponseDTO(
     OffsetDateTime lastActive = tale.getLastTimeActive() != null ? tale.getLastTimeActive() : creation;
     ETaleStatus status = tale.getStatus() != null ? tale.getStatus() : ETaleStatus.ACTIVE;
     ERuleSystem rulesSystem = tale.getRules();
+    ELanguage language = tale.getLanguage();
 
     return new TaleResponseDTO(
       tale.getId() != null ? tale.getId().toString() : null,
       tale.getTaleName(),
       tale.getPublic(),
       tale.getDescription(),
-      tale.getLanguage(),
+      language == null ? null : language.getValue(),
       status,
       tale.getImageURL(),
       rulesSystem,

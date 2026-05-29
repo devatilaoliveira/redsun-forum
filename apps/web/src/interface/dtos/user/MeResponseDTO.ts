@@ -3,11 +3,13 @@ import {SubscriptionDTO} from "../subscription/SubscriptionDTO";
 import {EProfileLanguage} from "../../enums/EProfileLanguage";
 import {ERuleSystem} from "../../enums/ERuleSystem";
 import {ERole} from "../../enums/ERole";
+import {EProvider} from "../../enums/EProvider";
 
 export interface MeResponseDTO {
   id: string;
   username: string;
   email: string;
+  provider: EProvider;
   imageURL: string;
   description?: string;
   favoriteLanguage: EProfileLanguage[] | null;

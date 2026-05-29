@@ -2,6 +2,7 @@ package com.rpg.redsunapi.tale.persistence;
 
 import com.rpg.redsunapi.tale.Tale;
 import com.rpg.redsunapi.tale.TaleRepository;
+import com.rpg.redsunapi.tale.enums.ELanguage;
 import com.rpg.redsunapi.tale.enums.ERuleSystem;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,7 +43,7 @@ public class TaleRepositoryAdapter implements TaleRepository {
   }
 
   @Override
-  public Page<Tale> findAllPublic(Pageable pageable, String language, ERuleSystem rules) {
+  public Page<Tale> findAllPublic(Pageable pageable, ELanguage language, ERuleSystem rules) {
     return jpaTaleRepository.findAllPublic(pageable, language, rules);
   }
 

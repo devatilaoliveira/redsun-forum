@@ -1,106 +1,91 @@
-<article class="user-card">
-  <div class="top">
-    <div class="avatar">
+<rs-box
+  class="user-card"
+  role="article"
+  [attr.aria-labelledby]="'user-finder-card-title-' + user().id"
+>
+  <div>
+    <a [routerLink]="profileRoute()" [attr.aria-label]="user().username">
       <rs-avatar
         [src]="user().imageURL"
         [userName]="user().username"
         [alt]="user().username"
-        [size]="72"
+        [size]="76"
       />
+    </a>
+  </div>
+  <div class="layout">
+    <h3 [id]="'user-finder-card-title-' + user().id">{{ user().username }}</h3>
+
+    <div class="body">
+      <p class="description">{{ user().description || ('NO_DESCRIPTION' | translate) }}</p>
     </div>
+    <rs-divider type="gradient" />
 
-    <div class="main">
-      <header class="header">
-        <div class="copy">
-          <div class="name-row">
-            <h3>{{ user().username }}</h3>
-          </div>
-
-          <p>{{ user().description || ('NO_DESCRIPTION' | translate) }}</p>
-        </div>
-
-        <div class="actions">
-          <rs-button
-            [disabled]="alreadyContact() || currentUser()"
-            [inProgress]="inProgress()"
-            (pressed)="onAddContactPressed()"
-          >
-            {{
-              currentUser()
-                ? ('PROFILE' | translate)
-                : alreadyContact()
-                  ? ('ALREADY_A_CONTACT' | translate)
-                  : ('ADD_TO_CONTACTS' | translate)
-            }}
-          </rs-button>
-
-          @if (hasMenuOptions()) {
-            <rs-more-options
-              [options]="menuOptions()"
-              [disabled]="inProgress()"
-              (actionSelected)="onMenuOptionSelected($event)"
-            />
+    <div class="preferences">
+      <section class="preference">
+        <h4>{{ 'ROLE' | translate }}</h4>
+        <div class="badges">
+          @if (user().favoriteRole?.length) {
+            @for (role of user().favoriteRole!; track role) {
+              <rs-badge
+                [label]="('ROLE_' + role) | translate"
+                [variant]="EVariant.SECONDARY"
+              />
+            }
+          } @else {
+            <p class="muted">{{ 'USER_FINDER_NO_ROLES' | translate }}</p>
           }
         </div>
-      </header>
+      </section>
 
-      <rs-divider class="divider" />
-
-      <section class="details">
-        <div class="detail">
-          <span class="label">
-            {{ 'ROLE' | translate }}{{ roleCount() > 1 ? ' (' + roleCount() + ')' : '' }}
-          </span>
-          <div class="chips">
-            @if (user().favoriteRole?.length) {
-              @for (role of user().favoriteRole!; track role) {
-                <rs-badge
-                  [label]="('ROLE_' + role) | translate"
-                  [variant]="EVariant.SECONDARY"
-                />
-              }
-            } @else {
-              <span class="empty">{{ 'NO_DESCRIPTION' | translate }}</span>
+      <section class="preference">
+        <h4>{{ 'RULES' | translate }}</h4>
+        <div class="badges">
+          @if (user().favoriteRules?.length) {
+            @for (rule of user().favoriteRules!; track rule) {
+              <rs-badge
+                [label]="('SYSTEM_RULE_' + rule) | translate"
+                [variant]="EVariant.SECONDARY"
+              />
             }
-          </div>
+          } @else {
+            <p class="muted">{{ 'USER_FINDER_NO_RULES' | translate }}</p>
+          }
         </div>
+      </section>
 
-        <div class="detail wide">
-          <span class="label">
-            {{ 'RULES' | translate }}{{ ruleCount() > 0 ? ' (' + ruleCount() + ')' : '' }}
-          </span>
-          <div class="chips">
-            @if (user().favoriteRules?.length) {
-              @for (rule of user().favoriteRules!; track rule) {
-                <rs-badge
-                  [label]="('SYSTEM_RULE_' + rule) | translate"
-                  [variant]="EVariant.SECONDARY"
-                />
-              }
-            } @else {
-              <span class="empty">{{ 'NO_DESCRIPTION' | translate }}</span>
+      <section class="preference">
+        <h4>{{ 'LANGUAGE' | translate }}</h4>
+        <div class="badges">
+          @if (user().favoriteLanguage?.length) {
+            @for (language of user().favoriteLanguage!; track language) {
+              <rs-badge
+                [label]="('LANGUAGE_' + language) | translate"
+                [variant]="EVariant.SECONDARY"
+              />
             }
-          </div>
-        </div>
-
-        <div class="detail">
-          <span class="label">
-            {{ 'LANGUAGE' | translate }}{{ languageCount() > 0 ? ' (' + languageCount() + ')' : '' }}
-          </span>
-          <div class="chips">
-            @if (user().favoriteLanguage?.length) {
-              @for (language of user().favoriteLanguage!; track language) {
-                <rs-badge
-                  [label]="('LANGUAGE_' + language) | translate"
-                  [variant]="EVariant.SECONDARY"
-                />
-              }
-            } @else {
-              <span class="empty">{{ 'NO_DESCRIPTION' | translate }}</span>
-            }
-          </div>
+          } @else {
+            <p class="muted">{{ 'USER_FINDER_NO_LANGUAGES' | translate }}</p>
+          }
         </div>
       </section>
     </div>
+    <div class="actions">
+      <rs-button
+        [disabled]="alreadyContact()"
+        [inProgress]="inProgress()"
+        (pressed)="onAddContactPressed()"
+      >
+        {{ alreadyContact() ? ('ALREADY_A_CONTACT' | translate) : ('ADD_TO_CONTACTS' | translate) }}
+      </rs-button>
+
+      @if (hasMenuOptions()) {
+        <rs-more-options
+          [options]="menuOptions()"
+          [disabled]="inProgress()"
+          (actionSelected)="onMenuOptionSelected($event)"
+        />
+      }
+    </div>
   </div>
-</article>
+</rs-box>

@@ -10,6 +10,16 @@
   cursor: pointer;
 }
 
-:host(:hover) {
-  border: 1px solid var(--color-primary);
+:host(:hover),
+:host(:focus-visible) {
+  border-color: var(--color-primary);
+}
+
+:host(:focus-visible) {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+:host(:active) {
+  transform: translateY(1px);
 }
