@@ -22,7 +22,6 @@ export class UserFinderCardComponent {
   public readonly user: InputSignal<UserFinderResultDTO> = input.required<UserFinderResultDTO>();
   public readonly inProgress: InputSignal<boolean> = input<boolean>(false);
   public readonly alreadyContact: InputSignal<boolean> = input<boolean>(false);
-  public readonly currentUser: InputSignal<boolean> = input<boolean>(false);
   public readonly menuOptions: InputSignal<RsMoreOption[]> = input<RsMoreOption[]>([]);
 
   public readonly addContactPressed: OutputEmitterRef<UserFinderResultDTO> = output<UserFinderResultDTO>();
@@ -31,18 +30,10 @@ export class UserFinderCardComponent {
   protected readonly EVariant = EVariant;
   protected readonly hasMenuOptions: Signal<boolean> = computed<boolean>(() => this.menuOptions().length > 0);
   protected readonly profileRoute: Signal<string[]> = computed<string[]>(() => {
-    if (this.currentUser()) {
-      return ["/", ROUTE_PATHS.profileDetails];
-    }
-
     return ["/", ROUTE_PATHS.contacts, ROUTE_PATHS.details, this.user().id];
   });
 
   protected onAddContactPressed(): void {
-    if (this.currentUser() || this.alreadyContact() || this.inProgress()) {
-      return;
-    }
-
     this.addContactPressed.emit(this.user());
   }
 
