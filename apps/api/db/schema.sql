@@ -20,7 +20,7 @@ DROP TABLE IF EXISTS public.users CASCADE;
 -- Users
 CREATE TABLE public.users (
   id uuid PRIMARY KEY,
-  username varchar(20) NOT NULL UNIQUE,
+  username varchar(25) NOT NULL UNIQUE,
   email varchar(254) NOT NULL UNIQUE,
   provider varchar(20) NOT NULL DEFAULT 'EMAIL' CHECK (provider IN ('EMAIL','GOOGLE')),
   description varchar(2000),
