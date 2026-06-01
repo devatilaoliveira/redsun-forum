@@ -10,6 +10,7 @@ import {UpsertCharacterSheetDTO} from "../interface/dtos/characterSheet/UpsertCh
 const CHARACTER_SHEET_ENDPOINT = `${environment.apiBaseUrl}/character-sheet`;
 
 export interface ICharacterSheetService {
+  getCharacterSheet(taleId: string, characterSheetId: string): Observable<CharacterSheetResponseDTO>;
   getMyCharacterSheet(taleId: string, characterSheetId: string): Observable<CharacterSheetResponseDTO>;
   upsertCharacterSheet(
     taleId: string,
@@ -23,11 +24,15 @@ export interface ICharacterSheetService {
 export class CharacterSheetService implements ICharacterSheetService {
   private readonly _http: HttpClient = inject(HttpClient);
 
-  public getMyCharacterSheet(taleId: string, characterSheetId: string): Observable<CharacterSheetResponseDTO> {
+  public getCharacterSheet(taleId: string, characterSheetId: string): Observable<CharacterSheetResponseDTO> {
     return this._http.get<CharacterSheetResponseDTO>(
       `${CHARACTER_SHEET_ENDPOINT}/${taleId}`,
       {params: {characterSheetId}}
     );
+  }
+
+  public getMyCharacterSheet(taleId: string, characterSheetId: string): Observable<CharacterSheetResponseDTO> {
+    return this.getCharacterSheet(taleId, characterSheetId);
   }
 
   public upsertCharacterSheet(

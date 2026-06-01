@@ -178,6 +178,12 @@ export const routes: Routes = [
                 title: "MANAGE_PROFILE"
               },
               {
+                path: `${ROUTE_PATHS.participants}/:${ROUTE_PATHS.id}`,
+                loadComponent: () => import("./features/tale-participant-profile/tale-participant-profile.view").then((module) => module.TaleParticipantProfileView),
+                canActivate: [TaleParticipantGuard],
+                title: "TALE_PARTICIPANT_PROFILE"
+              },
+              {
                 path: `${ROUTE_PATHS.locations}/${ROUTE_PATHS.creation}`,
                 loadComponent: () => import("./features/location-creation/location-creation.view").then((module) => module.LocationCreationView),
                 canActivate: [TaleParticipantGuard],

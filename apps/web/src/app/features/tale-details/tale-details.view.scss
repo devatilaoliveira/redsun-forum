@@ -31,6 +31,33 @@ $min-content: bp.$bp-sm;
   width: 100%;
 }
 
+.participant-card {
+  display: inline-flex;
+  width: 92px;
+  min-height: 104px;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-0-5);
+  padding: var(--space-0-5);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+
+.participant-card:focus-visible {
+  outline: 2px solid var(--color-primary, currentColor);
+  outline-offset: 3px;
+}
+
+.participant-name {
+  max-width: 100%;
+  font-size: var(--font-size-sm, 0.875rem);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
 .table-locals {
   width: 100%;
   max-width: bp.$bp-lg;

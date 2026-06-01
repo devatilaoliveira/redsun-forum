@@ -16,13 +16,15 @@
           class="participants-carousel"
         >
           <ng-template let-participant>
-            <rs-contact-card
-              [profileId]="participant.id"
-              [displayName]="participant.characterName || ''"
-              [avatarSrc]="participant.characterImageUrl"
-              [avatarSize]="64"
-              [hideLabel]="true"
-            />
+            <button class="participant-card" type="button" (click)="onParticipantPressed(participant)">
+              <rs-avatar
+                [src]="participant.characterImageUrl"
+                [userName]="participantDisplayName(participant)"
+                [alt]="participantDisplayName(participant)"
+                [size]="64"
+              />
+              <span class="participant-name">{{ participantDisplayName(participant) }}</span>
+            </button>
           </ng-template>
         </rs-carousel>
       }

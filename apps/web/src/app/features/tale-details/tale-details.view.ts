@@ -9,10 +9,11 @@ import {TaleDetailsCardComponent} from "../../shared/ui/tale-details-card/tale-d
 import {LocationsTableComponent} from "../../shared/ui/locations-table/locations-table.component";
 import {RsButton} from "../../shared/fragments/rsButton/rs.button";
 import {RsCarousel} from "../../shared/fragments/rsCarousel/rs.carousel";
-import {RsContactCard} from "../../shared/fragments/rsContactCard/rs.contact-card";
+import {RsAvatar} from "../../shared/fragments/rsAvatar/rs.avatar";
 import {ROUTE_PATHS} from "../../../interface/constants/route-path.constants";
 import {IPrinter, Printer} from "../../../infra/miscellaneous/printer.handler";
 import {TalesContextService} from "../../../stateServices/tales-context.service";
+import {TaleParticipantProfileDTO} from "../../../interface/dtos/tale/TaleParticipantProfileDTO";
 
 @Component({
   selector: "rs-tale-details",
@@ -24,7 +25,7 @@ import {TalesContextService} from "../../../stateServices/tales-context.service"
     LocationsTableComponent,
     RsButton,
     RsCarousel,
-    RsContactCard
+    RsAvatar
   ],
   templateUrl: "./tale-details.view.html",
   styleUrl: "./tale-details.view.scss"
@@ -47,6 +48,24 @@ export class TaleDetailsView {
     }
 
     void this._router.navigate(["/", ROUTE_PATHS.tales, taleId, ROUTE_PATHS.locations]);
+  }
+
+  protected onParticipantPressed(participant: TaleParticipantProfileDTO): void {
+    const taleId = this._talesContext.taleId();
+    if (!taleId || !participant.id) {
+      return;
+    }
+
+    void this._router.navigate(["/", ROUTE_PATHS.tales, taleId, ROUTE_PATHS.participants, participant.id]);
+  }
+
+  protected participantDisplayName(participant: TaleParticipantProfileDTO): string {
+    const characterName = participant.characterName?.trim() ?? "";
+    if (characterName.length > 0) {
+      return characterName;
+    }
+
+    return participant.username;
   }
 
   // Dev Mode Only
