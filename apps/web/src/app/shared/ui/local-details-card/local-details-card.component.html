@@ -1,7 +1,7 @@
 <rs-box class="card" [minHeight]="hasImage() ? 320 : null">
   @if (hasImage()) {
     <div class="cover">
-      <img
+      <rs-img
         class="image"
         [src]="location().imageUrl!"
         [alt]="location().imageUrl || ''"

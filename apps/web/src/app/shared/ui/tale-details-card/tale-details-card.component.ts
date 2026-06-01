@@ -11,11 +11,12 @@ import {ETheme} from "../../../../interface/enums/ETheme";
 import {RsDot} from "../../fragments/rsDot/rs.dot";
 import {ROUTE_PATHS} from "../../../../interface/constants/route-path.constants";
 import {LocationDTO} from "../../../../interface/dtos/location/LocationDTO";
+import {RsImg} from "../../fragments/rsImg/rs.img";
 
 @Component({
   selector: "rs-tale-details-card",
   standalone: true,
-  imports: [DatePipe, TranslatePipe, RsBox, RsDivider, RsDot],
+  imports: [DatePipe, TranslatePipe, RsBox, RsDivider, RsDot, RsImg],
   templateUrl: "./tale-details-card.component.html",
   styleUrl: "./tale-details-card.component.scss"
 })
@@ -23,7 +24,6 @@ export class TaleDetailsCardComponent {
   private readonly _router: Router = inject(Router);
 
   public readonly tale: InputSignal<TaleDetailDTO> = input.required<TaleDetailDTO>();
-  protected imageLoaded = false;
 
   protected readonly hasImage = computed<boolean>(() => {
     const url = this.tale().imageUrl;
@@ -52,10 +52,6 @@ export class TaleDetailsCardComponent {
   protected readonly lastActiveVariant = computed<EVariant>(() => UtilFunctions.getVariantByDate(this.tale().lastTimeActive));
   protected readonly EVariant = EVariant;
   protected readonly ETheme = ETheme;
-
-  protected onImageLoad(): void {
-    this.imageLoaded = true;
-  }
 
   protected navigateToTaleOwner(): void {
     const ownerId = this.tale().author.id;

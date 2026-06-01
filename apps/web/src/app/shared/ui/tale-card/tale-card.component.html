@@ -1,14 +1,12 @@
 <rs-box-clickable class="tale-card" [minHeight]="392" (pressed)="onCardPressed()">
   <div class="cover">
     @if (hasImage) {
-      <img
+      <rs-img
         class="card-image"
         [src]="tale.imageUrl!"
         [alt]="tale.taleName + ' cover'"
         loading="lazy"
         decoding="async"
-        (load)="onImageLoad()"
-        [class.loaded]="imageLoaded"
       />
     } @else {
       <div class="placeholder">

@@ -4,11 +4,12 @@ import {TranslatePipe} from "@ngx-translate/core";
 import {RsBox} from "../../fragments/rsBox/rs.box";
 import {LocationDetailsDTO} from "../../../../interface/dtos/location/LocationDetailsDTO";
 import {RsAvatar} from "../../fragments/rsAvatar/rs.avatar";
+import {RsImg} from "../../fragments/rsImg/rs.img";
 
 @Component({
   selector: "rs-local-details-card",
   standalone: true,
-  imports: [DatePipe, TranslatePipe, RsBox, RsAvatar],
+  imports: [DatePipe, TranslatePipe, RsBox, RsAvatar, RsImg],
   templateUrl: "./local-details-card.component.html",
   styleUrl: "./local-details-card.component.scss"
 })
