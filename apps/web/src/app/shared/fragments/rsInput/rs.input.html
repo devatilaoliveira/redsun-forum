@@ -8,7 +8,12 @@
     </label>
   }
 
-  <div class="field" [class.is-invalid]="isInvalid()" [class.is-blocked]="blocked()">
+  <div
+    class="field"
+    [class.is-invalid]="isInvalid()"
+    [class.is-blocked]="isUnavailable()"
+    [class.is-inline]="isInline()"
+  >
     <input
       class="control"
       [id]="inputId()"
@@ -17,13 +22,15 @@
       [placeholder]="placeholder()"
       [value]="currentValue()"
       [attr.maxlength]="maxLength()"
-      [attr.readonly]="blocked() ? '' : null"
+      [disabled]="isDisabled()"
+      [attr.readonly]="isReadonly() ? '' : null"
       [attr.required]="required() ? '' : null"
       [attr.autocomplete]="autocomplete() ?? null"
       [attr.pattern]="patternAttr()"
       [attr.aria-invalid]="isInvalid()"
       [attr.aria-required]="required()"
-      [attr.aria-readonly]="blocked()"
+      [attr.aria-disabled]="isDisabled()"
+      [attr.aria-readonly]="isReadonly()"
       [attr.aria-errormessage]="showError() ? errorId() : null"
       [attr.aria-describedby]="showError() ? errorId() : null"
       (input)="onInput($any($event.target).value)"
@@ -37,6 +44,7 @@
         [attr.data-testid]="testId() ? testId() + '-toggle' : null"
         [attr.aria-label]="(passwordVisible() ? 'RS_INPUT_HIDE_PASSWORD' : 'RS_INPUT_SHOW_PASSWORD') | translate"
         [attr.aria-pressed]="passwordVisible()"
+        [disabled]="isUnavailable()"
         (click)="togglePassword()"
       >
         <img
@@ -54,7 +62,7 @@
         type="button"
         class="toggle"
         [attr.data-testid]="testId() ? testId() + '-suffix-action' : null"
-        [disabled]="blocked()"
+        [disabled]="isUnavailable()"
         (click)="onSuffixActionPressed()"
       >
         <svg

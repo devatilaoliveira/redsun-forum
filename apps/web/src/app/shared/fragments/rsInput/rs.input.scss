@@ -46,6 +46,16 @@
   --rs-input-border: var(--color-primary);
 }
 
+.field.is-inline {
+  background-color: transparent;
+  padding: 0;
+  border: 0;
+}
+
+.field.is-inline:focus-within {
+  --rs-input-border: transparent;
+}
+
 .field.is-invalid,
 .field.is-invalid:focus-within {
   --rs-input-border: var(--color-danger);
@@ -70,6 +80,7 @@
   font-size: var(--text-normal);
   font-family: var(--font-family-body), serif;
   min-width: 0;
+  padding: 0;
 }
 
 .control:-webkit-autofill,
@@ -86,7 +97,8 @@
   color: var(--color-muted);
 }
 
-.control:read-only {
+.control:read-only,
+.control:disabled {
   cursor: not-allowed;
 }
 

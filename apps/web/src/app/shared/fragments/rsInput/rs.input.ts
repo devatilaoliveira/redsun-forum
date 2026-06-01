@@ -1,6 +1,8 @@
 import {Component, computed, effect, inject, input, InputSignal, output, OutputEmitterRef, Signal, signal, WritableSignal} from "@angular/core";
 import {TranslatePipe, TranslateService} from "@ngx-translate/core";
 
+export type RsInputVariant = "default" | "inline";
+
 @Component({
   selector: "rs-input",
   standalone: true,
@@ -20,6 +22,8 @@ export class RsInput {
   public readonly maxLength: InputSignal<number | null> = input<number | null>(null);
   public readonly required: InputSignal<boolean> = input<boolean>(false);
   public readonly blocked: InputSignal<boolean> = input<boolean>(false);
+  public readonly disabled: InputSignal<boolean> = input<boolean>(false);
+  public readonly readonly: InputSignal<boolean> = input<boolean>(false);
   public readonly pattern: InputSignal<RegExp | null> = input<RegExp | null>(null);
   public readonly errorMessage: InputSignal<string | null> = input<string | null>(null);
   public readonly autocomplete: InputSignal<string | null> = input<string | null>("off");
@@ -28,6 +32,7 @@ export class RsInput {
   public readonly validateAfterLength: InputSignal<number | null> = input<number | null>(null);
   public readonly suffixActionIcon: InputSignal<string> = input<string>("");
   public readonly hideErrorMessages: InputSignal<boolean> = input<boolean>(false);
+  public readonly variant: InputSignal<RsInputVariant> = input<RsInputVariant>("default");
 
   public readonly valueChanged: OutputEmitterRef<string> = output<string>();
   public readonly suffixActionPressed: OutputEmitterRef<void> = output<void>();
@@ -41,6 +46,11 @@ export class RsInput {
   protected readonly errorId: Signal<string> = computed<string>(() => `${this.inputId()}-error`);
   protected readonly showError: Signal<boolean> = computed<boolean>(() => this.touched() && !!this.validationError());
   protected readonly isInvalid: Signal<boolean> = computed<boolean>(() => this.showError());
+  protected readonly isInline: Signal<boolean> = computed<boolean>(() => this.variant() === "inline");
+  protected readonly isReadonly: Signal<boolean> = computed<boolean>(() => this.blocked() || this.readonly());
+  protected readonly isDisabled: Signal<boolean> = computed<boolean>(() => this.disabled());
+  protected readonly isUnavailable: Signal<boolean> = computed<boolean>(() => this.isReadonly() || this.isDisabled());
+  protected readonly canEdit: Signal<boolean> = computed<boolean>(() => !this.isUnavailable());
   protected readonly showPasswordToggle: Signal<boolean> = computed<boolean>(() => this.type() === "password");
   protected readonly inputType: Signal<string> = computed<string>(() => {
     if (this.type() === "password" && this.passwordVisible()) return "text";
@@ -59,7 +69,7 @@ export class RsInput {
   }
 
   protected onInput(value: string): void {
-    if (this.blocked()) return;
+    if (!this.canEdit()) return;
     this.currentValue.set(value);
     if (this.touched()) {
       this.validationError.set(this._validate(value));
@@ -73,10 +83,12 @@ export class RsInput {
   }
 
   protected togglePassword(): void {
+    if (this.isUnavailable()) return;
     this.passwordVisible.update((visible: boolean) => !visible);
   }
 
   protected onSuffixActionPressed(): void {
+    if (this.isUnavailable()) return;
     this.suffixActionPressed.emit();
   }
 
