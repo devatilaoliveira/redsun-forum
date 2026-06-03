@@ -1,0 +1,146 @@
+<section class="redsun-sheet" aria-label="RedSun character sheet">
+  <section class="sheet-section">
+    <h3 class="section-title">Identificacao</h3>
+    <div class="field-grid field-grid--four">
+      @for (field of identification; track field.key) {
+        <rs-input
+          [label]="field.label"
+          [value]="field.value"
+          [blocked]="!sheetEditable()"
+        />
+      }
+    </div>
+  </section>
+  <rs-divider type="solid" />
+
+  <section class="sheet-section">
+    <h3 class="section-title">Atributos</h3>
+    <div class="column-grid">
+      @for (group of attributes; track group.key) {
+        <article class="sheet-group">
+          <h3 class="section-title">{{ group.title }}</h3>
+          @for (field of group.fields; track field.key) {
+            <rs-skill-bullets [skillName]="field.label" [minLevel]="true" [levelEditable]="sheetEditable()" />
+          }
+        </article>
+      }
+    </div>
+  </section>
+  <rs-divider type="solid" />
+
+  <section class="sheet-section">
+    <h3 class="section-title">Habilidades</h3>
+    <div class="column-grid">
+      @for (group of abilities; track group.key) {
+        <article class="sheet-group">
+          <h3 class="section-title">{{ group.title }}</h3>
+          @for (field of group.fields; track field.key) {
+            @if (field.label) {
+              <rs-skill-bullets [skillName]="field.label" [minLevel]="false" [levelEditable]="sheetEditable()" />
+            } @else {
+              <rs-skill-bullets
+                [skillName]="field.label"
+                [minLevel]="false"
+                [editable]="sheetEditable()"
+                [levelEditable]="sheetEditable()"
+              />
+            }
+          }
+        </article>
+      }
+    </div>
+  </section>
+  <rs-divider type="solid" />
+
+  <section class="sheet-section">
+    <h3 class="section-title">Vantagens</h3>
+    <div class="column-grid">
+      @for (group of advantages; track group.key) {
+        <article class="sheet-group">
+          <h3 class="section-title">{{ group.title }}</h3>
+          @for (field of group.fields; track field.key) {
+            @if (field.label) {
+              <rs-skill-bullets [skillName]="field.label" [minLevel]="false" [levelEditable]="sheetEditable()" />
+            } @else {
+              <rs-skill-bullets
+                [skillName]="field.label"
+                [minLevel]="false"
+                [editable]="sheetEditable()"
+                [levelEditable]="sheetEditable()"
+              />
+            }
+          }
+        </article>
+      }
+    </div>
+  </section>
+  <rs-divider type="solid" />
+
+  <section class="sheet-section">
+    <h3 class="section-title">Antecedentes</h3>
+    <div class="field-grid field-grid--two">
+      @for (field of backgrounds; track field.key) {
+        <rs-input
+          label=" "
+          [value]="field.value"
+          [blocked]="!sheetEditable()"
+        />
+      }
+    </div>
+  </section>
+  <rs-divider type="solid" />
+
+  <section class="sheet-section">
+    <h3 class="section-title">Recursos</h3>
+    <div class="resource-grid">
+      @for (field of resources(); track field.key) {
+        <rs-limited-resources
+          [resourceName]="field.label"
+          [maximumValue]="field.maximumValue"
+          [currentValue]="field.currentValue"
+          [slots]="resourceSlots"
+          [editable]="sheetEditable()"
+          (maximumValueChanged)="updateResourceMaximum(field.key, $event)"
+          (currentValueChanged)="updateResourceCurrent(field.key, $event)"
+        />
+      }
+    </div>
+  </section>
+  <rs-divider type="solid" />
+
+  <section class="sheet-section">
+    <h3 class="section-title">Vitalidade</h3>
+    <div class="health-grid">
+      @for (field of health; track field.key) {
+        <rs-checkbox
+          [label]="field.label"
+          [disabled]="!sheetEditable()"
+        />
+      }
+    </div>
+  </section>
+  <rs-divider type="solid" />
+
+  <section class="sheet-section">
+    <h3 class="section-title">Detalhes</h3>
+    <div class="textarea-grid">
+      @for (field of textFields; track field.key) {
+        <rs-textarea
+          [label]="field.label"
+          [rows]="5"
+          [value]="field.value"
+          [blocked]="!sheetEditable()"
+        />
+      }
+    </div>
+  </section>
+  <rs-divider type="solid" />
+
+  <rs-round-icon-button
+    class="sheet-edit-button"
+    [iconSrc]="sheetButtonIcon()"
+    [ariaLabel]="sheetButtonLabel()"
+    [variant]="EVariant.PRIMARY"
+    (pressed)="toggleSheetEditMode()"
+  />
+</section>

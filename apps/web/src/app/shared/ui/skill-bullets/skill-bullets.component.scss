@@ -40,6 +40,10 @@
   background: var(--color-primary);
 }
 
+.bullets.is-read-only .bullet:disabled {
+  cursor: default;
+}
+
 .bullet:focus-visible {
   border-color: var(--color-primary);
   outline: 2px solid var(--color-primary);

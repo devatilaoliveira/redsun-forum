@@ -26,6 +26,7 @@ import {ImageCropperComponent, ImageCroppedEvent} from "ngx-image-cropper";
 import {ImageHandler} from "../../../infra/miscellaneous/image.handler";
 import {IToastService, ToastService} from "../../../services/toast.service";
 import {TalesContextService} from "../../../stateServices/tales-context.service";
+import {RedSunSheetComponent} from "./redsun-sheet/redsun-sheet.component";
 
 interface CharacterSheetFormControls {
   characterName: FormControl<string>;
@@ -47,7 +48,8 @@ type CharacterSheetFormValue = { [K in keyof CharacterSheetFormControls]: string
     RsSpinner,
     RsDialogModalComponent,
     RsAvatar,
-    ImageCropperComponent
+    ImageCropperComponent,
+    RedSunSheetComponent
   ],
   templateUrl: "./manage-character.view.html",
   styleUrl: "./manage-character.view.scss"
@@ -98,6 +100,11 @@ export class ManageCharacterView implements OnInit, OnDestroy {
         this.openToast("CHARACTER_SHEET_LOAD_ERROR");
       }
     });
+  }
+
+  protected isRedSunSheet(): boolean {
+    return true;
+    // return this.currentRuleSystem === ERuleSystem.REDSUN;
   }
 
   public ngOnDestroy(): void {

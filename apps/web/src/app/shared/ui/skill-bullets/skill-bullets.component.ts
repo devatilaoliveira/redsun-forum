@@ -1,5 +1,6 @@
 import {Component, computed, effect, input, InputSignal, signal, Signal, WritableSignal} from "@angular/core";
 import {RsInput} from "../../fragments/rsInput/rs.input";
+import {selectContiguousRank} from "../rank-selection";
 
 @Component({
   selector: "rs-skill-bullets",
@@ -12,6 +13,7 @@ export class SkillBulletsComponent {
   public readonly skillName: InputSignal<string> = input.required<string>();
   public readonly minLevel: InputSignal<boolean> = input.required<boolean>();
   public readonly editable: InputSignal<boolean> = input<boolean>(false);
+  public readonly levelEditable: InputSignal<boolean> = input<boolean>(true);
 
   protected readonly bullets: readonly number[] = [1, 2, 3, 4, 5];
   protected readonly level: WritableSignal<number> = signal<number>(0);
@@ -35,11 +37,11 @@ export class SkillBulletsComponent {
   }
 
   protected setLevel(selectedLevel: number): void {
+    if (!this.levelEditable()) return;
+
     const currentLevel: number = this.effectiveLevel();
     const minimumLevel: number = this.minLevel() ? 1 : 0;
-    const nextLevel: number = selectedLevel === currentLevel
-      ? Math.max(minimumLevel, selectedLevel - 1)
-      : selectedLevel;
+    const nextLevel: number = selectContiguousRank(currentLevel, selectedLevel, minimumLevel);
 
     this.level.set(nextLevel);
   }

@@ -12,12 +12,13 @@
     <span class="skill-name">{{ currentSkillName() }}</span>
   }
 
-  <div class="bullets" role="group" [attr.aria-label]="currentSkillName()">
+  <div class="bullets" role="group" [class.is-read-only]="!levelEditable()" [attr.aria-label]="currentSkillName()">
     @for (bullet of bullets; track bullet) {
       <button
         class="bullet"
         type="button"
         [class.is-filled]="bullet <= effectiveLevel()"
+        [disabled]="!levelEditable()"
         [attr.aria-label]="currentSkillName() + ' nivel ' + bullet"
         [attr.aria-pressed]="bullet <= effectiveLevel()"
         (click)="setLevel(bullet)"

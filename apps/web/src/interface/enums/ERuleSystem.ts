@@ -7,5 +7,6 @@ export enum ERuleSystem {
   SWADE = "SWADE",
   OTHER = "OTHER",
   CUSTOM = "CUSTOM",
-  FIM_DO_MUNDO = "FIM_DO_MUNDO"
+  FIM_DO_MUNDO = "FIM_DO_MUNDO",
+  REDSUN = "REDSUN",
 }

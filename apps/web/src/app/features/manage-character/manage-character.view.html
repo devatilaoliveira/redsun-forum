@@ -4,10 +4,25 @@
     [subTittle]="'CHARACTER_SHEET_SUBTITLE' | translate"
   />
 
-  <div class="content">
+  <div class="content" [class.content--wide]="isRedSunSheet()">
     @if (sheetLoading()) {
       <div class="status">
         <rs-spinner [variant]="EVariant.PRIMARY" />
+      </div>
+    } @else if (true) {
+      <div class="redsun-content">
+        <rs-redsun-sheet />
+
+        @if (!isTaleOwner()) {
+          <rs-button
+            class="quit-button"
+            [variant]="EVariant.WARNING"
+            [inProgress]="leavingInProgress()"
+            (pressed)="onQuitPressed()"
+          >
+            {{ 'QUIT_TALE' | translate }}
+          </rs-button>
+        }
       </div>
     } @else {
       <form class="form" [formGroup]="characterSheetFormGroup" (submit)="$event.preventDefault(); onSubmit()">

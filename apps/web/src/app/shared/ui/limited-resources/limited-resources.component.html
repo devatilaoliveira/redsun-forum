@@ -1,0 +1,33 @@
+<div class="limited-resource" [class.is-read-only]="!editable()">
+  <span class="resource-name">{{ resourceName() }}</span>
+
+  <div class="resource-tracks">
+    <div class="resource-track" role="group" [attr.aria-label]="resourceName() + ' valor maximo'">
+      @for (box of boxes(); track box) {
+        <button
+          class="resource-box resource-box--maximum"
+          type="button"
+          [class.is-filled]="box <= maximumLevel()"
+          [disabled]="!editable()"
+          [attr.aria-label]="resourceName() + ' valor maximo ' + box"
+          [attr.aria-pressed]="box <= maximumLevel()"
+          (click)="setMaximumLevel(box)"
+        ></button>
+      }
+    </div>
+
+    <div class="resource-track" role="group" [attr.aria-label]="resourceName() + ' valor atual'">
+      @for (box of boxes(); track box) {
+        <button
+          class="resource-box resource-box--current"
+          type="button"
+          [class.is-filled]="box <= currentLevel()"
+          [disabled]="!editable() || box > maximumLevel()"
+          [attr.aria-label]="resourceName() + ' valor atual ' + box"
+          [attr.aria-pressed]="box <= currentLevel()"
+          (click)="setCurrentLevel(box)"
+        ></button>
+      }
+    </div>
+  </div>
+</div>
