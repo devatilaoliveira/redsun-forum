@@ -1,9 +1,14 @@
-import {Component, computed, Signal, signal, WritableSignal} from "@angular/core";
-import {EVariant} from "../../../../interface/enums/EVariant";
-import {RsDivider} from "../../../shared/fragments/rsDivider/rs.divider";
+import {Component, effect, inject, input, InputSignal} from "@angular/core";
+import {FormControl, FormGroup, FormRecord, NonNullableFormBuilder} from "@angular/forms";
+import {
+  RedSunLimitedResourceDTO,
+  RedSunSheetDTO,
+  RedSunSkillDTO
+} from "../../../../interface/dtos/characterSheet/RedSunSheetDTO";
+import {UpsertRedSunSheetDTO} from "../../../../interface/dtos/characterSheet/UpsertRedSunSheetDTO";
 import {RsCheckbox} from "../../../shared/fragments/rsCheckbox/rs.checkbox";
+import {RsDivider} from "../../../shared/fragments/rsDivider/rs.divider";
 import {RsInput} from "../../../shared/fragments/rsInput/rs.input";
-import {RsRoundIconButton} from "../../../shared/fragments/rsRoundIconButton/rs.round-icon-button";
 import {RsTextarea} from "../../../shared/fragments/rsTextarea/rs.textarea";
 import {LimitedResourcesComponent} from "../../../shared/ui/limited-resources/limited-resources.component";
 import {clampRank} from "../../../shared/ui/rank-selection";
@@ -28,10 +33,37 @@ interface RedSunLimitedResource {
   readonly currentValue: number;
 }
 
+interface RedSunCheckField {
+  readonly key: string;
+  readonly label: string;
+  readonly checked: boolean;
+}
+
 interface RedSunFieldGroup<TField> {
   readonly key: string;
   readonly title: string;
   readonly fields: readonly TField[];
+}
+
+interface RedSunSkillFormControls {
+  name: FormControl<string>;
+  level: FormControl<number>;
+}
+
+interface RedSunLimitedResourceFormControls {
+  maximumValue: FormControl<number>;
+  currentValue: FormControl<number>;
+}
+
+interface RedSunSheetFormControls {
+  identification: FormRecord<FormControl<string>>;
+  attributes: FormRecord<FormControl<number>>;
+  abilities: FormRecord<FormGroup<RedSunSkillFormControls>>;
+  advantages: FormRecord<FormGroup<RedSunSkillFormControls>>;
+  backgrounds: FormRecord<FormControl<string>>;
+  resources: FormRecord<FormGroup<RedSunLimitedResourceFormControls>>;
+  health: FormRecord<FormControl<boolean>>;
+  details: FormRecord<FormControl<string>>;
 }
 
 @Component({
@@ -41,7 +73,6 @@ interface RedSunFieldGroup<TField> {
     RsCheckbox,
     RsDivider,
     RsInput,
-    RsRoundIconButton,
     RsTextarea,
     LimitedResourcesComponent,
     SkillBulletsComponent
@@ -50,18 +81,16 @@ interface RedSunFieldGroup<TField> {
   styleUrl: "./redsun-sheet.component.scss"
 })
 export class RedSunSheetComponent {
-  protected readonly EVariant = EVariant;
-  protected readonly sheetEditable: WritableSignal<boolean> = signal<boolean>(false);
-  protected readonly sheetButtonIcon: Signal<string> = computed<string>(() => {
-    return this.sheetEditable() ? "/assets/svgs/save.svg" : "/assets/svgs/edit.svg";
-  });
-  protected readonly sheetButtonLabel: Signal<string> = computed<string>(() => {
-    return this.sheetEditable() ? "Salvar ficha" : "Editar ficha";
-  });
+  private readonly _formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+
+  public readonly sheet: InputSignal<RedSunSheetDTO | null | undefined> = input<RedSunSheetDTO | null | undefined>(
+    undefined
+  );
+  public readonly sheetEditable: InputSignal<boolean> = input<boolean>(false);
+
   protected readonly resourceSlots: number = 10;
 
   protected readonly identification: readonly RedSunTextField[] = [
-    {key: "name", label: "Nome", value: ""},
     {key: "player", label: "Jogador", value: ""},
     {key: "nature", label: "Natureza", value: ""},
     {key: "demeanor", label: "Comportamento", value: ""}
@@ -147,7 +176,7 @@ export class RedSunSheetComponent {
     },
     {
       key: "specializations",
-      title: "Especializacoes",
+      title: "Especializações",
       fields: [
         {key: "martial_arts", label: "Artes Marciais", value: 0},
         {key: "herbalism", label: "Herborismo", value: 0},
@@ -169,23 +198,21 @@ export class RedSunSheetComponent {
 
   protected readonly backgrounds: readonly RedSunTextField[] = this.createBlankTextFields("background", 6);
 
-  protected readonly resources: WritableSignal<readonly RedSunLimitedResource[]> = signal<
-    readonly RedSunLimitedResource[]
-  >([
+  protected readonly resourceFields: readonly RedSunLimitedResource[] = [
     {key: "willpower", label: "Força de Vontade", maximumValue: 5, currentValue: 5},
     {key: "impetus", label: "Ímpeto", maximumValue: 5, currentValue: 5}
-  ]);
+  ];
 
-  protected readonly health: readonly RedSunTextField[] = [
-    {key: "bruised", label: "Escoriado", value: ""},
-    {key: "hurt", label: "Machucado", value: ""},
-    {key: "injured", label: "Ferido", value: ""},
-    {key: "badly_wounded", label: "Ferido Gravemente", value: ""},
-    {key: "mauled", label: "Espancado", value: ""},
-    {key: "crippled", label: "Aleijado", value: ""},
-    {key: "incapacitated", label: "Incapacitado", value: ""},
-    {key: "torpor", label: "Torpor", value: ""},
-    {key: "final_death", label: "Morte Final", value: ""}
+  protected readonly health: readonly RedSunCheckField[] = [
+    {key: "bruised", label: "Escoriado", checked: false},
+    {key: "hurt", label: "Machucado", checked: false},
+    {key: "injured", label: "Ferido", checked: false},
+    {key: "badly_wounded", label: "Ferido Gravemente", checked: false},
+    {key: "mauled", label: "Espancado", checked: false},
+    {key: "crippled", label: "Aleijado", checked: false},
+    {key: "incapacitated", label: "Incapacitado", checked: false},
+    {key: "torpor", label: "Torpor", checked: false},
+    {key: "final_death", label: "Morte Final", checked: false}
   ];
 
   protected readonly textFields: readonly RedSunTextField[] = [
@@ -196,8 +223,135 @@ export class RedSunSheetComponent {
     {key: "combat_maneuvers", label: "Manobras de Combate", value: ""},
     {key: "arsenal", label: "Arsenal", value: ""},
     {key: "learned_rituals", label: "Rituais aprendidos", value: ""},
-    {key: "craft", label: "Ofício", value: ""}
+    {key: "craft", label: "Oficio", value: ""}
   ];
+
+  protected readonly form: FormGroup<RedSunSheetFormControls> = new FormGroup<RedSunSheetFormControls>({
+    identification: this.createTextRecord(this.identification),
+    attributes: this.createRankRecord(this.attributes),
+    abilities: this.createSkillRecord(this.abilities),
+    advantages: this.createSkillRecord(this.advantages),
+    backgrounds: this.createTextRecord(this.backgrounds),
+    resources: this.createResourceRecord(this.resourceFields),
+    health: this.createCheckRecord(this.health),
+    details: this.createTextRecord(this.textFields)
+  });
+
+  constructor() {
+    effect(() => {
+      const sheet: RedSunSheetDTO | null | undefined = this.sheet();
+      if (sheet !== undefined) {
+        this.patchValue(sheet);
+      }
+    });
+  }
+
+  public isDirty(): boolean {
+    return this.form.dirty;
+  }
+
+  public isInvalid(): boolean {
+    return this.form.invalid;
+  }
+
+  public markAllAsTouched(): void {
+    this.form.markAllAsTouched();
+  }
+
+  public markAsSaved(): void {
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
+  }
+
+  public patchValue(sheet: RedSunSheetDTO | null): void {
+    this.patchTextRecord(this.form.controls.identification, this.identification, sheet?.identification);
+    this.patchRankRecord(this.form.controls.attributes, this.attributes, sheet?.attributes);
+    this.patchSkillRecord(this.form.controls.abilities, this.abilities, sheet?.abilities);
+    this.patchSkillRecord(this.form.controls.advantages, this.advantages, sheet?.advantages);
+    this.patchTextRecord(this.form.controls.backgrounds, this.backgrounds, sheet?.backgrounds);
+    this.patchResourceRecord(this.form.controls.resources, this.resourceFields, sheet?.resources);
+    this.patchCheckRecord(this.form.controls.health, this.health, sheet?.health);
+    this.patchTextRecord(this.form.controls.details, this.textFields, sheet?.details);
+    this.markAsSaved();
+  }
+
+  public toUpsertDto(): UpsertRedSunSheetDTO {
+    return {
+      identification: this.textRecordToDto(this.form.controls.identification),
+      attributes: this.rankRecordToDto(this.form.controls.attributes),
+      abilities: this.skillRecordToDto(this.form.controls.abilities),
+      advantages: this.skillRecordToDto(this.form.controls.advantages),
+      backgrounds: this.textRecordToDto(this.form.controls.backgrounds),
+      resources: this.resourceRecordToDto(this.form.controls.resources),
+      health: this.checkRecordToDto(this.form.controls.health),
+      details: this.textRecordToDto(this.form.controls.details)
+    };
+  }
+
+  protected textControl(record: FormRecord<FormControl<string>>, key: string): FormControl<string> {
+    return record.controls[key];
+  }
+
+  protected rankControl(record: FormRecord<FormControl<number>>, key: string): FormControl<number> {
+    return record.controls[key];
+  }
+
+  protected skillControl(
+    record: FormRecord<FormGroup<RedSunSkillFormControls>>,
+    key: string
+  ): FormGroup<RedSunSkillFormControls> {
+    return record.controls[key];
+  }
+
+  protected resourceControl(
+    record: FormRecord<FormGroup<RedSunLimitedResourceFormControls>>,
+    key: string
+  ): FormGroup<RedSunLimitedResourceFormControls> {
+    return record.controls[key];
+  }
+
+  protected checkControl(record: FormRecord<FormControl<boolean>>, key: string): FormControl<boolean> {
+    return record.controls[key];
+  }
+
+  protected setTextValue(control: FormControl<string>, value: string): void {
+    control.setValue(value);
+    control.markAsDirty();
+  }
+
+  protected setNumberValue(control: FormControl<number>, value: number): void {
+    control.setValue(clampRank(Math.floor(value), 0, 10));
+    control.markAsDirty();
+  }
+
+  protected setBooleanValue(control: FormControl<boolean>, value: boolean): void {
+    control.setValue(value);
+    control.markAsDirty();
+  }
+
+  protected setResourceMaximum(resourceKey: string, maximumValue: number): void {
+    const control: FormGroup<RedSunLimitedResourceFormControls> = this.resourceControl(
+      this.form.controls.resources,
+      resourceKey
+    );
+    const nextMaximumValue: number = clampRank(Math.floor(maximumValue), 0, this.resourceSlots);
+    control.controls.maximumValue.setValue(nextMaximumValue);
+    control.controls.maximumValue.markAsDirty();
+
+    if (control.controls.currentValue.value > nextMaximumValue) {
+      control.controls.currentValue.setValue(nextMaximumValue);
+      control.controls.currentValue.markAsDirty();
+    }
+  }
+
+  protected setResourceCurrent(resourceKey: string, currentValue: number): void {
+    const control: FormGroup<RedSunLimitedResourceFormControls> = this.resourceControl(
+      this.form.controls.resources,
+      resourceKey
+    );
+    control.controls.currentValue.setValue(clampRank(Math.floor(currentValue), 0, control.controls.maximumValue.value));
+    control.controls.currentValue.markAsDirty();
+  }
 
   private createBlankRankFields(prefix: string, count: number): readonly RedSunRankField[] {
     return Array.from({length: count}, (_, index: number) => ({
@@ -215,40 +369,180 @@ export class RedSunSheetComponent {
     }));
   }
 
-  protected toggleSheetEditMode(): void {
-    this.sheetEditable.update((editable: boolean) => !editable);
+  private createTextRecord(fields: readonly RedSunTextField[]): FormRecord<FormControl<string>> {
+    const controls: Record<string, FormControl<string>> = {};
+    fields.forEach((field: RedSunTextField) => {
+      controls[field.key] = this._formBuilder.control<string>(field.value);
+    });
+    return new FormRecord<FormControl<string>>(controls);
   }
 
-  protected updateResourceMaximum(resourceKey: string, maximumValue: number): void {
-    this.resources.update((resources: readonly RedSunLimitedResource[]) => {
-      return resources.map((resource: RedSunLimitedResource) => {
-        if (resource.key !== resourceKey) return resource;
+  private createRankRecord(groups: readonly RedSunFieldGroup<RedSunRankField>[]): FormRecord<FormControl<number>> {
+    const controls: Record<string, FormControl<number>> = {};
+    this.flattenGroups(groups).forEach((field: RedSunRankField) => {
+      controls[field.key] = this._formBuilder.control<number>(field.value);
+    });
+    return new FormRecord<FormControl<number>>(controls);
+  }
 
-        const nextMaximumValue: number = this.normalizeResourceValue(maximumValue, this.resourceSlots);
+  private createSkillRecord(
+    groups: readonly RedSunFieldGroup<RedSunRankField>[]
+  ): FormRecord<FormGroup<RedSunSkillFormControls>> {
+    const controls: Record<string, FormGroup<RedSunSkillFormControls>> = {};
+    this.flattenGroups(groups).forEach((field: RedSunRankField) => {
+      controls[field.key] = this.createSkillControl(field.label, field.value);
+    });
+    return new FormRecord<FormGroup<RedSunSkillFormControls>>(controls);
+  }
 
-        return {
-          ...resource,
-          maximumValue: nextMaximumValue,
-          currentValue: this.normalizeResourceValue(resource.currentValue, nextMaximumValue)
-        };
+  private createResourceRecord(
+    fields: readonly RedSunLimitedResource[]
+  ): FormRecord<FormGroup<RedSunLimitedResourceFormControls>> {
+    const controls: Record<string, FormGroup<RedSunLimitedResourceFormControls>> = {};
+    fields.forEach((field: RedSunLimitedResource) => {
+      controls[field.key] = new FormGroup<RedSunLimitedResourceFormControls>({
+        maximumValue: this._formBuilder.control<number>(field.maximumValue),
+        currentValue: this._formBuilder.control<number>(field.currentValue)
       });
+    });
+    return new FormRecord<FormGroup<RedSunLimitedResourceFormControls>>(controls);
+  }
+
+  private createCheckRecord(fields: readonly RedSunCheckField[]): FormRecord<FormControl<boolean>> {
+    const controls: Record<string, FormControl<boolean>> = {};
+    fields.forEach((field: RedSunCheckField) => {
+      controls[field.key] = this._formBuilder.control<boolean>(field.checked);
+    });
+    return new FormRecord<FormControl<boolean>>(controls);
+  }
+
+  private createSkillControl(name: string, level: number): FormGroup<RedSunSkillFormControls> {
+    return new FormGroup<RedSunSkillFormControls>({
+      name: this._formBuilder.control<string>(name),
+      level: this._formBuilder.control<number>(level)
     });
   }
 
-  protected updateResourceCurrent(resourceKey: string, currentValue: number): void {
-    this.resources.update((resources: readonly RedSunLimitedResource[]) => {
-      return resources.map((resource: RedSunLimitedResource) => {
-        if (resource.key !== resourceKey) return resource;
+  private flattenGroups<TField>(groups: readonly RedSunFieldGroup<TField>[]): readonly TField[] {
+    return groups.flatMap((group: RedSunFieldGroup<TField>) => group.fields);
+  }
 
-        return {
-          ...resource,
-          currentValue: this.normalizeResourceValue(currentValue, resource.maximumValue)
-        };
-      });
+  private patchTextRecord(
+    record: FormRecord<FormControl<string>>,
+    fields: readonly RedSunTextField[],
+    values: Record<string, string | null> | undefined
+  ): void {
+    fields.forEach((field: RedSunTextField) => {
+      record.controls[field.key].setValue(values?.[field.key] ?? field.value, {emitEvent: false});
     });
   }
 
-  private normalizeResourceValue(value: number, maximumValue: number): number {
-    return clampRank(Math.floor(value), 0, maximumValue);
+  private patchRankRecord(
+    record: FormRecord<FormControl<number>>,
+    groups: readonly RedSunFieldGroup<RedSunRankField>[],
+    values: Record<string, number> | undefined
+  ): void {
+    this.flattenGroups(groups).forEach((field: RedSunRankField) => {
+      record.controls[field.key].setValue(values?.[field.key] ?? field.value, {emitEvent: false});
+    });
+  }
+
+  private patchSkillRecord(
+    record: FormRecord<FormGroup<RedSunSkillFormControls>>,
+    groups: readonly RedSunFieldGroup<RedSunRankField>[],
+    values: Record<string, RedSunSkillDTO> | undefined
+  ): void {
+    this.flattenGroups(groups).forEach((field: RedSunRankField) => {
+      const value: RedSunSkillDTO | undefined = values?.[field.key];
+      record.controls[field.key].patchValue(
+        {
+          name: value?.name ?? field.label,
+          level: value?.level ?? field.value
+        },
+        {emitEvent: false}
+      );
+    });
+  }
+
+  private patchResourceRecord(
+    record: FormRecord<FormGroup<RedSunLimitedResourceFormControls>>,
+    fields: readonly RedSunLimitedResource[],
+    values: Record<string, RedSunLimitedResourceDTO> | undefined
+  ): void {
+    fields.forEach((field: RedSunLimitedResource) => {
+      const value: RedSunLimitedResourceDTO | undefined = values?.[field.key];
+      record.controls[field.key].patchValue(
+        {
+          maximumValue: value?.maximumValue ?? field.maximumValue,
+          currentValue: value?.currentValue ?? field.currentValue
+        },
+        {emitEvent: false}
+      );
+    });
+  }
+
+  private patchCheckRecord(
+    record: FormRecord<FormControl<boolean>>,
+    fields: readonly RedSunCheckField[],
+    values: Record<string, boolean> | undefined
+  ): void {
+    fields.forEach((field: RedSunCheckField) => {
+      record.controls[field.key].setValue(values?.[field.key] ?? field.checked, {emitEvent: false});
+    });
+  }
+
+  private textRecordToDto(record: FormRecord<FormControl<string>>): Record<string, string | null> {
+    const values: Record<string, string | null> = {};
+    Object.entries(record.controls).forEach(([key, control]: [string, FormControl<string>]) => {
+      values[key] = this.toNullableText(control.value);
+    });
+    return values;
+  }
+
+  private rankRecordToDto(record: FormRecord<FormControl<number>>): Record<string, number> {
+    const values: Record<string, number> = {};
+    Object.entries(record.controls).forEach(([key, control]: [string, FormControl<number>]) => {
+      values[key] = control.value;
+    });
+    return values;
+  }
+
+  private skillRecordToDto(record: FormRecord<FormGroup<RedSunSkillFormControls>>): Record<string, RedSunSkillDTO> {
+    const values: Record<string, RedSunSkillDTO> = {};
+    Object.entries(record.controls).forEach(([key, control]: [string, FormGroup<RedSunSkillFormControls>]) => {
+      values[key] = {
+        name: this.toNullableText(control.controls.name.value),
+        level: control.controls.level.value
+      };
+    });
+    return values;
+  }
+
+  private resourceRecordToDto(
+    record: FormRecord<FormGroup<RedSunLimitedResourceFormControls>>
+  ): Record<string, RedSunLimitedResourceDTO> {
+    const values: Record<string, RedSunLimitedResourceDTO> = {};
+    Object.entries(record.controls).forEach(
+      ([key, control]: [string, FormGroup<RedSunLimitedResourceFormControls>]) => {
+        values[key] = {
+          maximumValue: control.controls.maximumValue.value,
+          currentValue: control.controls.currentValue.value
+        };
+      }
+    );
+    return values;
+  }
+
+  private checkRecordToDto(record: FormRecord<FormControl<boolean>>): Record<string, boolean> {
+    const values: Record<string, boolean> = {};
+    Object.entries(record.controls).forEach(([key, control]: [string, FormControl<boolean>]) => {
+      values[key] = control.value;
+    });
+    return values;
+  }
+
+  private toNullableText(value: string): string | null {
+    const normalizedValue: string = value.trim();
+    return normalizedValue.length > 0 ? normalizedValue : null;
   }
 }

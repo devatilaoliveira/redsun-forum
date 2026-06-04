@@ -1,8 +1,10 @@
-export interface UpsertBasicSheetDTO {
-  characterName: string | null;
-  characterDescription: string | null;
-}
+import {UpsertBasicSheetDTO} from "./UpsertBasicSheetDTO";
+import {UpsertRedSunSheetDTO} from "./UpsertRedSunSheetDTO";
+
+export type {UpsertBasicSheetDTO} from "./UpsertBasicSheetDTO";
 
 export interface UpsertCharacterSheetDTO {
-  sheet: UpsertBasicSheetDTO;
+  sheet: UpsertBasicSheetDTO & {
+    redsun?: UpsertRedSunSheetDTO | null;
+  };
 }

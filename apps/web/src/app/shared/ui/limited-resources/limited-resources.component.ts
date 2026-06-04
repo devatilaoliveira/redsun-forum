@@ -1,7 +1,7 @@
 import {Component, computed, input, InputSignal, output, OutputEmitterRef, Signal} from "@angular/core";
 import {clampRank, selectContiguousRank} from "../rank-selection";
 
-const MAX_RESOURCE_SLOTS = 100;
+const MAX_RESOURCE_SLOTS = 10;
 
 @Component({
   selector: "rs-limited-resources",

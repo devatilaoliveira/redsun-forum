@@ -47,8 +47,8 @@
   gap: var(--space-1);
 }
 
-.field-grid--four {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+.field-grid--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .field-grid--two,
@@ -69,13 +69,6 @@
   flex-direction: column;
   gap: var(--space-0-5);
   min-width: 0;
-}
-
-.sheet-edit-button {
-  position: fixed;
-  right: var(--space-1);
-  bottom: var(--space-1);
-  z-index: 10;
 }
 
 .rank-row {
@@ -99,7 +92,7 @@
 }
 
 @media (max-width: 900px) {
-  .field-grid--four,
+  .field-grid--three,
   .field-grid--two,
   .textarea-grid,
   .column-grid,

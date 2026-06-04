@@ -1,12 +1,13 @@
 <section class="redsun-sheet" aria-label="RedSun character sheet">
   <section class="sheet-section">
     <h3 class="section-title">Identificacao</h3>
-    <div class="field-grid field-grid--four">
+    <div class="field-grid field-grid--three">
       @for (field of identification; track field.key) {
         <rs-input
           [label]="field.label"
-          [value]="field.value"
+          [value]="textControl(form.controls.identification, field.key).value"
           [blocked]="!sheetEditable()"
+          (valueChanged)="setTextValue(textControl(form.controls.identification, field.key), $event)"
         />
       }
     </div>
@@ -20,7 +21,13 @@
         <article class="sheet-group">
           <h3 class="section-title">{{ group.title }}</h3>
           @for (field of group.fields; track field.key) {
-            <rs-skill-bullets [skillName]="field.label" [minLevel]="true" [levelEditable]="sheetEditable()" />
+            <rs-skill-bullets
+              [skillName]="field.label"
+              [levelValue]="rankControl(form.controls.attributes, field.key).value"
+              [minLevel]="true"
+              [levelEditable]="sheetEditable()"
+              (levelValueChanged)="setNumberValue(rankControl(form.controls.attributes, field.key), $event)"
+            />
           }
         </article>
       }
@@ -36,13 +43,22 @@
           <h3 class="section-title">{{ group.title }}</h3>
           @for (field of group.fields; track field.key) {
             @if (field.label) {
-              <rs-skill-bullets [skillName]="field.label" [minLevel]="false" [levelEditable]="sheetEditable()" />
-            } @else {
               <rs-skill-bullets
                 [skillName]="field.label"
+                [levelValue]="skillControl(form.controls.abilities, field.key).controls.level.value"
+                [minLevel]="false"
+                [levelEditable]="sheetEditable()"
+                (levelValueChanged)="setNumberValue(skillControl(form.controls.abilities, field.key).controls.level, $event)"
+              />
+            } @else {
+              <rs-skill-bullets
+                [skillName]="skillControl(form.controls.abilities, field.key).controls.name.value"
+                [levelValue]="skillControl(form.controls.abilities, field.key).controls.level.value"
                 [minLevel]="false"
                 [editable]="sheetEditable()"
                 [levelEditable]="sheetEditable()"
+                (skillNameChanged)="setTextValue(skillControl(form.controls.abilities, field.key).controls.name, $event)"
+                (levelValueChanged)="setNumberValue(skillControl(form.controls.abilities, field.key).controls.level, $event)"
               />
             }
           }
@@ -60,13 +76,22 @@
           <h3 class="section-title">{{ group.title }}</h3>
           @for (field of group.fields; track field.key) {
             @if (field.label) {
-              <rs-skill-bullets [skillName]="field.label" [minLevel]="false" [levelEditable]="sheetEditable()" />
-            } @else {
               <rs-skill-bullets
                 [skillName]="field.label"
+                [levelValue]="skillControl(form.controls.advantages, field.key).controls.level.value"
+                [minLevel]="false"
+                [levelEditable]="sheetEditable()"
+                (levelValueChanged)="setNumberValue(skillControl(form.controls.advantages, field.key).controls.level, $event)"
+              />
+            } @else {
+              <rs-skill-bullets
+                [skillName]="skillControl(form.controls.advantages, field.key).controls.name.value"
+                [levelValue]="skillControl(form.controls.advantages, field.key).controls.level.value"
                 [minLevel]="false"
                 [editable]="sheetEditable()"
                 [levelEditable]="sheetEditable()"
+                (skillNameChanged)="setTextValue(skillControl(form.controls.advantages, field.key).controls.name, $event)"
+                (levelValueChanged)="setNumberValue(skillControl(form.controls.advantages, field.key).controls.level, $event)"
               />
             }
           }
@@ -82,8 +107,9 @@
       @for (field of backgrounds; track field.key) {
         <rs-input
           label=" "
-          [value]="field.value"
+          [value]="textControl(form.controls.backgrounds, field.key).value"
           [blocked]="!sheetEditable()"
+          (valueChanged)="setTextValue(textControl(form.controls.backgrounds, field.key), $event)"
         />
       }
     </div>
@@ -93,15 +119,15 @@
   <section class="sheet-section">
     <h3 class="section-title">Recursos</h3>
     <div class="resource-grid">
-      @for (field of resources(); track field.key) {
+      @for (field of resourceFields; track field.key) {
         <rs-limited-resources
           [resourceName]="field.label"
-          [maximumValue]="field.maximumValue"
-          [currentValue]="field.currentValue"
+          [maximumValue]="resourceControl(form.controls.resources, field.key).controls.maximumValue.value"
+          [currentValue]="resourceControl(form.controls.resources, field.key).controls.currentValue.value"
           [slots]="resourceSlots"
           [editable]="sheetEditable()"
-          (maximumValueChanged)="updateResourceMaximum(field.key, $event)"
-          (currentValueChanged)="updateResourceCurrent(field.key, $event)"
+          (maximumValueChanged)="setResourceMaximum(field.key, $event)"
+          (currentValueChanged)="setResourceCurrent(field.key, $event)"
         />
       }
     </div>
@@ -114,7 +140,9 @@
       @for (field of health; track field.key) {
         <rs-checkbox
           [label]="field.label"
+          [checked]="checkControl(form.controls.health, field.key).value"
           [disabled]="!sheetEditable()"
+          (checkedChange)="setBooleanValue(checkControl(form.controls.health, field.key), $event)"
         />
       }
     </div>
@@ -128,19 +156,12 @@
         <rs-textarea
           [label]="field.label"
           [rows]="5"
-          [value]="field.value"
+          [value]="textControl(form.controls.details, field.key).value"
           [blocked]="!sheetEditable()"
+          (valueChanged)="setTextValue(textControl(form.controls.details, field.key), $event)"
         />
       }
     </div>
   </section>
   <rs-divider type="solid" />
-
-  <rs-round-icon-button
-    class="sheet-edit-button"
-    [iconSrc]="sheetButtonIcon()"
-    [ariaLabel]="sheetButtonLabel()"
-    [variant]="EVariant.PRIMARY"
-    (pressed)="toggleSheetEditMode()"
-  />
 </section>
