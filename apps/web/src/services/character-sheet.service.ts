@@ -6,6 +6,7 @@ import {
 } from "../interface/dtos/characterSheet/CharacterSheetDTO";
 import {environment} from "../environments/environment";
 import {UpsertCharacterSheetDTO} from "../interface/dtos/characterSheet/UpsertCharacterSheetDTO";
+import {ERuleSystem} from "../interface/enums/ERuleSystem";
 
 const CHARACTER_SHEET_ENDPOINT = `${environment.apiBaseUrl}/character-sheet`;
 
@@ -15,6 +16,7 @@ export interface ICharacterSheetService {
   upsertCharacterSheet(
     taleId: string,
     characterSheetId: string,
+    ruleSystem: ERuleSystem,
     request: UpsertCharacterSheetDTO,
     avatarFile?: File | null
   ): Observable<CharacterSheetResponseDTO>;
@@ -38,6 +40,7 @@ export class CharacterSheetService implements ICharacterSheetService {
   public upsertCharacterSheet(
     taleId: string,
     characterSheetId: string,
+    ruleSystem: ERuleSystem,
     request: UpsertCharacterSheetDTO,
     avatarFile?: File | null
   ): Observable<CharacterSheetResponseDTO> {
@@ -47,8 +50,9 @@ export class CharacterSheetService implements ICharacterSheetService {
       formData.append("avatar", avatarFile);
     }
 
+    // TODO: This might be `${CHARACTER_SHEET_ENDPOINT}/${taleId}/${ruleSystem}`,
     return this._http.put<CharacterSheetResponseDTO>(
-      `${CHARACTER_SHEET_ENDPOINT}/${taleId}`,
+      `${CHARACTER_SHEET_ENDPOINT}/${taleId}/${ruleSystem === ERuleSystem.REDSUN ? "redsun" : "basic"}`,
       formData,
       {params: {characterSheetId}}
     );

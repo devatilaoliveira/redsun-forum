@@ -1,3 +1,6 @@
-import {RedSunSheetDTO} from "./RedSunSheetDTO";
+import {RedSunSheetResponseDTO} from "./RedSunSheetResponseDTO";
 
-export type UpsertRedSunSheetDTO = RedSunSheetDTO;
+export type UpsertRedSunSheetDTO = Omit<
+  RedSunSheetResponseDTO,
+  "id" | "characterId" | "characterName" | "characterDescription" | "characterImageUrl"
+>;

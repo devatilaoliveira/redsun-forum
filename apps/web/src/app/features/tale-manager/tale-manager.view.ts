@@ -71,7 +71,7 @@ export class TaleManagerView implements OnDestroy {
     description: this._fb.control<string>("", {validators: [Validators.required, Validators.maxLength(UTIL_CONSTANTS.EXTRA_LONG_TEXT_LENGTH)]}),
     language: new FormControl<ELanguage | null>(null),
     isPublic: this._fb.control<boolean>(true),
-    ruleSystem: this._fb.control<ERuleSystem>(ERuleSystem.DND_5E, {validators: [Validators.required]}),
+    ruleSystem: this._fb.control<ERuleSystem>(ERuleSystem.REDSUN, {validators: [Validators.required]}),
     image: new FormControl<File | null>(null)
   });
   protected readonly controls = this.editTaleFormGroup.controls;
@@ -141,7 +141,7 @@ export class TaleManagerView implements OnDestroy {
   }
 
   protected onRuleSystemChange(value: string | null): void {
-    const nextValue: ERuleSystem = value ? (value as ERuleSystem) : ERuleSystem.DND_5E;
+    const nextValue: ERuleSystem = value ? (value as ERuleSystem) : ERuleSystem.REDSUN;
     if (nextValue === this.controls.ruleSystem.value) {
       return;
     }

@@ -1,10 +1,6 @@
-import {Component, effect, inject, input, InputSignal} from "@angular/core";
-import {FormControl, FormGroup, FormRecord, NonNullableFormBuilder} from "@angular/forms";
-import {
-  RedSunLimitedResourceDTO,
-  RedSunSheetDTO,
-  RedSunSkillDTO
-} from "../../../../interface/dtos/characterSheet/RedSunSheetDTO";
+import {Component, effect, input, InputSignal} from "@angular/core";
+import {FormControl, FormGroup} from "@angular/forms";
+import {RedSunSheetResponseDTO} from "../../../../interface/dtos/characterSheet/RedSunSheetResponseDTO";
 import {UpsertRedSunSheetDTO} from "../../../../interface/dtos/characterSheet/UpsertRedSunSheetDTO";
 import {RsCheckbox} from "../../../shared/fragments/rsCheckbox/rs.checkbox";
 import {RsDivider} from "../../../shared/fragments/rsDivider/rs.divider";
@@ -14,57 +10,88 @@ import {LimitedResourcesComponent} from "../../../shared/ui/limited-resources/li
 import {clampRank} from "../../../shared/ui/rank-selection";
 import {SkillBulletsComponent} from "../../../shared/ui/skill-bullets/skill-bullets.component";
 
-interface RedSunTextField {
-  readonly key: string;
-  readonly label: string;
-  readonly value: string;
-}
+type RedSunControlValue<T> = T extends string | null ? string : T;
+type RedSunSheetFormControls = {
+  [K in keyof UpsertRedSunSheetDTO]: FormControl<RedSunControlValue<UpsertRedSunSheetDTO[K]>>;
+};
 
-interface RedSunRankField {
-  readonly key: string;
-  readonly label: string;
-  readonly value: number;
-}
-
-interface RedSunLimitedResource {
-  readonly key: string;
-  readonly label: string;
-  readonly maximumValue: number;
-  readonly currentValue: number;
-}
-
-interface RedSunCheckField {
-  readonly key: string;
-  readonly label: string;
-  readonly checked: boolean;
-}
-
-interface RedSunFieldGroup<TField> {
-  readonly key: string;
-  readonly title: string;
-  readonly fields: readonly TField[];
-}
-
-interface RedSunSkillFormControls {
-  name: FormControl<string>;
-  level: FormControl<number>;
-}
-
-interface RedSunLimitedResourceFormControls {
-  maximumValue: FormControl<number>;
-  currentValue: FormControl<number>;
-}
-
-interface RedSunSheetFormControls {
-  identification: FormRecord<FormControl<string>>;
-  attributes: FormRecord<FormControl<number>>;
-  abilities: FormRecord<FormGroup<RedSunSkillFormControls>>;
-  advantages: FormRecord<FormGroup<RedSunSkillFormControls>>;
-  backgrounds: FormRecord<FormControl<string>>;
-  resources: FormRecord<FormGroup<RedSunLimitedResourceFormControls>>;
-  health: FormRecord<FormControl<boolean>>;
-  details: FormRecord<FormControl<string>>;
-}
+const DEFAULT_REDSUN_SHEET: UpsertRedSunSheetDTO = {
+  nature: null,
+  demeanor: null,
+  strength: 0,
+  dexterity: 0,
+  stamina: 0,
+  presence: 0,
+  empathy: 0,
+  influence: 0,
+  perception: 0,
+  intellect: 0,
+  determination: 0,
+  alertness: 0,
+  sports: 0,
+  intuition: 0,
+  intimidation: 0,
+  subterfuge: 0,
+  leadership: 0,
+  diplomacy: 0,
+  talent1Name: null,
+  talent1Level: 0,
+  talent2Name: null,
+  talent2Level: 0,
+  animalHandling: 0,
+  riding: 0,
+  legerdemain: 0,
+  survival: 0,
+  stealth: 0,
+  athletics: 0,
+  performance: 0,
+  history: 0,
+  religion: 0,
+  language: 0,
+  occultism: 0,
+  investigation: 0,
+  psychology: 0,
+  business: 0,
+  calling1Name: null,
+  calling1Level: 0,
+  calling2Name: null,
+  calling2Level: 0,
+  calling3Name: null,
+  calling3Level: 0,
+  calling4Name: null,
+  calling4Level: 0,
+  calling5Name: null,
+  calling5Level: 0,
+  martialArts: 0,
+  herbalism: 0,
+  rituals: 0,
+  meditation: 0,
+  craft: 0,
+  meleeThrowing: 0,
+  rangedWeapons: 0,
+  unarmed: 0,
+  willpowerMax: 0,
+  willpowerCurrent: 0,
+  impetusMax: 0,
+  impetusCurrent: 0,
+  bruised: false,
+  hurt: false,
+  injured: false,
+  badlyWounded: false,
+  mauled: false,
+  crippled: false,
+  incapacitated: false,
+  torpor: false,
+  finalDeath: false,
+  experience: null,
+  equipment: null,
+  notes: null,
+  activeRitualsEffects: null,
+  combatManeuvers: null,
+  arsenal: null,
+  learnedRituals: null,
+  craftDetails: null
+};
 
 @Component({
   selector: "rs-redsun-sheet",
@@ -81,165 +108,94 @@ interface RedSunSheetFormControls {
   styleUrl: "./redsun-sheet.component.scss"
 })
 export class RedSunSheetComponent {
-  private readonly _formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-
-  public readonly sheet: InputSignal<RedSunSheetDTO | null | undefined> = input<RedSunSheetDTO | null | undefined>(
+  public readonly sheet: InputSignal<RedSunSheetResponseDTO | null | undefined> = input<RedSunSheetResponseDTO | null | undefined>(
     undefined
   );
   public readonly sheetEditable: InputSignal<boolean> = input<boolean>(false);
 
   protected readonly resourceSlots: number = 10;
-
-  protected readonly identification: readonly RedSunTextField[] = [
-    {key: "player", label: "Jogador", value: ""},
-    {key: "nature", label: "Natureza", value: ""},
-    {key: "demeanor", label: "Comportamento", value: ""}
-  ];
-
-  protected readonly attributes: readonly RedSunFieldGroup<RedSunRankField>[] = [
-    {
-      key: "physical",
-      title: "Fisicos",
-      fields: [
-        {key: "strength", label: "Forca", value: 0},
-        {key: "dexterity", label: "Destreza", value: 0},
-        {key: "stamina", label: "Vigor", value: 0}
-      ]
-    },
-    {
-      key: "social",
-      title: "Sociais",
-      fields: [
-        {key: "presence", label: "Presenca", value: 0},
-        {key: "empathy", label: "Empatia", value: 0},
-        {key: "influence", label: "Influencia", value: 0}
-      ]
-    },
-    {
-      key: "mental",
-      title: "Mentais",
-      fields: [
-        {key: "perception", label: "Percepcao", value: 0},
-        {key: "intellect", label: "Intelecto", value: 0},
-        {key: "determination", label: "Determinacao", value: 0}
-      ]
-    }
-  ];
-
-  protected readonly abilities: readonly RedSunFieldGroup<RedSunRankField>[] = [
-    {
-      key: "talents",
-      title: "Talentos",
-      fields: [
-        {key: "alertness", label: "Prontidao", value: 0},
-        {key: "sports", label: "Esportes", value: 0},
-        {key: "intuition", label: "Intuicao", value: 0},
-        {key: "intimidation", label: "Intimidacao", value: 0},
-        {key: "subterfuge", label: "Labia", value: 0},
-        {key: "leadership", label: "Lideranca", value: 0},
-        {key: "diplomacy", label: "Diplomacia", value: 0}
-      ].concat(this.createBlankRankFields("talents", 2))
-    },
-    {
-      key: "skills",
-      title: "Pericias",
-      fields: [
-        {key: "animal_handling", label: "Adestrar", value: 0},
-        {key: "riding", label: "Cavalgar", value: 0},
-        {key: "legerdemain", label: "Prestidigitacao", value: 0},
-        {key: "survival", label: "Sobrevivencia", value: 0},
-        {key: "stealth", label: "Furtividade", value: 0},
-        {key: "athletics", label: "Atletismo", value: 0},
-        {key: "performance", label: "Performance", value: 0}
-      ].concat(this.createBlankRankFields("skills", 2))
-    },
-    {
-      key: "knowledges",
-      title: "Conhecimentos",
-      fields: [
-        {key: "history", label: "Historia", value: 0},
-        {key: "religion", label: "Religiao", value: 0},
-        {key: "language", label: "Lingua", value: 0},
-        {key: "occultism", label: "Ocultismo", value: 0},
-        {key: "investigation", label: "Investigacao", value: 0},
-        {key: "psychology", label: "Psicologia", value: 0},
-        {key: "business", label: "Negocios", value: 0}
-      ].concat(this.createBlankRankFields("knowledges", 2))
-    }
-  ];
-
-  protected readonly advantages: readonly RedSunFieldGroup<RedSunRankField>[] = [
-    {
-      key: "callings",
-      title: "vacações",
-      fields: this.createBlankRankFields("callings", 5)
-    },
-    {
-      key: "specializations",
-      title: "Especializações",
-      fields: [
-        {key: "martial_arts", label: "Artes Marciais", value: 0},
-        {key: "herbalism", label: "Herborismo", value: 0},
-        {key: "rituals", label: "Rituais", value: 0},
-        {key: "meditation", label: "Meditacao", value: 0},
-        {key: "craft", label: "Oficio", value: 0}
-      ]
-    },
-    {
-      key: "combat",
-      title: "Combate",
-      fields: [
-        {key: "melee_throwing", label: "Armas Brancas", value: 0},
-        {key: "ranged_weapons", label: "Armas a Distancia", value: 0},
-        {key: "unarmed", label: "Desarmado", value: 0}
-      ]
-    }
-  ];
-
-  protected readonly backgrounds: readonly RedSunTextField[] = this.createBlankTextFields("background", 6);
-
-  protected readonly resourceFields: readonly RedSunLimitedResource[] = [
-    {key: "willpower", label: "Força de Vontade", maximumValue: 5, currentValue: 5},
-    {key: "impetus", label: "Ímpeto", maximumValue: 5, currentValue: 5}
-  ];
-
-  protected readonly health: readonly RedSunCheckField[] = [
-    {key: "bruised", label: "Escoriado", checked: false},
-    {key: "hurt", label: "Machucado", checked: false},
-    {key: "injured", label: "Ferido", checked: false},
-    {key: "badly_wounded", label: "Ferido Gravemente", checked: false},
-    {key: "mauled", label: "Espancado", checked: false},
-    {key: "crippled", label: "Aleijado", checked: false},
-    {key: "incapacitated", label: "Incapacitado", checked: false},
-    {key: "torpor", label: "Torpor", checked: false},
-    {key: "final_death", label: "Morte Final", checked: false}
-  ];
-
-  protected readonly textFields: readonly RedSunTextField[] = [
-    {key: "experience", label: "Experiencia", value: ""},
-    {key: "equipment", label: "Equipamento", value: ""},
-    {key: "notes", label: "Anotacoes", value: ""},
-    {key: "active_rituals_effects", label: "Rituais e Efeitos Ativos", value: ""},
-    {key: "combat_maneuvers", label: "Manobras de Combate", value: ""},
-    {key: "arsenal", label: "Arsenal", value: ""},
-    {key: "learned_rituals", label: "Rituais aprendidos", value: ""},
-    {key: "craft", label: "Oficio", value: ""}
-  ];
-
   protected readonly form: FormGroup<RedSunSheetFormControls> = new FormGroup<RedSunSheetFormControls>({
-    identification: this.createTextRecord(this.identification),
-    attributes: this.createRankRecord(this.attributes),
-    abilities: this.createSkillRecord(this.abilities),
-    advantages: this.createSkillRecord(this.advantages),
-    backgrounds: this.createTextRecord(this.backgrounds),
-    resources: this.createResourceRecord(this.resourceFields),
-    health: this.createCheckRecord(this.health),
-    details: this.createTextRecord(this.textFields)
+    nature: new FormControl<string>("", {nonNullable: true}),
+    demeanor: new FormControl<string>("", {nonNullable: true}),
+    strength: new FormControl<number>(0, {nonNullable: true}),
+    dexterity: new FormControl<number>(0, {nonNullable: true}),
+    stamina: new FormControl<number>(0, {nonNullable: true}),
+    presence: new FormControl<number>(0, {nonNullable: true}),
+    empathy: new FormControl<number>(0, {nonNullable: true}),
+    influence: new FormControl<number>(0, {nonNullable: true}),
+    perception: new FormControl<number>(0, {nonNullable: true}),
+    intellect: new FormControl<number>(0, {nonNullable: true}),
+    determination: new FormControl<number>(0, {nonNullable: true}),
+    alertness: new FormControl<number>(0, {nonNullable: true}),
+    sports: new FormControl<number>(0, {nonNullable: true}),
+    intuition: new FormControl<number>(0, {nonNullable: true}),
+    intimidation: new FormControl<number>(0, {nonNullable: true}),
+    subterfuge: new FormControl<number>(0, {nonNullable: true}),
+    leadership: new FormControl<number>(0, {nonNullable: true}),
+    diplomacy: new FormControl<number>(0, {nonNullable: true}),
+    talent1Name: new FormControl<string>("", {nonNullable: true}),
+    talent1Level: new FormControl<number>(0, {nonNullable: true}),
+    talent2Name: new FormControl<string>("", {nonNullable: true}),
+    talent2Level: new FormControl<number>(0, {nonNullable: true}),
+    animalHandling: new FormControl<number>(0, {nonNullable: true}),
+    riding: new FormControl<number>(0, {nonNullable: true}),
+    legerdemain: new FormControl<number>(0, {nonNullable: true}),
+    survival: new FormControl<number>(0, {nonNullable: true}),
+    stealth: new FormControl<number>(0, {nonNullable: true}),
+    athletics: new FormControl<number>(0, {nonNullable: true}),
+    performance: new FormControl<number>(0, {nonNullable: true}),
+    history: new FormControl<number>(0, {nonNullable: true}),
+    religion: new FormControl<number>(0, {nonNullable: true}),
+    language: new FormControl<number>(0, {nonNullable: true}),
+    occultism: new FormControl<number>(0, {nonNullable: true}),
+    investigation: new FormControl<number>(0, {nonNullable: true}),
+    psychology: new FormControl<number>(0, {nonNullable: true}),
+    business: new FormControl<number>(0, {nonNullable: true}),
+    calling1Name: new FormControl<string>("", {nonNullable: true}),
+    calling1Level: new FormControl<number>(0, {nonNullable: true}),
+    calling2Name: new FormControl<string>("", {nonNullable: true}),
+    calling2Level: new FormControl<number>(0, {nonNullable: true}),
+    calling3Name: new FormControl<string>("", {nonNullable: true}),
+    calling3Level: new FormControl<number>(0, {nonNullable: true}),
+    calling4Name: new FormControl<string>("", {nonNullable: true}),
+    calling4Level: new FormControl<number>(0, {nonNullable: true}),
+    calling5Name: new FormControl<string>("", {nonNullable: true}),
+    calling5Level: new FormControl<number>(0, {nonNullable: true}),
+    martialArts: new FormControl<number>(0, {nonNullable: true}),
+    herbalism: new FormControl<number>(0, {nonNullable: true}),
+    rituals: new FormControl<number>(0, {nonNullable: true}),
+    meditation: new FormControl<number>(0, {nonNullable: true}),
+    craft: new FormControl<number>(0, {nonNullable: true}),
+    meleeThrowing: new FormControl<number>(0, {nonNullable: true}),
+    rangedWeapons: new FormControl<number>(0, {nonNullable: true}),
+    unarmed: new FormControl<number>(0, {nonNullable: true}),
+    willpowerMax: new FormControl<number>(0, {nonNullable: true}),
+    willpowerCurrent: new FormControl<number>(0, {nonNullable: true}),
+    impetusMax: new FormControl<number>(0, {nonNullable: true}),
+    impetusCurrent: new FormControl<number>(0, {nonNullable: true}),
+    bruised: new FormControl<boolean>(false, {nonNullable: true}),
+    hurt: new FormControl<boolean>(false, {nonNullable: true}),
+    injured: new FormControl<boolean>(false, {nonNullable: true}),
+    badlyWounded: new FormControl<boolean>(false, {nonNullable: true}),
+    mauled: new FormControl<boolean>(false, {nonNullable: true}),
+    crippled: new FormControl<boolean>(false, {nonNullable: true}),
+    incapacitated: new FormControl<boolean>(false, {nonNullable: true}),
+    torpor: new FormControl<boolean>(false, {nonNullable: true}),
+    finalDeath: new FormControl<boolean>(false, {nonNullable: true}),
+    experience: new FormControl<string>("", {nonNullable: true}),
+    equipment: new FormControl<string>("", {nonNullable: true}),
+    notes: new FormControl<string>("", {nonNullable: true}),
+    activeRitualsEffects: new FormControl<string>("", {nonNullable: true}),
+    combatManeuvers: new FormControl<string>("", {nonNullable: true}),
+    arsenal: new FormControl<string>("", {nonNullable: true}),
+    learnedRituals: new FormControl<string>("", {nonNullable: true}),
+    craftDetails: new FormControl<string>("", {nonNullable: true})
   });
+  protected readonly controls = this.form.controls;
 
   constructor() {
     effect(() => {
-      const sheet: RedSunSheetDTO | null | undefined = this.sheet();
+      const sheet: RedSunSheetResponseDTO | null | undefined = this.sheet();
       if (sheet !== undefined) {
         this.patchValue(sheet);
       }
@@ -263,55 +219,109 @@ export class RedSunSheetComponent {
     this.form.markAsUntouched();
   }
 
-  public patchValue(sheet: RedSunSheetDTO | null): void {
-    this.patchTextRecord(this.form.controls.identification, this.identification, sheet?.identification);
-    this.patchRankRecord(this.form.controls.attributes, this.attributes, sheet?.attributes);
-    this.patchSkillRecord(this.form.controls.abilities, this.abilities, sheet?.abilities);
-    this.patchSkillRecord(this.form.controls.advantages, this.advantages, sheet?.advantages);
-    this.patchTextRecord(this.form.controls.backgrounds, this.backgrounds, sheet?.backgrounds);
-    this.patchResourceRecord(this.form.controls.resources, this.resourceFields, sheet?.resources);
-    this.patchCheckRecord(this.form.controls.health, this.health, sheet?.health);
-    this.patchTextRecord(this.form.controls.details, this.textFields, sheet?.details);
+  public patchValue(sheet: RedSunSheetResponseDTO | null): void {
+    const value: UpsertRedSunSheetDTO = {...DEFAULT_REDSUN_SHEET, ...(sheet ?? {})};
+    this.form.patchValue({
+      ...value,
+      nature: value.nature ?? "",
+      demeanor: value.demeanor ?? "",
+      talent1Name: value.talent1Name ?? "",
+      talent2Name: value.talent2Name ?? "",
+      calling1Name: value.calling1Name ?? "",
+      calling2Name: value.calling2Name ?? "",
+      calling3Name: value.calling3Name ?? "",
+      calling4Name: value.calling4Name ?? "",
+      calling5Name: value.calling5Name ?? "",
+      experience: value.experience ?? "",
+      equipment: value.equipment ?? "",
+      notes: value.notes ?? "",
+      activeRitualsEffects: value.activeRitualsEffects ?? "",
+      combatManeuvers: value.combatManeuvers ?? "",
+      arsenal: value.arsenal ?? "",
+      learnedRituals: value.learnedRituals ?? "",
+      craftDetails: value.craftDetails ?? ""
+    }, {emitEvent: false});
     this.markAsSaved();
   }
 
   public toUpsertDto(): UpsertRedSunSheetDTO {
     return {
-      identification: this.textRecordToDto(this.form.controls.identification),
-      attributes: this.rankRecordToDto(this.form.controls.attributes),
-      abilities: this.skillRecordToDto(this.form.controls.abilities),
-      advantages: this.skillRecordToDto(this.form.controls.advantages),
-      backgrounds: this.textRecordToDto(this.form.controls.backgrounds),
-      resources: this.resourceRecordToDto(this.form.controls.resources),
-      health: this.checkRecordToDto(this.form.controls.health),
-      details: this.textRecordToDto(this.form.controls.details)
+      nature: this.toNullableText(this.controls.nature.value),
+      demeanor: this.toNullableText(this.controls.demeanor.value),
+      strength: this.controls.strength.value,
+      dexterity: this.controls.dexterity.value,
+      stamina: this.controls.stamina.value,
+      presence: this.controls.presence.value,
+      empathy: this.controls.empathy.value,
+      influence: this.controls.influence.value,
+      perception: this.controls.perception.value,
+      intellect: this.controls.intellect.value,
+      determination: this.controls.determination.value,
+      alertness: this.controls.alertness.value,
+      sports: this.controls.sports.value,
+      intuition: this.controls.intuition.value,
+      intimidation: this.controls.intimidation.value,
+      subterfuge: this.controls.subterfuge.value,
+      leadership: this.controls.leadership.value,
+      diplomacy: this.controls.diplomacy.value,
+      talent1Name: this.toNullableText(this.controls.talent1Name.value),
+      talent1Level: this.controls.talent1Level.value,
+      talent2Name: this.toNullableText(this.controls.talent2Name.value),
+      talent2Level: this.controls.talent2Level.value,
+      animalHandling: this.controls.animalHandling.value,
+      riding: this.controls.riding.value,
+      legerdemain: this.controls.legerdemain.value,
+      survival: this.controls.survival.value,
+      stealth: this.controls.stealth.value,
+      athletics: this.controls.athletics.value,
+      performance: this.controls.performance.value,
+      history: this.controls.history.value,
+      religion: this.controls.religion.value,
+      language: this.controls.language.value,
+      occultism: this.controls.occultism.value,
+      investigation: this.controls.investigation.value,
+      psychology: this.controls.psychology.value,
+      business: this.controls.business.value,
+      calling1Name: this.toNullableText(this.controls.calling1Name.value),
+      calling1Level: this.controls.calling1Level.value,
+      calling2Name: this.toNullableText(this.controls.calling2Name.value),
+      calling2Level: this.controls.calling2Level.value,
+      calling3Name: this.toNullableText(this.controls.calling3Name.value),
+      calling3Level: this.controls.calling3Level.value,
+      calling4Name: this.toNullableText(this.controls.calling4Name.value),
+      calling4Level: this.controls.calling4Level.value,
+      calling5Name: this.toNullableText(this.controls.calling5Name.value),
+      calling5Level: this.controls.calling5Level.value,
+      martialArts: this.controls.martialArts.value,
+      herbalism: this.controls.herbalism.value,
+      rituals: this.controls.rituals.value,
+      meditation: this.controls.meditation.value,
+      craft: this.controls.craft.value,
+      meleeThrowing: this.controls.meleeThrowing.value,
+      rangedWeapons: this.controls.rangedWeapons.value,
+      unarmed: this.controls.unarmed.value,
+      willpowerMax: this.controls.willpowerMax.value,
+      willpowerCurrent: this.controls.willpowerCurrent.value,
+      impetusMax: this.controls.impetusMax.value,
+      impetusCurrent: this.controls.impetusCurrent.value,
+      bruised: this.controls.bruised.value,
+      hurt: this.controls.hurt.value,
+      injured: this.controls.injured.value,
+      badlyWounded: this.controls.badlyWounded.value,
+      mauled: this.controls.mauled.value,
+      crippled: this.controls.crippled.value,
+      incapacitated: this.controls.incapacitated.value,
+      torpor: this.controls.torpor.value,
+      finalDeath: this.controls.finalDeath.value,
+      experience: this.toNullableText(this.controls.experience.value),
+      equipment: this.toNullableText(this.controls.equipment.value),
+      notes: this.toNullableText(this.controls.notes.value),
+      activeRitualsEffects: this.toNullableText(this.controls.activeRitualsEffects.value),
+      combatManeuvers: this.toNullableText(this.controls.combatManeuvers.value),
+      arsenal: this.toNullableText(this.controls.arsenal.value),
+      learnedRituals: this.toNullableText(this.controls.learnedRituals.value),
+      craftDetails: this.toNullableText(this.controls.craftDetails.value)
     };
-  }
-
-  protected textControl(record: FormRecord<FormControl<string>>, key: string): FormControl<string> {
-    return record.controls[key];
-  }
-
-  protected rankControl(record: FormRecord<FormControl<number>>, key: string): FormControl<number> {
-    return record.controls[key];
-  }
-
-  protected skillControl(
-    record: FormRecord<FormGroup<RedSunSkillFormControls>>,
-    key: string
-  ): FormGroup<RedSunSkillFormControls> {
-    return record.controls[key];
-  }
-
-  protected resourceControl(
-    record: FormRecord<FormGroup<RedSunLimitedResourceFormControls>>,
-    key: string
-  ): FormGroup<RedSunLimitedResourceFormControls> {
-    return record.controls[key];
-  }
-
-  protected checkControl(record: FormRecord<FormControl<boolean>>, key: string): FormControl<boolean> {
-    return record.controls[key];
   }
 
   protected setTextValue(control: FormControl<string>, value: string): void {
@@ -319,8 +329,8 @@ export class RedSunSheetComponent {
     control.markAsDirty();
   }
 
-  protected setNumberValue(control: FormControl<number>, value: number): void {
-    control.setValue(clampRank(Math.floor(value), 0, 10));
+  protected setRankValue(control: FormControl<number>, value: number): void {
+    control.setValue(clampRank(Math.floor(value), 0, 5));
     control.markAsDirty();
   }
 
@@ -329,216 +339,44 @@ export class RedSunSheetComponent {
     control.markAsDirty();
   }
 
-  protected setResourceMaximum(resourceKey: string, maximumValue: number): void {
-    const control: FormGroup<RedSunLimitedResourceFormControls> = this.resourceControl(
-      this.form.controls.resources,
-      resourceKey
-    );
-    const nextMaximumValue: number = clampRank(Math.floor(maximumValue), 0, this.resourceSlots);
-    control.controls.maximumValue.setValue(nextMaximumValue);
-    control.controls.maximumValue.markAsDirty();
+  protected setWillpowerMaximum(maximumValue: number): void {
+    this.setResourceMaximum(this.controls.willpowerMax, this.controls.willpowerCurrent, maximumValue);
+  }
 
-    if (control.controls.currentValue.value > nextMaximumValue) {
-      control.controls.currentValue.setValue(nextMaximumValue);
-      control.controls.currentValue.markAsDirty();
+  protected setWillpowerCurrent(currentValue: number): void {
+    this.setResourceCurrent(this.controls.willpowerCurrent, this.controls.willpowerMax, currentValue);
+  }
+
+  protected setImpetusMaximum(maximumValue: number): void {
+    this.setResourceMaximum(this.controls.impetusMax, this.controls.impetusCurrent, maximumValue);
+  }
+
+  protected setImpetusCurrent(currentValue: number): void {
+    this.setResourceCurrent(this.controls.impetusCurrent, this.controls.impetusMax, currentValue);
+  }
+
+  private setResourceMaximum(
+    maximumControl: FormControl<number>,
+    currentControl: FormControl<number>,
+    maximumValue: number
+  ): void {
+    const nextMaximumValue: number = clampRank(Math.floor(maximumValue), 0, this.resourceSlots);
+    maximumControl.setValue(nextMaximumValue);
+    maximumControl.markAsDirty();
+
+    if (currentControl.value > nextMaximumValue) {
+      currentControl.setValue(nextMaximumValue);
+      currentControl.markAsDirty();
     }
   }
 
-  protected setResourceCurrent(resourceKey: string, currentValue: number): void {
-    const control: FormGroup<RedSunLimitedResourceFormControls> = this.resourceControl(
-      this.form.controls.resources,
-      resourceKey
-    );
-    control.controls.currentValue.setValue(clampRank(Math.floor(currentValue), 0, control.controls.maximumValue.value));
-    control.controls.currentValue.markAsDirty();
-  }
-
-  private createBlankRankFields(prefix: string, count: number): readonly RedSunRankField[] {
-    return Array.from({length: count}, (_, index: number) => ({
-      key: `${prefix}_${index + 1}`,
-      label: "",
-      value: 0
-    }));
-  }
-
-  private createBlankTextFields(prefix: string, count: number): readonly RedSunTextField[] {
-    return Array.from({length: count}, (_, index: number) => ({
-      key: `${prefix}_${index + 1}`,
-      label: "",
-      value: ""
-    }));
-  }
-
-  private createTextRecord(fields: readonly RedSunTextField[]): FormRecord<FormControl<string>> {
-    const controls: Record<string, FormControl<string>> = {};
-    fields.forEach((field: RedSunTextField) => {
-      controls[field.key] = this._formBuilder.control<string>(field.value);
-    });
-    return new FormRecord<FormControl<string>>(controls);
-  }
-
-  private createRankRecord(groups: readonly RedSunFieldGroup<RedSunRankField>[]): FormRecord<FormControl<number>> {
-    const controls: Record<string, FormControl<number>> = {};
-    this.flattenGroups(groups).forEach((field: RedSunRankField) => {
-      controls[field.key] = this._formBuilder.control<number>(field.value);
-    });
-    return new FormRecord<FormControl<number>>(controls);
-  }
-
-  private createSkillRecord(
-    groups: readonly RedSunFieldGroup<RedSunRankField>[]
-  ): FormRecord<FormGroup<RedSunSkillFormControls>> {
-    const controls: Record<string, FormGroup<RedSunSkillFormControls>> = {};
-    this.flattenGroups(groups).forEach((field: RedSunRankField) => {
-      controls[field.key] = this.createSkillControl(field.label, field.value);
-    });
-    return new FormRecord<FormGroup<RedSunSkillFormControls>>(controls);
-  }
-
-  private createResourceRecord(
-    fields: readonly RedSunLimitedResource[]
-  ): FormRecord<FormGroup<RedSunLimitedResourceFormControls>> {
-    const controls: Record<string, FormGroup<RedSunLimitedResourceFormControls>> = {};
-    fields.forEach((field: RedSunLimitedResource) => {
-      controls[field.key] = new FormGroup<RedSunLimitedResourceFormControls>({
-        maximumValue: this._formBuilder.control<number>(field.maximumValue),
-        currentValue: this._formBuilder.control<number>(field.currentValue)
-      });
-    });
-    return new FormRecord<FormGroup<RedSunLimitedResourceFormControls>>(controls);
-  }
-
-  private createCheckRecord(fields: readonly RedSunCheckField[]): FormRecord<FormControl<boolean>> {
-    const controls: Record<string, FormControl<boolean>> = {};
-    fields.forEach((field: RedSunCheckField) => {
-      controls[field.key] = this._formBuilder.control<boolean>(field.checked);
-    });
-    return new FormRecord<FormControl<boolean>>(controls);
-  }
-
-  private createSkillControl(name: string, level: number): FormGroup<RedSunSkillFormControls> {
-    return new FormGroup<RedSunSkillFormControls>({
-      name: this._formBuilder.control<string>(name),
-      level: this._formBuilder.control<number>(level)
-    });
-  }
-
-  private flattenGroups<TField>(groups: readonly RedSunFieldGroup<TField>[]): readonly TField[] {
-    return groups.flatMap((group: RedSunFieldGroup<TField>) => group.fields);
-  }
-
-  private patchTextRecord(
-    record: FormRecord<FormControl<string>>,
-    fields: readonly RedSunTextField[],
-    values: Record<string, string | null> | undefined
+  private setResourceCurrent(
+    currentControl: FormControl<number>,
+    maximumControl: FormControl<number>,
+    currentValue: number
   ): void {
-    fields.forEach((field: RedSunTextField) => {
-      record.controls[field.key].setValue(values?.[field.key] ?? field.value, {emitEvent: false});
-    });
-  }
-
-  private patchRankRecord(
-    record: FormRecord<FormControl<number>>,
-    groups: readonly RedSunFieldGroup<RedSunRankField>[],
-    values: Record<string, number> | undefined
-  ): void {
-    this.flattenGroups(groups).forEach((field: RedSunRankField) => {
-      record.controls[field.key].setValue(values?.[field.key] ?? field.value, {emitEvent: false});
-    });
-  }
-
-  private patchSkillRecord(
-    record: FormRecord<FormGroup<RedSunSkillFormControls>>,
-    groups: readonly RedSunFieldGroup<RedSunRankField>[],
-    values: Record<string, RedSunSkillDTO> | undefined
-  ): void {
-    this.flattenGroups(groups).forEach((field: RedSunRankField) => {
-      const value: RedSunSkillDTO | undefined = values?.[field.key];
-      record.controls[field.key].patchValue(
-        {
-          name: value?.name ?? field.label,
-          level: value?.level ?? field.value
-        },
-        {emitEvent: false}
-      );
-    });
-  }
-
-  private patchResourceRecord(
-    record: FormRecord<FormGroup<RedSunLimitedResourceFormControls>>,
-    fields: readonly RedSunLimitedResource[],
-    values: Record<string, RedSunLimitedResourceDTO> | undefined
-  ): void {
-    fields.forEach((field: RedSunLimitedResource) => {
-      const value: RedSunLimitedResourceDTO | undefined = values?.[field.key];
-      record.controls[field.key].patchValue(
-        {
-          maximumValue: value?.maximumValue ?? field.maximumValue,
-          currentValue: value?.currentValue ?? field.currentValue
-        },
-        {emitEvent: false}
-      );
-    });
-  }
-
-  private patchCheckRecord(
-    record: FormRecord<FormControl<boolean>>,
-    fields: readonly RedSunCheckField[],
-    values: Record<string, boolean> | undefined
-  ): void {
-    fields.forEach((field: RedSunCheckField) => {
-      record.controls[field.key].setValue(values?.[field.key] ?? field.checked, {emitEvent: false});
-    });
-  }
-
-  private textRecordToDto(record: FormRecord<FormControl<string>>): Record<string, string | null> {
-    const values: Record<string, string | null> = {};
-    Object.entries(record.controls).forEach(([key, control]: [string, FormControl<string>]) => {
-      values[key] = this.toNullableText(control.value);
-    });
-    return values;
-  }
-
-  private rankRecordToDto(record: FormRecord<FormControl<number>>): Record<string, number> {
-    const values: Record<string, number> = {};
-    Object.entries(record.controls).forEach(([key, control]: [string, FormControl<number>]) => {
-      values[key] = control.value;
-    });
-    return values;
-  }
-
-  private skillRecordToDto(record: FormRecord<FormGroup<RedSunSkillFormControls>>): Record<string, RedSunSkillDTO> {
-    const values: Record<string, RedSunSkillDTO> = {};
-    Object.entries(record.controls).forEach(([key, control]: [string, FormGroup<RedSunSkillFormControls>]) => {
-      values[key] = {
-        name: this.toNullableText(control.controls.name.value),
-        level: control.controls.level.value
-      };
-    });
-    return values;
-  }
-
-  private resourceRecordToDto(
-    record: FormRecord<FormGroup<RedSunLimitedResourceFormControls>>
-  ): Record<string, RedSunLimitedResourceDTO> {
-    const values: Record<string, RedSunLimitedResourceDTO> = {};
-    Object.entries(record.controls).forEach(
-      ([key, control]: [string, FormGroup<RedSunLimitedResourceFormControls>]) => {
-        values[key] = {
-          maximumValue: control.controls.maximumValue.value,
-          currentValue: control.controls.currentValue.value
-        };
-      }
-    );
-    return values;
-  }
-
-  private checkRecordToDto(record: FormRecord<FormControl<boolean>>): Record<string, boolean> {
-    const values: Record<string, boolean> = {};
-    Object.entries(record.controls).forEach(([key, control]: [string, FormControl<boolean>]) => {
-      values[key] = control.value;
-    });
-    return values;
+    currentControl.setValue(clampRank(Math.floor(currentValue), 0, maximumControl.value));
+    currentControl.markAsDirty();
   }
 
   private toNullableText(value: string): string | null {

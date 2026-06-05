@@ -8,6 +8,7 @@ DROP TABLE IF EXISTS public.letter_recipients CASCADE;
 DROP TABLE IF EXISTS public.letters CASCADE;
 DROP TABLE IF EXISTS public.posts CASCADE;
 DROP TABLE IF EXISTS public.locations CASCADE;
+DROP TABLE IF EXISTS public.redsun_sheets CASCADE;
 DROP TABLE IF EXISTS public.basic_sheets CASCADE;
 DROP TABLE IF EXISTS public.tale_participants CASCADE;
 DROP TABLE IF EXISTS public.tales CASCADE;
@@ -47,7 +48,7 @@ CREATE TABLE public.user_favorite_rules (
   user_id uuid NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
   preference_order integer NOT NULL CHECK (preference_order BETWEEN 0 AND 9),
   favorite_rules varchar(20) NOT NULL CHECK (favorite_rules IN (
-    'DND_5E','STORYTELLER','PATHFINDER_2E','BRP','GURPS','SWADE','OTHER','CUSTOM','FIM_DO_MUNDO'
+    'REDSUN','FIM_DO_MUNDO','DND','STORYTELLER','PATHFINDER','BRP','GURPS','SWADE','OTHER','CUSTOM'
   )),
   PRIMARY KEY (user_id, preference_order)
 );
@@ -111,7 +112,7 @@ CREATE TABLE public.tales (
   description varchar(4000),
   language varchar(10) CHECK (language IS NULL OR language IN ('EN','DE','PT')),
   rules varchar(15) NOT NULL CHECK (rules IN (
-    'DND_5E','STORYTELLER','PATHFINDER_2E','BRP','GURPS','SWADE','OTHER','CUSTOM','FIM_DO_MUNDO'
+    'REDSUN','FIM_DO_MUNDO','DND','STORYTELLER','PATHFINDER','BRP','GURPS','SWADE','OTHER','CUSTOM'
   )),
   creation_date timestamptz NOT NULL DEFAULT now(),
   last_time_active timestamptz NOT NULL DEFAULT now(),
@@ -141,6 +142,139 @@ CREATE TABLE public.basic_sheets (
 );
 CREATE INDEX idx_basic_sheets_tale ON public.basic_sheets(tale_id);
 CREATE INDEX idx_basic_sheets_character ON public.basic_sheets(character_id);
+
+-- RedSun character sheets
+CREATE TABLE public.redsun_sheets (
+  id uuid PRIMARY KEY REFERENCES public.basic_sheets(id) ON DELETE CASCADE,
+  nature varchar(120),
+  demeanor varchar(120),
+  strength integer NOT NULL DEFAULT 0,
+  dexterity integer NOT NULL DEFAULT 0,
+  stamina integer NOT NULL DEFAULT 0,
+  presence integer NOT NULL DEFAULT 0,
+  empathy integer NOT NULL DEFAULT 0,
+  influence integer NOT NULL DEFAULT 0,
+  perception integer NOT NULL DEFAULT 0,
+  intellect integer NOT NULL DEFAULT 0,
+  determination integer NOT NULL DEFAULT 0,
+  alertness integer NOT NULL DEFAULT 0,
+  sports integer NOT NULL DEFAULT 0,
+  intuition integer NOT NULL DEFAULT 0,
+  intimidation integer NOT NULL DEFAULT 0,
+  subterfuge integer NOT NULL DEFAULT 0,
+  leadership integer NOT NULL DEFAULT 0,
+  diplomacy integer NOT NULL DEFAULT 0,
+  talent_1_name varchar(120),
+  talent_1_level integer NOT NULL DEFAULT 0,
+  talent_2_name varchar(120),
+  talent_2_level integer NOT NULL DEFAULT 0,
+  animal_handling integer NOT NULL DEFAULT 0,
+  riding integer NOT NULL DEFAULT 0,
+  legerdemain integer NOT NULL DEFAULT 0,
+  survival integer NOT NULL DEFAULT 0,
+  stealth integer NOT NULL DEFAULT 0,
+  athletics integer NOT NULL DEFAULT 0,
+  performance integer NOT NULL DEFAULT 0,
+  history integer NOT NULL DEFAULT 0,
+  religion integer NOT NULL DEFAULT 0,
+  language integer NOT NULL DEFAULT 0,
+  occultism integer NOT NULL DEFAULT 0,
+  investigation integer NOT NULL DEFAULT 0,
+  psychology integer NOT NULL DEFAULT 0,
+  business integer NOT NULL DEFAULT 0,
+  calling_1_name varchar(120),
+  calling_1_level integer NOT NULL DEFAULT 0,
+  calling_2_name varchar(120),
+  calling_2_level integer NOT NULL DEFAULT 0,
+  calling_3_name varchar(120),
+  calling_3_level integer NOT NULL DEFAULT 0,
+  calling_4_name varchar(120),
+  calling_4_level integer NOT NULL DEFAULT 0,
+  calling_5_name varchar(120),
+  calling_5_level integer NOT NULL DEFAULT 0,
+  martial_arts integer NOT NULL DEFAULT 0,
+  herbalism integer NOT NULL DEFAULT 0,
+  rituals integer NOT NULL DEFAULT 0,
+  meditation integer NOT NULL DEFAULT 0,
+  craft integer NOT NULL DEFAULT 0,
+  melee_throwing integer NOT NULL DEFAULT 0,
+  ranged_weapons integer NOT NULL DEFAULT 0,
+  unarmed integer NOT NULL DEFAULT 0,
+  willpower_max integer NOT NULL DEFAULT 0,
+  willpower_current integer NOT NULL DEFAULT 0,
+  impetus_max integer NOT NULL DEFAULT 0,
+  impetus_current integer NOT NULL DEFAULT 0,
+  bruised boolean NOT NULL DEFAULT FALSE,
+  hurt boolean NOT NULL DEFAULT FALSE,
+  injured boolean NOT NULL DEFAULT FALSE,
+  badly_wounded boolean NOT NULL DEFAULT FALSE,
+  mauled boolean NOT NULL DEFAULT FALSE,
+  crippled boolean NOT NULL DEFAULT FALSE,
+  incapacitated boolean NOT NULL DEFAULT FALSE,
+  torpor boolean NOT NULL DEFAULT FALSE,
+  final_death boolean NOT NULL DEFAULT FALSE,
+  experience varchar(120),
+  equipment text,
+  notes text,
+  active_rituals_effects text,
+  combat_maneuvers text,
+  arsenal text,
+  learned_rituals text,
+  craft_details text,
+  CONSTRAINT chk_redsun_rank_values CHECK (
+    strength BETWEEN 0 AND 5
+    AND dexterity BETWEEN 0 AND 5
+    AND stamina BETWEEN 0 AND 5
+    AND presence BETWEEN 0 AND 5
+    AND empathy BETWEEN 0 AND 5
+    AND influence BETWEEN 0 AND 5
+    AND perception BETWEEN 0 AND 5
+    AND intellect BETWEEN 0 AND 5
+    AND determination BETWEEN 0 AND 5
+    AND alertness BETWEEN 0 AND 5
+    AND sports BETWEEN 0 AND 5
+    AND intuition BETWEEN 0 AND 5
+    AND intimidation BETWEEN 0 AND 5
+    AND subterfuge BETWEEN 0 AND 5
+    AND leadership BETWEEN 0 AND 5
+    AND diplomacy BETWEEN 0 AND 5
+    AND talent_1_level BETWEEN 0 AND 5
+    AND talent_2_level BETWEEN 0 AND 5
+    AND animal_handling BETWEEN 0 AND 5
+    AND riding BETWEEN 0 AND 5
+    AND legerdemain BETWEEN 0 AND 5
+    AND survival BETWEEN 0 AND 5
+    AND stealth BETWEEN 0 AND 5
+    AND athletics BETWEEN 0 AND 5
+    AND performance BETWEEN 0 AND 5
+    AND history BETWEEN 0 AND 5
+    AND religion BETWEEN 0 AND 5
+    AND language BETWEEN 0 AND 5
+    AND occultism BETWEEN 0 AND 5
+    AND investigation BETWEEN 0 AND 5
+    AND psychology BETWEEN 0 AND 5
+    AND business BETWEEN 0 AND 5
+    AND calling_1_level BETWEEN 0 AND 5
+    AND calling_2_level BETWEEN 0 AND 5
+    AND calling_3_level BETWEEN 0 AND 5
+    AND calling_4_level BETWEEN 0 AND 5
+    AND calling_5_level BETWEEN 0 AND 5
+    AND martial_arts BETWEEN 0 AND 5
+    AND herbalism BETWEEN 0 AND 5
+    AND rituals BETWEEN 0 AND 5
+    AND meditation BETWEEN 0 AND 5
+    AND craft BETWEEN 0 AND 5
+    AND melee_throwing BETWEEN 0 AND 5
+    AND ranged_weapons BETWEEN 0 AND 5
+    AND unarmed BETWEEN 0 AND 5
+  ),
+  CONSTRAINT chk_redsun_resource_values CHECK (
+    willpower_max BETWEEN 0 AND 10
+    AND willpower_current BETWEEN 0 AND 10
+    AND impetus_max BETWEEN 0 AND 10
+    AND impetus_current BETWEEN 0 AND 10
+  )
+);
 
 -- Locations
 CREATE TABLE public.locations (

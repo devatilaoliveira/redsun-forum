@@ -1,6 +1,6 @@
 import {Component, computed, inject, OnDestroy, OnInit, Signal, signal, ViewChild, WritableSignal} from "@angular/core";
 import {ActivatedRoute, Router} from "@angular/router";
-import {FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from "@angular/forms";
+import {FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
 import {ITranslateService, TranslatePipe, TranslateService} from "@ngx-translate/core";
 import {finalize} from "rxjs";
 import {ROUTE_PATHS} from "../../../interface/constants/route-path.constants";
@@ -19,8 +19,11 @@ import {RsSpinner} from "../../shared/fragments/rsSpinner/rs.spinner";
 import {RsTextarea} from "../../shared/fragments/rsTextarea/rs.textarea";
 import {RsViewHeader} from "../../shared/fragments/rsViewHeader/rs.view-header";
 import {RsDialogModalComponent} from "../../shared/ui/dialog-modal/dialog-modal.component";
-import {UpsertCharacterSheetDTO} from "../../../interface/dtos/characterSheet/UpsertCharacterSheetDTO";
-import {RedSunSheetDTO} from "../../../interface/dtos/characterSheet/RedSunSheetDTO";
+import {
+  UpsertBasicSheetDTO,
+  UpsertCharacterSheetDTO
+} from "../../../interface/dtos/characterSheet/UpsertCharacterSheetDTO";
+import {RedSunSheetResponseDTO} from "../../../interface/dtos/characterSheet/RedSunSheetResponseDTO";
 import {IPrinter, Printer} from "../../../infra/miscellaneous/printer.handler";
 import {RsAvatar} from "../../shared/fragments/rsAvatar/rs.avatar";
 import {RsRoundIconButton} from "../../shared/fragments/rsRoundIconButton/rs.round-icon-button";
@@ -77,7 +80,7 @@ export class ManageCharacterView implements OnInit, OnDestroy {
   private currentRuleSystem: ERuleSystem | null = null;
 
   protected readonly characterSheetFormGroup: FormGroup<CharacterSheetFormControls> = this._formBuilder.group({
-    characterName: this._formBuilder.control<string>(""),
+    characterName: this._formBuilder.control<string>("", {validators: [Validators.required, Validators.pattern(/\S/)]}),
     characterDescription: this._formBuilder.control<string>("")
   });
   protected readonly controls = this.characterSheetFormGroup.controls;
@@ -88,7 +91,7 @@ export class ManageCharacterView implements OnInit, OnDestroy {
   protected readonly pendingAvatarFile: WritableSignal<File | null> = signal<File | null>(null);
   protected readonly avatarPreviewUrl: WritableSignal<string | null> = signal<string | null>(null);
   protected readonly characterImageUrl: WritableSignal<string | null> = signal<string | null>(null);
-  protected readonly redSunSheet: WritableSignal<RedSunSheetDTO | null> = signal<RedSunSheetDTO | null>(null);
+  protected readonly redSunSheet: WritableSignal<RedSunSheetResponseDTO | null> = signal<RedSunSheetResponseDTO | null>(null);
   protected readonly avatarCropOpen: WritableSignal<boolean> = signal<boolean>(false);
   protected readonly avatarCropFile: WritableSignal<File | undefined> = signal<File | undefined>(undefined);
   protected readonly avatarCropBlob: WritableSignal<Blob | null> = signal<Blob | null>(null);
@@ -116,9 +119,7 @@ export class ManageCharacterView implements OnInit, OnDestroy {
   }
 
   protected isRedSunSheet(): boolean {
-    // Agent: Leave it like this temporarily.
-    return true;
-    // return this.currentRuleSystem === ERuleSystem.REDSUN;
+    return this.currentRuleSystem === ERuleSystem.REDSUN;
   }
 
   public ngOnDestroy(): void {
@@ -214,6 +215,7 @@ export class ManageCharacterView implements OnInit, OnDestroy {
     this._characterSheetService.upsertCharacterSheet(
       this.taleId,
       this.characterSheetId,
+      this.requireRuleSystem(),
       this.toUpsertRequest(),
       this.pendingAvatarFile()
     ).pipe(
@@ -221,9 +223,6 @@ export class ManageCharacterView implements OnInit, OnDestroy {
     ).subscribe({
       next: (response: CharacterSheetResponseDTO) => {
         this.applyLoadedSheet(response);
-        if (this.isRedSunSheet() && !Object.prototype.hasOwnProperty.call(response.sheet, "redsun")) {
-          this.redSunSheetComponent?.markAsSaved();
-        }
         this.sheetEditable.set(false);
         this._talesContext.refreshTale();
       },
@@ -289,8 +288,8 @@ export class ManageCharacterView implements OnInit, OnDestroy {
     this.currentRuleSystem = response.ruleSystem;
     this.characterImageUrl.set(response.sheet.characterImageUrl);
     this.patchForm(this.toFormValue(response.sheet));
-    if (this.isRedSunSheet() && Object.prototype.hasOwnProperty.call(response.sheet, "redsun")) {
-      this.redSunSheet.set(response.sheet.redsun ?? null);
+    if (this.isRedSunSheet()) {
+      this.redSunSheet.set(response.sheet as RedSunSheetResponseDTO);
     } else if (!this.isRedSunSheet()) {
       this.redSunSheet.set(null);
     }
@@ -305,18 +304,27 @@ export class ManageCharacterView implements OnInit, OnDestroy {
 
   private toUpsertRequest(): UpsertCharacterSheetDTO {
     const formValue: CharacterSheetFormValue = this.getCurrentFormValue();
-    const request: UpsertCharacterSheetDTO = {
-      sheet: {
-        characterName: this.toNullableText(formValue.characterName),
-        characterDescription: this.toNullableText(formValue.characterDescription)
-      }
+    const basicRequest: UpsertBasicSheetDTO = {
+      characterName: formValue.characterName.trim(),
+      characterDescription: this.toNullableText(formValue.characterDescription)
     };
 
     if (this.isRedSunSheet() && this.redSunSheetComponent) {
-      request.sheet.redsun = this.redSunSheetComponent.toUpsertDto();
+      return {
+        ...basicRequest,
+        ...this.redSunSheetComponent.toUpsertDto()
+      };
     }
 
-    return request;
+    return basicRequest;
+  }
+
+  private requireRuleSystem(): ERuleSystem {
+    if (this.currentRuleSystem === null) {
+      throw new Error("Character sheet rule system is not loaded.");
+    }
+
+    return this.currentRuleSystem;
   }
 
   private toNullableText(value: string): string | null {

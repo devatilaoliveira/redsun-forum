@@ -2,13 +2,16 @@ package com.rpg.redsunapi.characterSheet;
 
 import com.rpg.redsunapi.characterSheet.core.CharacterSheetHandlerRegistry;
 import com.rpg.redsunapi.characterSheet.core.RuleCharacterSheetHandler;
+import com.rpg.redsunapi.characterSheet.dto.BasicSheetUpsertDTO;
 import com.rpg.redsunapi.characterSheet.dto.CharacterSheetResponseDTO;
-import com.rpg.redsunapi.characterSheet.dto.CharacterSheetUpsertRequestDTO;
 import com.rpg.redsunapi.storage.CharacterStorageService;
 import com.rpg.redsunapi.tale.Tale;
 import com.rpg.redsunapi.tale.TaleRepository;
 import com.rpg.redsunapi.tale.enums.ETaleStatus;
+import com.rpg.redsunapi.tale.enums.ERuleSystem;
 import com.rpg.redsunapi.user.User;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -24,20 +27,28 @@ import java.util.Set;
 import java.util.UUID;
 
 @Service
+@NullMarked
 public class CharacterSheetService {
   private static final Logger log = LoggerFactory.getLogger(CharacterSheetService.class);
+  private static final String DEFAULT_CHARACTER_NAME = "no_given_name_yet";
 
   private final TaleRepository taleRepository;
   private final CharacterSheetHandlerRegistry handlerRegistry;
+  private final BasicSheetHandler basicSheetHandler;
+  private final RedSunSheetHandler redSunSheetHandler;
   private final CharacterStorageService characterStorageService;
 
   public CharacterSheetService(
     TaleRepository taleRepository,
     CharacterSheetHandlerRegistry handlerRegistry,
+    BasicSheetHandler basicSheetHandler,
+    RedSunSheetHandler redSunSheetHandler,
     CharacterStorageService characterStorageService
   ) {
     this.taleRepository = taleRepository;
     this.handlerRegistry = handlerRegistry;
+    this.basicSheetHandler = basicSheetHandler;
+    this.redSunSheetHandler = redSunSheetHandler;
     this.characterStorageService = characterStorageService;
   }
 
@@ -54,22 +65,61 @@ public class CharacterSheetService {
   }
 
   @Transactional
-  public CharacterSheetResponseDTO putSheet(
+  public CharacterSheetResponseDTO putBasicSheet(
     UUID taleId,
     UUID characterSheetId,
     User requester,
-    CharacterSheetUpsertRequestDTO request,
-    MultipartFile avatarFile
+    BasicSheetUpsertDTO request,
+    @Nullable MultipartFile avatarFile
+  ) throws IOException {
+    return putSheet(
+      taleId,
+      characterSheetId,
+      requester,
+      avatarFile,
+      false,
+      basicSheetHandler,
+      sheet -> basicSheetHandler.applyUpdate(sheet, request)
+    );
+  }
+
+  @Transactional
+  public CharacterSheetResponseDTO putRedSunSheet(
+    UUID taleId,
+    UUID characterSheetId,
+    User requester,
+    RedSunSheetUpsertDTO request,
+    @Nullable MultipartFile avatarFile
+  ) throws IOException {
+    return putSheet(
+      taleId,
+      characterSheetId,
+      requester,
+      avatarFile,
+      true,
+      redSunSheetHandler,
+      sheet -> redSunSheetHandler.applyUpdate(sheet, request)
+    );
+  }
+
+  private CharacterSheetResponseDTO putSheet(
+    UUID taleId,
+    UUID characterSheetId,
+    User requester,
+    @Nullable MultipartFile avatarFile,
+    boolean redSunEndpoint,
+    RuleCharacterSheetHandler handler,
+    SheetUpdater updater
   ) throws IOException {
     Tale tale = requireActiveTale(taleId);
     requireCanAccess(tale, requester.getId(), characterSheetId);
+    requireMatchingRuleSystem(tale, redSunEndpoint);
 
-    RuleCharacterSheetHandler handler = handlerRegistry.resolve(tale.getRules());
     CharacterSheet sheet = handler.getOrCreateSheet(tale, characterSheetId);
-    String oldAvatarUrl = sheet.getCharacterImageUrl();
-    String newAvatarUrl = null;
+    @Nullable String oldAvatarUrl = sheet.getCharacterImageUrl();
+    @Nullable String newAvatarUrl = null;
     boolean hasAvatarUpload = avatarFile != null && !avatarFile.isEmpty();
-    String effectiveCharacterImageUrl = oldAvatarUrl;
+    @Nullable String effectiveCharacterImageUrl = oldAvatarUrl;
 
     try {
       if (hasAvatarUpload) {
@@ -77,7 +127,7 @@ public class CharacterSheetService {
         effectiveCharacterImageUrl = newAvatarUrl;
       }
 
-      handler.applyUpdate(sheet, request.sheet());
+      updater.apply(sheet);
       sheet.setCharacterImageUrl(effectiveCharacterImageUrl);
       handler.save(sheet);
 
@@ -103,36 +153,33 @@ public class CharacterSheetService {
     return new CharacterSheetResponseDTO(tale.getRules(), payload);
   }
 
-  public void ensureCharacterSheetForParticipant(Tale tale, UUID participantId) {
-    if (tale == null || tale.getId() == null || participantId == null) {
-      return;
+  private void requireMatchingRuleSystem(Tale tale, boolean redSunEndpoint) {
+    boolean taleUsesRedSun = tale.getRules() == ERuleSystem.REDSUN;
+    if (taleUsesRedSun != redSunEndpoint) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Character sheet type does not match the tale rule system.");
     }
+  }
 
+  public void ensureCharacterSheetForParticipant(Tale tale, User participant) {
     RuleCharacterSheetHandler handler = handlerRegistry.resolve(tale.getRules());
-    if (handler.exists(tale, participantId)) {
+    if (handler.exists(tale, participant.getId())) {
       return;
     }
 
-    handler.getOrCreateSheet(tale, participantId);
+    CharacterSheet sheet = handler.getOrCreateSheet(tale, participant.getId());
+    sheet.setCharacterName(DEFAULT_CHARACTER_NAME);
+    handler.save(sheet);
   }
 
   public void initializeCharacterSheetForTaleOwner(Tale tale) {
-    if (tale == null || tale.getId() == null || tale.getOwnerId() == null) {
-      return;
-    }
-
     RuleCharacterSheetHandler handler = handlerRegistry.resolve(tale.getRules());
     CharacterSheet sheet = handler.getOrCreateSheet(tale, tale.getOwnerId());
-    sheet.setCharacterName(tale.getTaleName());
+    sheet.setCharacterName(DEFAULT_CHARACTER_NAME);
     sheet.setCharacterImageUrl(tale.getImageURL());
     handler.save(sheet);
   }
 
   public void resetCharacterSheetsForRuleChange(Tale tale) {
-    if (tale == null) {
-      return;
-    }
-
     RuleCharacterSheetHandler handler = handlerRegistry.resolve(tale.getRules());
     handler.deleteByTale(tale);
     tale.getBasicSheets().clear();
@@ -149,19 +196,13 @@ public class CharacterSheetService {
     }
 
     for (UUID participantId : participantIds) {
-      handler.getOrCreateSheet(tale, participantId);
+      CharacterSheet sheet = handler.getOrCreateSheet(tale, participantId);
+      sheet.setCharacterName(DEFAULT_CHARACTER_NAME);
+      handler.save(sheet);
     }
   }
 
   public void removeCharacterSheetForParticipant(Tale tale, UUID participantId) {
-    if (tale == null || participantId == null) {
-      return;
-    }
-
-    if (tale.getId() == null) {
-      return;
-    }
-
     RuleCharacterSheetHandler handler = handlerRegistry.resolve(tale.getRules());
     handler.deleteByTaleAndCharacterId(tale, participantId);
     tale.removeBasicSheet(participantId);
@@ -179,5 +220,10 @@ public class CharacterSheetService {
     if (!requesterId.equals(tale.getOwnerId()) && !requesterId.equals(targetUserId)) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot access this character sheet.");
     }
+  }
+
+  @FunctionalInterface
+  private interface SheetUpdater {
+    void apply(CharacterSheet sheet);
   }
 }

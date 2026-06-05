@@ -1,6 +1,7 @@
 package com.rpg.redsunapi.characterSheet.core;
 
 import com.rpg.redsunapi.characterSheet.BasicSheetHandler;
+import com.rpg.redsunapi.characterSheet.RedSunSheetHandler;
 import com.rpg.redsunapi.tale.enums.ERuleSystem;
 import org.springframework.stereotype.Component;
 
@@ -8,9 +9,11 @@ import org.springframework.stereotype.Component;
 public class CharacterSheetHandlerRegistry {
 
   private final RuleCharacterSheetHandler basicSheetHandler;
+  private final RuleCharacterSheetHandler redSunSheetHandler;
 
-  public CharacterSheetHandlerRegistry(BasicSheetHandler basicSheetHandler) {
+  public CharacterSheetHandlerRegistry(BasicSheetHandler basicSheetHandler, RedSunSheetHandler redSunSheetHandler) {
     this.basicSheetHandler = basicSheetHandler;
+    this.redSunSheetHandler = redSunSheetHandler;
   }
 
   public RuleCharacterSheetHandler resolve(ERuleSystem ruleSystem) {
@@ -19,15 +22,16 @@ public class CharacterSheetHandlerRegistry {
     }
 
     return switch (ruleSystem) {
-      case DND_5E,
+      case DND,
            STORYTELLER,
-           PATHFINDER_2E,
+           PATHFINDER,
            BRP,
            GURPS,
            SWADE,
            OTHER,
            CUSTOM,
            FIM_DO_MUNDO -> basicSheetHandler;
+      case REDSUN -> redSunSheetHandler;
     };
   }
 }

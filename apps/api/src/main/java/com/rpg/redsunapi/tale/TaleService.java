@@ -108,7 +108,7 @@ public class TaleService {
 
     characterSheetService.initializeCharacterSheetForTaleOwner(savedTale);
     for (User participant : participants) {
-      characterSheetService.ensureCharacterSheetForParticipant(savedTale, participant.getId());
+      characterSheetService.ensureCharacterSheetForParticipant(savedTale, participant);
     }
 
     return savedTale;
@@ -351,7 +351,7 @@ public class TaleService {
     }
 
     participants.add(participant);
-    characterSheetService.ensureCharacterSheetForParticipant(tale, participant.getId());
+    characterSheetService.ensureCharacterSheetForParticipant(tale, participant);
     return taleRepository.save(tale);
   }
 

@@ -1,4 +1,4 @@
 export interface UpsertBasicSheetDTO {
-  characterName: string | null;
+  characterName: string;
   characterDescription: string | null;
 }
