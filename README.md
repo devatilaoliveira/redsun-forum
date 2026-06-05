@@ -155,31 +155,29 @@ Pop-Location
 
 ### Database Reset
 
-Use these command sequences when starting a Supabase/Postgres database from scratch. The reset command is destructive: it drops and recreates application tables, wipes configured auth/storage/application data, reapplies RLS policies, hardens Supabase Data API access, reapplies app-role grants, and verifies runtime login through `DB_USER`.
+The reset is destructive. It recreates the application schema, wipes configured application/auth/storage data, reapplies policies and grants, and verifies the runtime database login.
 
-`db/app-role-bootstrap.sql` is separate on purpose. Run it only for a brand-new database role or an intentional `DB_PASSWORD` rotation. Routine resets should not rotate the application database password.
+#### Initial Setup
 
-#### Fresh Non-Prod Database
+1. Create the application runtime role in the Supabase SQL Editor. Create `DB_APP_ROLE`, not the project-qualified `DB_USER` value:
 
-1. Prepare `apps/api/.env.local` from `apps/api/.env.template`, including `DB_ADMIN_USER`, `DB_ADMIN_PASSWORD`, `DB_APP_ROLE`, `DB_USER`, and `DB_PASSWORD`.
-
-2. Create or rotate the application login role:
-
-```powershell
-Push-Location apps\api
-.\scripts\run-supabase-sql.ps1 -EnvFile .env.local -OverrideEnv -SqlFiles db/app-role-bootstrap.sql,db/app-role-grants.sql
-Pop-Location
+```sql
+CREATE ROLE redsun_dev
+WITH LOGIN PASSWORD 'use-the-same-value-as-DB_PASSWORD'
+NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
 ```
 
-3. Wait a few minutes for Supabase pooler credential propagation, then verify runtime login and grants:
+2. Prepare `apps/api/.env.local` from `apps/api/.env.template`. The relevant values should follow this pattern:
 
-```powershell
-Push-Location apps\api
-.\scripts\run-supabase-sql.ps1 -EnvFile .env.local -OverrideEnv -SqlFiles db/app-role-grants.sql
-Pop-Location
+```dotenv
+DB_APP_ROLE=redsun_dev
+DB_USER=redsun_dev.your-project-ref
+DB_PASSWORD=use-the-same-value-as-the-role-password
 ```
 
-4. Rebuild the non-prod database schema, data, policies, storage setup, Data API hardening, and runtime grants:
+`DB_APP_ROLE` is the actual PostgreSQL role. `DB_USER` is the Supavisor pooler login and must include the Supabase project reference.
+
+3. Run the reset from `apps/api`:
 
 ```powershell
 Push-Location apps\api
@@ -187,41 +185,55 @@ Push-Location apps\api
 Pop-Location
 ```
 
-For later non-prod wipes where `DB_APP_ROLE` and `DB_PASSWORD` already exist, run only step 4.
+Use the same reset command for later wipes. It does not create the runtime role or change its password.
 
-#### Fresh Production Database
+#### SQL Execution Order
 
-Production database resets are destructive and should only be run with intentional production credentials in `apps/api/.env.prod`.
+Without `-SqlFiles`, `run-supabase-sql.ps1` executes these files in order:
 
-1. Prepare and verify `apps/api/.env.prod`, including `DB_ADMIN_USER`, `DB_ADMIN_PASSWORD`, `DB_APP_ROLE`, `DB_USER`, and `DB_PASSWORD`.
+1. `db/schema.sql` - drops and recreates application tables.
+2. `db/private-wipe.sql` - clears application-owned private data.
+3. `db/storage.sql` - configures storage buckets and policies.
+4. `db/storage-wipe.sql` - clears configured storage records.
+5. `db/auth-wipe.sql` - clears configured Supabase Auth data.
+6. `db/data-api-hardening.sql` - restricts Data API access and enables RLS as defense in depth.
+7. `db/app-role-grants.sql` - reapplies runtime grants and unrestricted backend-role policies.
 
-2. Create or rotate the production application login role:
+After the files finish, the script verifies the login using `DB_HOST`, `DB_PORT`, `DB_USER`, and `DB_PASSWORD`.
+
+#### Run Selected SQL Files
+
+Use `-SqlFiles` to run one file without performing a full reset:
 
 ```powershell
 Push-Location apps\api
-.\scripts\run-supabase-sql.ps1 -EnvFile .env.prod -OverrideEnv -SqlFiles db/app-role-bootstrap.sql,db/app-role-grants.sql
+.\scripts\run-supabase-sql.ps1 -EnvFile .env.local -OverrideEnv -SqlFiles db/app-role-grants.sql
 Pop-Location
 ```
 
-3. Wait a few minutes for Supabase pooler credential propagation, then verify runtime login and grants:
+Pass a comma-separated list to run several files in the specified order:
 
 ```powershell
-Push-Location apps\api
-.\scripts\run-supabase-sql.ps1 -EnvFile .env.prod -OverrideEnv -SqlFiles db/app-role-grants.sql
-Pop-Location
+.\scripts\run-supabase-sql.ps1 -EnvFile .env.local -OverrideEnv -SqlFiles db/data-api-hardening.sql,db/app-role-grants.sql
 ```
 
-4. Rebuild the production database schema, data, policies, storage setup, Data API hardening, and runtime grants:
+`-SqlFiles` replaces the default list; it does not add files to the default reset.
+
+#### Select An Environment File
+
+`-EnvFile` selects which environment file the script loads. Paths are relative to the current directory:
 
 ```powershell
-Push-Location apps\api
+# Local configuration
+.\scripts\run-supabase-sql.ps1 -EnvFile .env.local -OverrideEnv
+
+# Production configuration
 .\scripts\run-supabase-sql.ps1 -EnvFile .env.prod -OverrideEnv
-Pop-Location
 ```
 
-For later production wipes where the runtime role/password already exist, run only step 4.
+`-OverrideEnv` makes values from the selected file replace variables already present in the PowerShell process. This prevents stale shell values from overriding the selected configuration.
 
-If Supabase returns `ECIRCUITBREAKER` or `too many authentication failures`, stop retrying immediately. Stop any API/app instances that may still be using stale database credentials, wait for the Supabase pooler block to clear, then verify `DB_USER` and `DB_PASSWORD` in the selected env file before rerunning the command.
+If Supabase returns `ECIRCUITBREAKER` or `too many authentication failures`, stop all clients using stale credentials and stop retrying until the pooler block clears.
 
 ### Database Backup And Restore
 
