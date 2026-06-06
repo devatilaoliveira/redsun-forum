@@ -10,13 +10,13 @@ import {RsButton} from "../../shared/fragments/rsButton/rs.button";
 import {RsInput} from "../../shared/fragments/rsInput/rs.input";
 
 @Component({
-  selector: "rs-change-email",
+  selector: "rs-change-password",
   standalone: true,
   imports: [TranslatePipe, RsButton, RsInput],
-  templateUrl: "./change-email.view.html",
-  styleUrl: "./change-email.view.scss"
+  templateUrl: "./change-password.view.html",
+  styleUrl: "./change-password.view.scss"
 })
-export class ChangeEmailView implements OnInit {
+export class ChangePasswordView implements OnInit {
   private readonly _authService: IAuthService = inject(AuthService);
   private readonly _supabaseAuthClient: ISupabaseAuthClient = inject(SupabaseAuthClientAdapter);
   private readonly _translateService: ITranslateService = inject(TranslateService);

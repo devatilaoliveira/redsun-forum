@@ -309,7 +309,7 @@ export class ProfileDetailsView {
     this.deleteUsernameValue.set(value);
   }
 
-  protected navigateToChangeEmail(): void {
+  protected navigateToChangePassword(): void {
     void this._router.navigate(["/", ROUTE_PATHS.changePassword]);
   }
 

@@ -82,12 +82,12 @@
       </div>
     </form>
 
-    <div class="change-email-section">
+    <div class="change-password-section">
       @if (user?.provider === EProvider.EMAIL) {
         <rs-button
           [variant]="EVariant.PRIMARY"
           [disabled]="isSaving() || deleteInProgress()"
-          (pressed)="navigateToChangeEmail()"
+          (pressed)="navigateToChangePassword()"
         >
           {{ "CHANGE_PASSWORD" | translate }}
         </rs-button>

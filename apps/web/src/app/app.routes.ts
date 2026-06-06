@@ -60,7 +60,7 @@ export const routes: Routes = [
   },
   {
     path: ROUTE_PATHS.changePassword,
-    loadComponent: () => import("./features/change-email/change-email.view").then((module) => module.ChangeEmailView),
+    loadComponent: () => import("./features/change-password/change-password.view").then((module) => module.ChangePasswordView),
     title: "CHANGE_PASSWORD",
     data: {
       hideTopBar: true
