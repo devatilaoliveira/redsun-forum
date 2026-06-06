@@ -59,15 +59,7 @@ export interface RedSunSheetResponseDTO extends BasicSheetDTO {
   willpowerCurrent: number;
   impetusMax: number;
   impetusCurrent: number;
-  bruised: boolean;
-  hurt: boolean;
-  injured: boolean;
-  badlyWounded: boolean;
-  mauled: boolean;
-  crippled: boolean;
-  incapacitated: boolean;
-  torpor: boolean;
-  finalDeath: boolean;
+  vitalityDamage: number;
   experience: string | null;
   equipment: string | null;
   notes: string | null;

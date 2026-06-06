@@ -41,7 +41,6 @@
 .field-grid,
 .column-grid,
 .textarea-grid,
-.health-grid,
 .resource-grid {
   display: grid;
   gap: var(--space-1);
@@ -57,10 +56,6 @@
 }
 
 .column-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.health-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
@@ -95,8 +90,7 @@
   .field-grid--three,
   .field-grid--two,
   .textarea-grid,
-  .column-grid,
-  .health-grid {
+  .column-grid {
     grid-template-columns: 1fr;
   }
 }

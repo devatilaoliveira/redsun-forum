@@ -150,15 +150,7 @@ public class RedSunSheetHandler implements RuleCharacterSheetHandler {
     sheet.willpowerCurrent = resource(dto.willpowerCurrent());
     sheet.impetusMax = resource(dto.impetusMax());
     sheet.impetusCurrent = resource(dto.impetusCurrent());
-    sheet.bruised = bool(dto.bruised());
-    sheet.hurt = bool(dto.hurt());
-    sheet.injured = bool(dto.injured());
-    sheet.badlyWounded = bool(dto.badlyWounded());
-    sheet.mauled = bool(dto.mauled());
-    sheet.crippled = bool(dto.crippled());
-    sheet.incapacitated = bool(dto.incapacitated());
-    sheet.torpor = bool(dto.torpor());
-    sheet.finalDeath = bool(dto.finalDeath());
+    sheet.vitalityDamage = vitalityDamage(dto.vitalityDamage(), sheet.stamina);
     sheet.experience = CharacterSheetText.normalizeOptionalText(dto.experience());
     sheet.equipment = CharacterSheetText.normalizeOptionalText(dto.equipment());
     sheet.notes = CharacterSheetText.normalizeOptionalText(dto.notes());
@@ -177,12 +169,13 @@ public class RedSunSheetHandler implements RuleCharacterSheetHandler {
     return clamp(value, 0, 10);
   }
 
+  private int vitalityDamage(@Nullable Integer value, int stamina) {
+    int maximumDamage = stamina >= 5 ? 11 : stamina >= 4 ? 10 : 9;
+    return clamp(value, 0, maximumDamage);
+  }
+
   private int clamp(@Nullable Integer value, int minimum, int maximum) {
     int number = value != null ? value : minimum;
     return Math.max(minimum, Math.min(maximum, number));
-  }
-
-  private boolean bool(@Nullable Boolean value) {
-    return Boolean.TRUE.equals(value);
   }
 }

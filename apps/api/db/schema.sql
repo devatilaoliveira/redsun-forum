@@ -204,15 +204,7 @@ CREATE TABLE public.redsun_sheets (
   willpower_current integer NOT NULL DEFAULT 0,
   impetus_max integer NOT NULL DEFAULT 0,
   impetus_current integer NOT NULL DEFAULT 0,
-  bruised boolean NOT NULL DEFAULT FALSE,
-  hurt boolean NOT NULL DEFAULT FALSE,
-  injured boolean NOT NULL DEFAULT FALSE,
-  badly_wounded boolean NOT NULL DEFAULT FALSE,
-  mauled boolean NOT NULL DEFAULT FALSE,
-  crippled boolean NOT NULL DEFAULT FALSE,
-  incapacitated boolean NOT NULL DEFAULT FALSE,
-  torpor boolean NOT NULL DEFAULT FALSE,
-  final_death boolean NOT NULL DEFAULT FALSE,
+  vitality_damage integer NOT NULL DEFAULT 0,
   experience varchar(120),
   equipment text,
   notes text,
@@ -273,6 +265,9 @@ CREATE TABLE public.redsun_sheets (
     AND willpower_current BETWEEN 0 AND 10
     AND impetus_max BETWEEN 0 AND 10
     AND impetus_current BETWEEN 0 AND 10
+  ),
+  CONSTRAINT chk_redsun_vitality_damage CHECK (
+    vitality_damage BETWEEN 0 AND 11
   )
 );
 

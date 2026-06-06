@@ -2,13 +2,13 @@ import {Component, effect, input, InputSignal} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
 import {RedSunSheetResponseDTO} from "../../../../interface/dtos/characterSheet/RedSunSheetResponseDTO";
 import {UpsertRedSunSheetDTO} from "../../../../interface/dtos/characterSheet/UpsertRedSunSheetDTO";
-import {RsCheckbox} from "../../../shared/fragments/rsCheckbox/rs.checkbox";
 import {RsDivider} from "../../../shared/fragments/rsDivider/rs.divider";
 import {RsInput} from "../../../shared/fragments/rsInput/rs.input";
 import {RsTextarea} from "../../../shared/fragments/rsTextarea/rs.textarea";
 import {LimitedResourcesComponent} from "../../../shared/ui/limited-resources/limited-resources.component";
 import {clampRank} from "../../../shared/ui/rank-selection";
 import {SkillBulletsComponent} from "../../../shared/ui/skill-bullets/skill-bullets.component";
+import {VitalityTrackComponent} from "./vitality-track/vitality-track.component";
 
 type RedSunControlValue<T> = T extends string | null ? string : T;
 type RedSunSheetFormControls = {
@@ -74,15 +74,7 @@ const DEFAULT_REDSUN_SHEET: UpsertRedSunSheetDTO = {
   willpowerCurrent: 0,
   impetusMax: 0,
   impetusCurrent: 0,
-  bruised: false,
-  hurt: false,
-  injured: false,
-  badlyWounded: false,
-  mauled: false,
-  crippled: false,
-  incapacitated: false,
-  torpor: false,
-  finalDeath: false,
+  vitalityDamage: 0,
   experience: null,
   equipment: null,
   notes: null,
@@ -97,12 +89,12 @@ const DEFAULT_REDSUN_SHEET: UpsertRedSunSheetDTO = {
   selector: "rs-redsun-sheet",
   standalone: true,
   imports: [
-    RsCheckbox,
     RsDivider,
     RsInput,
     RsTextarea,
     LimitedResourcesComponent,
-    SkillBulletsComponent
+    SkillBulletsComponent,
+    VitalityTrackComponent
   ],
   templateUrl: "./redsun-sheet.component.html",
   styleUrl: "./redsun-sheet.component.scss"
@@ -173,15 +165,7 @@ export class RedSunSheetComponent {
     willpowerCurrent: new FormControl<number>(0, {nonNullable: true}),
     impetusMax: new FormControl<number>(0, {nonNullable: true}),
     impetusCurrent: new FormControl<number>(0, {nonNullable: true}),
-    bruised: new FormControl<boolean>(false, {nonNullable: true}),
-    hurt: new FormControl<boolean>(false, {nonNullable: true}),
-    injured: new FormControl<boolean>(false, {nonNullable: true}),
-    badlyWounded: new FormControl<boolean>(false, {nonNullable: true}),
-    mauled: new FormControl<boolean>(false, {nonNullable: true}),
-    crippled: new FormControl<boolean>(false, {nonNullable: true}),
-    incapacitated: new FormControl<boolean>(false, {nonNullable: true}),
-    torpor: new FormControl<boolean>(false, {nonNullable: true}),
-    finalDeath: new FormControl<boolean>(false, {nonNullable: true}),
+    vitalityDamage: new FormControl<number>(0, {nonNullable: true}),
     experience: new FormControl<string>("", {nonNullable: true}),
     equipment: new FormControl<string>("", {nonNullable: true}),
     notes: new FormControl<string>("", {nonNullable: true}),
@@ -304,15 +288,7 @@ export class RedSunSheetComponent {
       willpowerCurrent: this.controls.willpowerCurrent.value,
       impetusMax: this.controls.impetusMax.value,
       impetusCurrent: this.controls.impetusCurrent.value,
-      bruised: this.controls.bruised.value,
-      hurt: this.controls.hurt.value,
-      injured: this.controls.injured.value,
-      badlyWounded: this.controls.badlyWounded.value,
-      mauled: this.controls.mauled.value,
-      crippled: this.controls.crippled.value,
-      incapacitated: this.controls.incapacitated.value,
-      torpor: this.controls.torpor.value,
-      finalDeath: this.controls.finalDeath.value,
+      vitalityDamage: this.controls.vitalityDamage.value,
       experience: this.toNullableText(this.controls.experience.value),
       equipment: this.toNullableText(this.controls.equipment.value),
       notes: this.toNullableText(this.controls.notes.value),
@@ -334,9 +310,21 @@ export class RedSunSheetComponent {
     control.markAsDirty();
   }
 
-  protected setBooleanValue(control: FormControl<boolean>, value: boolean): void {
-    control.setValue(value);
-    control.markAsDirty();
+  protected setStaminaValue(value: number): void {
+    const nextStaminaValue: number = clampRank(Math.floor(value), 0, 5);
+    this.controls.stamina.setValue(nextStaminaValue);
+    this.controls.stamina.markAsDirty();
+
+    const maximumVitalityDamage: number = this.maximumVitalityDamage(nextStaminaValue);
+    if (this.controls.vitalityDamage.value > maximumVitalityDamage) {
+      this.controls.vitalityDamage.setValue(maximumVitalityDamage);
+      this.controls.vitalityDamage.markAsDirty();
+    }
+  }
+
+  protected setVitalityDamage(value: number): void {
+    this.controls.vitalityDamage.setValue(value);
+    this.controls.vitalityDamage.markAsDirty();
   }
 
   protected setWillpowerMaximum(maximumValue: number): void {
@@ -382,5 +370,11 @@ export class RedSunSheetComponent {
   private toNullableText(value: string): string | null {
     const normalizedValue: string = value.trim();
     return normalizedValue.length > 0 ? normalizedValue : null;
+  }
+
+  private maximumVitalityDamage(staminaValue: number): number {
+    if (staminaValue >= 5) return 11;
+    if (staminaValue >= 4) return 10;
+    return 9;
   }
 }

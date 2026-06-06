@@ -25,7 +25,7 @@
         <h3 class="section-title">Fisicos</h3>
         <rs-skill-bullets skillName="Forca" [levelValue]="controls.strength.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.strength, $event)" />
         <rs-skill-bullets skillName="Destreza" [levelValue]="controls.dexterity.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.dexterity, $event)" />
-        <rs-skill-bullets skillName="Vigor" [levelValue]="controls.stamina.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.stamina, $event)" />
+        <rs-skill-bullets skillName="Vigor" [levelValue]="controls.stamina.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setStaminaValue($event)" />
       </article>
 
       <article class="sheet-group">
@@ -143,18 +143,12 @@
   <rs-divider type="solid" />
 
   <section class="sheet-section">
-    <h3 class="section-title">Vitalidade</h3>
-    <div class="health-grid">
-      <rs-checkbox label="Escoriado" [checked]="controls.bruised.value" [disabled]="!sheetEditable()" (checkedChange)="setBooleanValue(controls.bruised, $event)" />
-      <rs-checkbox label="Machucado" [checked]="controls.hurt.value" [disabled]="!sheetEditable()" (checkedChange)="setBooleanValue(controls.hurt, $event)" />
-      <rs-checkbox label="Ferido" [checked]="controls.injured.value" [disabled]="!sheetEditable()" (checkedChange)="setBooleanValue(controls.injured, $event)" />
-      <rs-checkbox label="Ferido Gravemente" [checked]="controls.badlyWounded.value" [disabled]="!sheetEditable()" (checkedChange)="setBooleanValue(controls.badlyWounded, $event)" />
-      <rs-checkbox label="Espancado" [checked]="controls.mauled.value" [disabled]="!sheetEditable()" (checkedChange)="setBooleanValue(controls.mauled, $event)" />
-      <rs-checkbox label="Aleijado" [checked]="controls.crippled.value" [disabled]="!sheetEditable()" (checkedChange)="setBooleanValue(controls.crippled, $event)" />
-      <rs-checkbox label="Incapacitado" [checked]="controls.incapacitated.value" [disabled]="!sheetEditable()" (checkedChange)="setBooleanValue(controls.incapacitated, $event)" />
-      <rs-checkbox label="Torpor" [checked]="controls.torpor.value" [disabled]="!sheetEditable()" (checkedChange)="setBooleanValue(controls.torpor, $event)" />
-      <rs-checkbox label="Morte Final" [checked]="controls.finalDeath.value" [disabled]="!sheetEditable()" (checkedChange)="setBooleanValue(controls.finalDeath, $event)" />
-    </div>
+    <rs-vitality-track
+      [damageValue]="controls.vitalityDamage.value"
+      [staminaValue]="controls.stamina.value"
+      [editable]="sheetEditable()"
+      (damageValueChanged)="setVitalityDamage($event)"
+    />
   </section>
   <rs-divider type="solid" />
 

@@ -126,20 +126,8 @@ public class RedSunSheet extends BasicSheet {
   @Column(name = "impetus_current")
   int impetusCurrent;
 
-  boolean bruised;
-  boolean hurt;
-  boolean injured;
-
-  @Column(name = "badly_wounded")
-  boolean badlyWounded;
-
-  boolean mauled;
-  boolean crippled;
-  boolean incapacitated;
-  boolean torpor;
-
-  @Column(name = "final_death")
-  boolean finalDeath;
+  @Column(name = "vitality_damage")
+  int vitalityDamage;
 
   @Column(length = 120)
   @Nullable String experience;
