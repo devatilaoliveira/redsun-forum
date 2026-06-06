@@ -146,6 +146,8 @@ public class RedSunSheetHandler implements RuleCharacterSheetHandler {
     sheet.meleeThrowing = rank(dto.meleeThrowing());
     sheet.rangedWeapons = rank(dto.rangedWeapons());
     sheet.unarmed = rank(dto.unarmed());
+    sheet.throwing = rank(dto.throwing());
+    sheet.exoticWeapons = rank(dto.exoticWeapons());
     sheet.willpowerMax = resource(dto.willpowerMax());
     sheet.willpowerCurrent = resource(dto.willpowerCurrent());
     sheet.impetusMax = resource(dto.impetusMax());

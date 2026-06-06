@@ -64,6 +64,8 @@ public record RedSunSheetUpsertDTO(
   @Nullable Integer meleeThrowing,
   @Nullable Integer rangedWeapons,
   @Nullable Integer unarmed,
+  @Nullable Integer throwing,
+  @Nullable Integer exoticWeapons,
   @Nullable Integer willpowerMax,
   @Nullable Integer willpowerCurrent,
   @Nullable Integer impetusMax,

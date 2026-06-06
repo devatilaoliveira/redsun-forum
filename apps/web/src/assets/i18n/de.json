@@ -351,6 +351,8 @@
   "MELEE_WEAPONS": "Nahkampfwaffen",
   "RANGED_WEAPONS": "Fernkampfwaffen",
   "UNARMED": "Unbewaffnet",
+  "THROWING": "Wurfwaffen",
+  "EXOTIC_WEAPONS": "Exotische Waffen",
   "RESOURCES": "Ressourcen",
   "WILLPOWER": "Willenskraft",
   "IMPETUS": "Impetus",

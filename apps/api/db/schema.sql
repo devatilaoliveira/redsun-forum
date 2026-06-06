@@ -200,6 +200,8 @@ CREATE TABLE public.redsun_sheets (
   melee_throwing integer NOT NULL DEFAULT 0,
   ranged_weapons integer NOT NULL DEFAULT 0,
   unarmed integer NOT NULL DEFAULT 0,
+  throwing integer NOT NULL DEFAULT 0,
+  exotic_weapons integer NOT NULL DEFAULT 0,
   willpower_max integer NOT NULL DEFAULT 0,
   willpower_current integer NOT NULL DEFAULT 0,
   impetus_max integer NOT NULL DEFAULT 0,
@@ -259,6 +261,8 @@ CREATE TABLE public.redsun_sheets (
     AND melee_throwing BETWEEN 0 AND 5
     AND ranged_weapons BETWEEN 0 AND 5
     AND unarmed BETWEEN 0 AND 5
+    AND throwing BETWEEN 0 AND 5
+    AND exotic_weapons BETWEEN 0 AND 5
   ),
   CONSTRAINT chk_redsun_resource_values CHECK (
     willpower_max BETWEEN 0 AND 10

@@ -55,6 +55,8 @@ export interface RedSunSheetResponseDTO extends BasicSheetDTO {
   meleeThrowing: number;
   rangedWeapons: number;
   unarmed: number;
+  throwing: number;
+  exoticWeapons: number;
   willpowerMax: number;
   willpowerCurrent: number;
   impetusMax: number;

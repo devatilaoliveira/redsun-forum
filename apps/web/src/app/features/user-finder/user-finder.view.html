@@ -2,13 +2,13 @@
   <div class="content">
     <rs-view-header
       [title]="'FIND_USERS' | translate"
-      [subTittle]="'FIND_USERS_SUBTITLE' | translate"
+      [subTittle]="'DISCOVER_USERS_BY_PUBLIC_PROFILE' | translate"
     />
 
     <div class="filters">
       <rs-input
         [label]="'USERNAME' | translate"
-        [placeholder]="'FIND_USERS_USERNAME_PLACEHOLDER' | translate"
+        [placeholder]="'SEARCH_BY_USERNAME' | translate"
         [value]="usernameFilter()"
         (valueChanged)="onUsernameChange($event)"
       />
@@ -43,7 +43,7 @@
 
     @if (accountError()) {
       <div class="status">
-        <p>{{ 'FIND_USERS_ACCOUNT_ERROR' | translate }}</p>
+        <p>{{ 'ACCOUNT_LOAD_FOR_USER_SEARCH_FAILED' | translate }}</p>
       </div>
     } @else if (loading()) {
       <div class="status">
@@ -52,7 +52,7 @@
       </div>
     } @else if (!hasUsers()) {
       <div class="status">
-        <p>{{ 'FIND_USERS_EMPTY' | translate }}</p>
+        <p>{{ 'NO_USERS_MATCH_FILTERS' | translate }}</p>
       </div>
     } @else {
       <div class="results">

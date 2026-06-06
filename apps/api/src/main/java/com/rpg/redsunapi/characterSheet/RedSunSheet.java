@@ -113,6 +113,10 @@ public class RedSunSheet extends BasicSheet {
   int rangedWeapons;
 
   int unarmed;
+  int throwing;
+
+  @Column(name = "exotic_weapons")
+  int exoticWeapons;
 
   @Column(name = "willpower_max")
   int willpowerMax;
