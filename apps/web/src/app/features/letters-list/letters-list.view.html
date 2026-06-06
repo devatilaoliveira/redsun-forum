@@ -6,28 +6,28 @@
     />
     <div class="input-toggle">
       <div>
-        <rs-tooltip text="Compose a new letter" align="start">
+        <rs-tooltip [text]="'COMPOSE_NEW_LETTER' | translate" align="start">
           <rs-round-icon-button
             [iconSrc]="'/assets/svgs/edit.svg'"
-            [ariaLabel]="'Compose a new letter'"
+            [ariaLabel]="'COMPOSE_NEW_LETTER' | translate"
             [disabled]="isLoading()"
             (pressed)="onComposeLetter()"
           />
         </rs-tooltip>
       </div>
       <div>
-        <rs-tooltip text="Show received letters" align="end">
+        <rs-tooltip [text]="'SHOW_RECEIVED_LETTERS' | translate" align="end">
           <rs-round-icon-button
             [iconSrc]="'/assets/svgs/inbox.svg'"
-            [ariaLabel]="'Show received letters'"
+            [ariaLabel]="'SHOW_RECEIVED_LETTERS' | translate"
             [disabled]="isLoading()"
             (pressed)="onShowReceived()"
           />
         </rs-tooltip>
-        <rs-tooltip text="Show sent letters" align="end">
+        <rs-tooltip [text]="'SHOW_SENT_LETTERS' | translate" align="end">
           <rs-round-icon-button
             [iconSrc]="'/assets/svgs/send.svg'"
-            [ariaLabel]="'Show sent letters'"
+            [ariaLabel]="'SHOW_SENT_LETTERS' | translate"
             [disabled]="isLoading()"
             (pressed)="onShowSent()"
           />

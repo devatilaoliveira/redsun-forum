@@ -9,18 +9,18 @@
       <rs-view-header [title]="location.locationName" />
       <div class="post-form">
         <div class="input-toggle">
-          <rs-tooltip text="Message" align="start">
+          <rs-tooltip [text]="'SHOW_POST_INPUT' | translate" align="start">
             <rs-round-icon-button
               [iconSrc]="'/assets/svgs/post.svg'"
-              [ariaLabel]="'Show post input'"
+              [ariaLabel]="'SHOW_POST_INPUT' | translate"
               [disabled]="postInProgress()"
               (pressed)="onShowPostInput()"
             />
           </rs-tooltip>
-          <rs-tooltip text="Dices" align="end">
+          <rs-tooltip [text]="'SHOW_DICE_INPUT' | translate" align="end">
             <rs-round-icon-button
               [iconSrc]="'/assets/svgs/dice.svg'"
-              [ariaLabel]="'Show dice input'"
+              [ariaLabel]="'SHOW_DICE_INPUT' | translate"
               [disabled]="postInProgress()"
               (pressed)="onShowDiceInput()"
             />
