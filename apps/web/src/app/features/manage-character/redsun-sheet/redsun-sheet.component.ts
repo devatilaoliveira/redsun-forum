@@ -1,5 +1,6 @@
 import {Component, effect, input, InputSignal} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
+import {TranslatePipe} from "@ngx-translate/core";
 import {RedSunSheetResponseDTO} from "../../../../interface/dtos/characterSheet/RedSunSheetResponseDTO";
 import {UpsertRedSunSheetDTO} from "../../../../interface/dtos/characterSheet/UpsertRedSunSheetDTO";
 import {RsDivider} from "../../../shared/fragments/rsDivider/rs.divider";
@@ -94,6 +95,7 @@ const DEFAULT_REDSUN_SHEET: UpsertRedSunSheetDTO = {
     RsTextarea,
     LimitedResourcesComponent,
     SkillBulletsComponent,
+    TranslatePipe,
     VitalityTrackComponent
   ],
   templateUrl: "./redsun-sheet.component.html",
