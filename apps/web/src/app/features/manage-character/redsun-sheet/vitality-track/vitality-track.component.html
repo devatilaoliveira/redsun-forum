@@ -11,8 +11,9 @@
         [attr.aria-pressed]="damage <= selectedDamage()"
         (click)="setDamageValue(damage)"
       >
-        <span class="box" aria-hidden="true"></span>
         <span class="label">{{ row.labelKey | translate }}</span>
+        <span class="penalty">{{ penaltyFor(damage) }}</span>
+        <span class="box" aria-hidden="true"></span>
       </button>
     }
   </div>

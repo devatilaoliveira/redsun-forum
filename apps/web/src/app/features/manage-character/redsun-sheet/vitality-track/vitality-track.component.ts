@@ -22,6 +22,8 @@ const VITALITY_TRACK_ROWS: readonly VitalityTrackRow[] = [
   {labelKey: "DEATH"}
 ];
 
+const VITALITY_PENALTIES: readonly number[] = [0, -1, -1, -2, -2, -3, -3, -4, -7];
+
 @Component({
   selector: "rs-vitality-track",
   standalone: true,
@@ -51,5 +53,10 @@ export class VitalityTrackComponent {
     if (!this.editable()) return;
 
     this.damageValueChanged.emit(clampRank(selectedDamage, 0, this.visibleRows().length - 1));
+  }
+
+  protected penaltyFor(damage: number): string {
+    const penalty: number | undefined = VITALITY_PENALTIES[damage];
+    return penalty === undefined ? "" : penalty.toString();
   }
 }
