@@ -30,6 +30,12 @@
           {{ 'VISIT_USER_PROFILE' | translate }}
         </rs-button>
       </div>
+
+      @if (redSunSheet(); as fullSheet) {
+        <div class="rule-sheet">
+          <rs-redsun-sheet [sheet]="fullSheet" [sheetEditable]="false" />
+        </div>
+      }
     } @else {
       <p class="empty">{{ 'PARTICIPANT_PROFILE_NOT_FOUND' | translate }}</p>
     }

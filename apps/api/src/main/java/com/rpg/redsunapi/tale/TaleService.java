@@ -439,7 +439,9 @@ public class TaleService {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
     }
 
+    UUID previousOwnerId = tale.getOwnerId();
     tale.setOwnerId(newOwnerId);
+    characterSheetService.handleOwnershipTransfer(tale, previousOwnerId, newOwnerId);
 
     return taleRepository.save(tale);
   }

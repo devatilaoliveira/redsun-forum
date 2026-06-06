@@ -3,7 +3,11 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {finalize} from "rxjs";
 import {TranslatePipe} from "@ngx-translate/core";
 import {CharacterSheetService, ICharacterSheetService} from "../../../services/character-sheet.service";
-import {BasicSheetDTO, CharacterSheetResponseDTO} from "../../../interface/dtos/characterSheet/CharacterSheetDTO";
+import {
+  CharacterSheetDTO,
+  CharacterSheetResponseDTO
+} from "../../../interface/dtos/characterSheet/CharacterSheetDTO";
+import {RedSunSheetResponseDTO} from "../../../interface/dtos/characterSheet/RedSunSheetResponseDTO";
 import {ROUTE_PATHS} from "../../../interface/constants/route-path.constants";
 import {IPrinter, Printer} from "../../../infra/miscellaneous/printer.handler";
 import {TalesContextService} from "../../../stateServices/tales-context.service";
@@ -13,6 +17,7 @@ import {RsSpinner} from "../../shared/fragments/rsSpinner/rs.spinner";
 import {RsAvatar} from "../../shared/fragments/rsAvatar/rs.avatar";
 import {RsButton} from "../../shared/fragments/rsButton/rs.button";
 import {EVariant} from "../../../interface/enums/EVariant";
+import {RedSunSheetComponent} from "../manage-character/redsun-sheet/redsun-sheet.component";
 
 @Component({
   selector: "rs-tale-participant-profile",
@@ -22,7 +27,8 @@ import {EVariant} from "../../../interface/enums/EVariant";
     RsViewHeader,
     RsSpinner,
     RsAvatar,
-    RsButton
+    RsButton,
+    RedSunSheetComponent
   ],
   templateUrl: "./tale-participant-profile.view.html",
   styleUrl: "./tale-participant-profile.view.scss"
@@ -36,7 +42,7 @@ export class TaleParticipantProfileView implements OnInit {
 
   private readonly taleId: string | null = this._route.snapshot.paramMap.get(ROUTE_PATHS.taleId);
   protected readonly participantId: string | null = this._route.snapshot.paramMap.get(ROUTE_PATHS.id);
-  protected readonly sheet: WritableSignal<BasicSheetDTO | null> = signal<BasicSheetDTO | null>(null);
+  protected readonly sheet: WritableSignal<CharacterSheetDTO | null> = signal<CharacterSheetDTO | null>(null);
   protected readonly isLoading: WritableSignal<boolean> = signal<boolean>(true);
   protected readonly EVariant = EVariant;
   protected readonly participant: Signal<TaleParticipantProfileDTO | null> = computed(() => {
@@ -63,6 +69,10 @@ export class TaleParticipantProfileView implements OnInit {
   protected readonly description: Signal<string> = computed(() =>
     this.sheet()?.characterDescription?.trim() ?? ""
   );
+  protected readonly redSunSheet: Signal<RedSunSheetResponseDTO | null> = computed(() => {
+    const sheet = this.sheet();
+    return this.isRedSunSheet(sheet) ? sheet : null;
+  });
 
   public ngOnInit(): void {
     if (!this.taleId || !this.participantId) {
@@ -87,5 +97,12 @@ export class TaleParticipantProfileView implements OnInit {
     }
 
     void this._router.navigate(["/", ROUTE_PATHS.contacts, ROUTE_PATHS.details, this.participantId]);
+  }
+
+  private isRedSunSheet(sheet: CharacterSheetDTO | null): sheet is RedSunSheetResponseDTO {
+    return sheet !== null
+      && "strength" in sheet
+      && "willpowerMax" in sheet
+      && "combatManeuvers" in sheet;
   }
 }

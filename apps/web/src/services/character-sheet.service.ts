@@ -18,7 +18,8 @@ export interface ICharacterSheetService {
     characterSheetId: string,
     ruleSystem: ERuleSystem,
     request: UpsertCharacterSheetDTO,
-    avatarFile?: File | null
+    avatarFile?: File | null,
+    basicSheetOnly?: boolean
   ): Observable<CharacterSheetResponseDTO>;
 }
 
@@ -42,7 +43,8 @@ export class CharacterSheetService implements ICharacterSheetService {
     characterSheetId: string,
     ruleSystem: ERuleSystem,
     request: UpsertCharacterSheetDTO,
-    avatarFile?: File | null
+    avatarFile?: File | null,
+    basicSheetOnly: boolean = false
   ): Observable<CharacterSheetResponseDTO> {
     const formData = new FormData();
     formData.append("request", new Blob([JSON.stringify(request)], {type: "application/json"}));
@@ -52,10 +54,17 @@ export class CharacterSheetService implements ICharacterSheetService {
 
     // TODO: This might be `${CHARACTER_SHEET_ENDPOINT}/${taleId}/${ruleSystem}`,
     return this._http.put<CharacterSheetResponseDTO>(
-      `${CHARACTER_SHEET_ENDPOINT}/${taleId}/${ruleSystem === ERuleSystem.REDSUN ? "redsun" : "basic"}`,
+      `${CHARACTER_SHEET_ENDPOINT}/${taleId}/${this.endpointFor(ruleSystem, basicSheetOnly)}`,
       formData,
       {params: {characterSheetId}}
     );
   }
-}
 
+  private endpointFor(ruleSystem: ERuleSystem, basicSheetOnly: boolean): "basic" | "redsun" {
+    if (basicSheetOnly) {
+      return "basic";
+    }
+
+    return ruleSystem === ERuleSystem.REDSUN ? "redsun" : "basic";
+  }
+}

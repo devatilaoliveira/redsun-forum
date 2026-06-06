@@ -119,7 +119,7 @@ export class ManageCharacterView implements OnInit, OnDestroy {
   }
 
   protected isRedSunSheet(): boolean {
-    return this.currentRuleSystem === ERuleSystem.REDSUN;
+    return this.currentRuleSystem === ERuleSystem.REDSUN && !this.isTaleOwner();
   }
 
   public ngOnDestroy(): void {
@@ -217,7 +217,8 @@ export class ManageCharacterView implements OnInit, OnDestroy {
       this.characterSheetId,
       this.requireRuleSystem(),
       this.toUpsertRequest(),
-      this.pendingAvatarFile()
+      this.pendingAvatarFile(),
+      this.isTaleOwner()
     ).pipe(
       finalize(() => this.saveInProgress.set(false))
     ).subscribe({

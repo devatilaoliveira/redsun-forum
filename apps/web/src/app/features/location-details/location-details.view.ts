@@ -29,6 +29,7 @@ import {PostDetailsCardComponent} from "../../shared/ui/post-details-card/post-d
 import {ROUTE_PATHS} from "../../../interface/constants/route-path.constants";
 import {TaleParticipantProfileDTO} from "../../../interface/dtos/tale/TaleParticipantProfileDTO";
 import {TalesContextService} from "../../../stateServices/tales-context.service";
+import {RsTooltip} from "../../shared/fragments/rsTooltip/rs.tooltip";
 
 type PostFormGroup = FormGroup<{
   content: FormControl<string>;
@@ -62,6 +63,7 @@ interface VisiblePostViewModel {
     RsAvatar,
     RsDiceInput,
     RsRoundIconButton,
+    RsTooltip,
     RsDialogModalComponent,
     PostDetailsCardComponent
   ],
