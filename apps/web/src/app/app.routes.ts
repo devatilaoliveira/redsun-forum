@@ -247,7 +247,7 @@ export const routes: Routes = [
       {
         path: `${ROUTE_PATHS.letters}/:${ROUTE_PATHS.letterId}`,
         loadComponent: () => import("./features/letter-read/letter-read.view").then((module) => module.LetterReadView),
-        title: "LETTER_READ"
+        title: "LETTER"
       },
       {
         path: ROUTE_PATHS.contacts,

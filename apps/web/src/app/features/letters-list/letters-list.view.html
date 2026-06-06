@@ -49,12 +49,12 @@
           <div class="avatar-column"></div>
           <div class="sender-column">
             @if (isSent()) {
-              {{ 'LETTER_RECIPIENTS' | translate }}
+              {{ 'RECIPIENTS' | translate }}
             } @else {
               {{ 'SENDER' | translate }}
             }
           </div>
-          <div class="subject-column">{{ 'LETTER_SUBJECT' | translate }}</div>
+          <div class="subject-column">{{ 'SUBJECT' | translate }}</div>
         </div>
 
         <div class="body">

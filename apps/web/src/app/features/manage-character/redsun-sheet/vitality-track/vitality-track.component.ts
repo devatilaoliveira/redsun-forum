@@ -8,18 +8,18 @@ interface VitalityTrackRow {
 }
 
 const VITALITY_TRACK_ROWS: readonly VitalityTrackRow[] = [
-  {labelKey: "REDSUN_VITALITY_UNDAMAGED"},
-  {labelKey: "REDSUN_VITALITY_BRUISED"},
-  {labelKey: "REDSUN_VITALITY_HURT"},
-  {labelKey: "REDSUN_VITALITY_INJURED"},
-  {labelKey: "REDSUN_VITALITY_INJURED_VIGOR_4", minimumStamina: 4},
-  {labelKey: "REDSUN_VITALITY_SERIOUSLY_INJURED"},
-  {labelKey: "REDSUN_VITALITY_GRAVELY_INJURED_VIGOR_5", minimumStamina: 5},
-  {labelKey: "REDSUN_VITALITY_GRAVELY_INJURED"},
-  {labelKey: "REDSUN_VITALITY_MAIMED"},
-  {labelKey: "REDSUN_VITALITY_INCAPACITATED"},
-  {labelKey: "REDSUN_VITALITY_UNCONSCIOUS"},
-  {labelKey: "REDSUN_VITALITY_DEATH"}
+  {labelKey: "UNDAMAGED"},
+  {labelKey: "BRUISED"},
+  {labelKey: "HURT"},
+  {labelKey: "INJURED"},
+  {labelKey: "INJURED_VIGOR_4", minimumStamina: 4},
+  {labelKey: "SERIOUSLY_INJURED"},
+  {labelKey: "GRAVELY_INJURED_VIGOR_5", minimumStamina: 5},
+  {labelKey: "GRAVELY_INJURED"},
+  {labelKey: "MAIMED"},
+  {labelKey: "INCAPACITATED"},
+  {labelKey: "UNCONSCIOUS"},
+  {labelKey: "DEATH"}
 ];
 
 @Component({

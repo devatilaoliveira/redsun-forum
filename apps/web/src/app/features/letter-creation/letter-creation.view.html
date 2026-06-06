@@ -8,8 +8,8 @@
     <form class="form" [formGroup]="letterFormGroup" (submit)="$event.preventDefault(); onSubmit()">
       @if (!hasContactId()) {
         <rs-contacts-multi-select
-          [label]="'LETTER_RECIPIENTS' | translate"
-          [placeholder]="'LETTER_RECIPIENTS_PLACEHOLDER' | translate"
+          [label]="'RECIPIENTS' | translate"
+          [placeholder]="'SEARCH_CONTACTS' | translate"
           [contacts]="myContacts()"
           [value]="letterControls.recipientsIds.value"
           [required]="true"
@@ -18,16 +18,16 @@
       }
 
       <rs-input
-        [label]="'LETTER_SUBJECT' | translate"
-        [placeholder]="'LETTER_SUBJECT_PLACEHOLDER' | translate"
+        [label]="'SUBJECT' | translate"
+        [placeholder]="'ADD_SUBJECT' | translate"
         [required]="true"
         [value]="letterControls.subject.value"
         (valueChanged)="onSubjectChange($event)"
       />
 
       <rs-textarea
-        [label]="'LETTER_CONTENT' | translate"
-        [placeholder]="'LETTER_CONTENT_PLACEHOLDER' | translate"
+        [label]="'CONTENT' | translate"
+        [placeholder]="'WRITE_YOUR_LETTER' | translate"
         [maxLength]="UTIL_CONSTANTS.EXTRA_LONG_TEXT_LENGTH"
         [required]="true"
         [value]="letterControls.content.value"
