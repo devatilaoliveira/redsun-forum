@@ -25,7 +25,7 @@ CREATE TABLE public.users (
   username varchar(25) NOT NULL UNIQUE,
   email varchar(254) NOT NULL UNIQUE,
   provider varchar(20) NOT NULL DEFAULT 'EMAIL' CHECK (provider IN ('EMAIL','GOOGLE')),
-  description varchar(2000),
+  description varchar(4000),
   image_url varchar(500),
   deleted boolean NOT NULL DEFAULT FALSE,
   deleted_at timestamptz,

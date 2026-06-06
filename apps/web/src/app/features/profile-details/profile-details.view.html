@@ -24,7 +24,7 @@
         [label]="'DESCRIPTION' | translate"
         [value]="controls.description.value"
         [blocked]="!isEditMode() || isSaving()"
-        [maxLength]="UTIL_CONSTANTS.LONG_TEXT_LENGTH"
+        [maxLength]="UTIL_CONSTANTS.EXTRA_LONG_TEXT_LENGTH"
         (valueChanged)="onDescriptionChange($event)"
       />
 

@@ -95,7 +95,7 @@ export class ProfileDetailsView {
       Validators.maxLength(UTIL_CONSTANTS.USERNAME_MAX_LENGTH),
       Validators.pattern(this.usernamePattern)
     ]}),
-    description: this._formBuilder.control<string>("", {validators: [Validators.maxLength(UTIL_CONSTANTS.LONG_TEXT_LENGTH)]}),
+    description: this._formBuilder.control<string>("", {validators: [Validators.maxLength(UTIL_CONSTANTS.EXTRA_LONG_TEXT_LENGTH)]}),
     favoriteLanguage: this._formBuilder.control<EProfileLanguage[]>([], {validators: [Validators.maxLength(USER_PREFERENCE_MAX_ITEMS)]}),
     favoriteRules: this._formBuilder.control<ERuleSystem[]>([], {validators: [Validators.maxLength(USER_PREFERENCE_MAX_ITEMS)]}),
     favoriteRole: this._formBuilder.control<ERole[]>([], {validators: [Validators.maxLength(USER_PREFERENCE_MAX_ITEMS)]})
