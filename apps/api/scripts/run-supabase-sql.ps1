@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
   [string]$EnvFile = ".env.local",
-  [string[]]$SqlFiles = @("db/schema.sql", "db/private-wipe.sql", "db/rls_tale.sql", "db/rls_post.sql", "db/storage.sql", "db/storage-wipe.sql", "db/auth-wipe.sql", "db/data-api-hardening.sql", "db/app-role-grants.sql"),
+  [string[]]$SqlFiles = @("db/schema.sql", "db/private-wipe.sql", "db/storage.sql", "db/storage-wipe.sql", "db/auth-wipe.sql", "db/data-api-hardening.sql", "db/app-role-grants.sql"),
   [string]$PsqlPath,
   [string]$SslMode = "require",
   [switch]$OverrideEnv,
@@ -130,7 +130,7 @@ function Test-RuntimeDatabaseLogin {
       throw "Runtime database login hit the Supabase pooler authentication circuit breaker. Stop app instances or scripts using stale DB credentials, wait for the pooler block to clear, then verify DB_USER/DB_PASSWORD and rerun the grants or reset command."
     }
     if ($psqlMessage -match "password authentication failed") {
-      throw "Runtime database login failed because Supabase rejected DB_USER/DB_PASSWORD. Stop retrying, verify the runtime role password in Supabase/Postgres, then rerun only db/app-role-bootstrap.sql,db/app-role-grants.sql."
+      throw "Runtime database login failed because Supabase rejected DB_USER/DB_PASSWORD. Stop retrying. Verify that the role configured by DB_APP_ROLE exists in Supabase and that DB_USER/DB_PASSWORD match it."
     }
 
     if ($attempt -lt $MaxAttempts) {
@@ -213,11 +213,8 @@ try {
     }
   }
 
-  $runsAppRoleBootstrapSql = $SqlFiles | Where-Object { (Split-Path -Path $_ -Leaf) -eq "app-role-bootstrap.sql" }
   $runsAppRoleGrantsSql = $SqlFiles | Where-Object { (Split-Path -Path $_ -Leaf) -eq "app-role-grants.sql" }
-  if ($runsAppRoleGrantsSql -and $runsAppRoleBootstrapSql) {
-    Write-Warning "Skipped immediate runtime database login verification because app-role-bootstrap.sql ran and Supabase pooler credentials may need time to propagate. Wait a few minutes, then verify with db/app-role-grants.sql only."
-  } elseif ($runsAppRoleGrantsSql -and -not $SkipRuntimeLoginVerification) {
+  if ($runsAppRoleGrantsSql -and -not $SkipRuntimeLoginVerification) {
     Test-RuntimeDatabaseLogin -PsqlCommand $psqlCmd
   } elseif ($runsAppRoleGrantsSql) {
     Write-Warning "Skipped runtime database login verification because -SkipRuntimeLoginVerification was provided."

@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -20,6 +22,7 @@ import java.util.UUID;
   name = "basic_sheets",
   uniqueConstraints = @UniqueConstraint(name = "uk_basic_sheets_tale_character", columnNames = {"tale_id", "character_id"})
 )
+@Inheritance(strategy = InheritanceType.JOINED)
 public class BasicSheet implements CharacterSheet {
 
   @Id

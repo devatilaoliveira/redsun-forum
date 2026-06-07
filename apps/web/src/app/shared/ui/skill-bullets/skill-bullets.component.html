@@ -1,0 +1,28 @@
+<div class="skill-bullets">
+  @if (editable()) {
+    <rs-input
+      class="skill-name-input"
+      variant="inline"
+      placeholder="---"
+      [hideErrorMessages]="true"
+      [value]="currentSkillName()"
+      (valueChanged)="onSkillNameChanged($event)"
+    />
+  } @else {
+    <span class="skill-name">{{ currentSkillName() }}</span>
+  }
+
+  <div class="bullets" role="group" [class.is-read-only]="!levelEditable()" [attr.aria-label]="currentSkillName()">
+    @for (bullet of bullets; track bullet) {
+      <button
+        class="bullet"
+        type="button"
+        [class.is-filled]="bullet <= effectiveLevel()"
+        [disabled]="!levelEditable()"
+        [attr.aria-label]="currentSkillName() + ' nivel ' + bullet"
+        [attr.aria-pressed]="bullet <= effectiveLevel()"
+        (click)="setLevel(bullet)"
+      ></button>
+    }
+  </div>
+</div>

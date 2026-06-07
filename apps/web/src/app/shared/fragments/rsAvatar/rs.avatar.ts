@@ -10,19 +10,20 @@ import {
   WritableSignal,
   signal
 } from "@angular/core";
-import {NgOptimizedImage, NgTemplateOutlet} from "@angular/common";
+import {NgTemplateOutlet} from "@angular/common";
 import {finalize} from "rxjs";
 import {MeResponseDTO} from "../../../../interface/dtos/user/MeResponseDTO";
 import {UtilFunctions} from "../../../../infra/miscellaneous/util.functions";
 import {IUserProfileService, UserProfileService} from "../../../../services/user-profile.service";
 import {IPrinter, Printer} from "../../../../infra/miscellaneous/printer.handler";
+import {RsImg} from "../rsImg/rs.img";
 
 @Component({
   selector: "rs-avatar",
   standalone: true,
   imports: [
-    NgOptimizedImage,
-    NgTemplateOutlet
+    NgTemplateOutlet,
+    RsImg
   ],
   templateUrl: "./rs.avatar.html",
   styleUrl: "./rs.avatar.scss"

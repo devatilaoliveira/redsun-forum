@@ -1,0 +1,68 @@
+:host {
+  display: block;
+}
+
+.limited-resource {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-0-5);
+  width: 100%;
+}
+
+.resource-name {
+  min-width: 0;
+  text-align: center;
+}
+
+.resource-tracks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.resource-track {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.resource-box {
+  width: 21px;
+  height: 21px;
+  border: 1px solid var(--color-muted);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 120ms ease, background-color 120ms ease, opacity 120ms ease;
+}
+
+.resource-box--maximum {
+  border-radius: 50%;
+}
+
+.resource-box--current {
+  border-radius: 2px;
+}
+
+.resource-box.is-filled {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+}
+
+.limited-resource:not(.is-read-only) .resource-box:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.limited-resource.is-read-only .resource-box:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+.resource-box:focus-visible {
+  border-color: var(--color-primary);
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}

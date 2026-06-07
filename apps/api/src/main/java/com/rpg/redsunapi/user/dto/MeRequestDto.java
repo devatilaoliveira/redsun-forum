@@ -12,10 +12,10 @@ import java.util.List;
 
 public record MeRequestDto(
   @NotBlank
-  @Size(max = 20)
-  @Pattern(regexp = "^[A-Za-z0-9]{1,20}$", message = "Username may contain only letters and numbers")
+  @Size(max = 25)
+  @Pattern(regexp = "^[A-Za-z0-9]{1,25}$", message = "Username may contain only letters and numbers")
   String username,
-  @Nullable @Size(max = 2000) String description,
+  @Nullable @Size(max = 4000) String description,
   @Nullable @Size(max = 10) List<ELanguage> favoriteLanguage,
   @Nullable @Size(max = 10) List<ERuleSystem> favoriteRules,
   @Nullable @Size(max = 10) List<ERole> favoriteRole

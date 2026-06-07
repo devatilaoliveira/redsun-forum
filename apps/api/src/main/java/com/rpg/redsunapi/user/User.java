@@ -17,7 +17,7 @@ public class User {
   @Column(updatable = false)
   private UUID id;
 
-  @Column(nullable = false, unique = true, length = 20)
+  @Column(nullable = false, unique = true, length = 25)
   private String username;
 
   @Column(nullable = false, unique = true, length = 254)
@@ -27,7 +27,7 @@ public class User {
   @Column(nullable = false, length = 20)
   private Provider provider = Provider.EMAIL;
 
-  @Column(length = 2000)
+  @Column(length = 4000)
   private String description;
 
   @Column(name = "image_url", length = 500)

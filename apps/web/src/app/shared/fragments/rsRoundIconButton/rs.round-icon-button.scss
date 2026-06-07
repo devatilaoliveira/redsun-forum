@@ -6,11 +6,13 @@
   --rs-icon-size: 24px;
   --rs-icon-color: var(--color-text);
   --rs-hover-bg: var(--color-hover);
+  --rs-button-bg: transparent;
+  --rs-button-border: transparent;
   width: calc(var(--rs-icon-size) + 16px);
   height: calc(var(--rs-icon-size) + 16px);
   border-radius: var(--radius-pill);
-  border: 1px solid transparent;
-  background-color: transparent;
+  border: 1px solid var(--rs-button-border);
+  background-color: var(--rs-button-bg);
   color: var(--rs-icon-color);
   display: inline-flex;
   align-items: center;
@@ -18,6 +20,13 @@
   padding: 0;
   cursor: pointer;
   transition: color 120ms ease, background-color 120ms ease;
+}
+
+.rs-round-icon-button[data-variant="primary"] {
+  --rs-icon-color: var(--color-black);
+  --rs-hover-bg: color-mix(in srgb, var(--color-primary) 88%, var(--color-black));
+  --rs-button-bg: var(--color-primary);
+  --rs-button-border: var(--color-primary);
 }
 
 .icon {
@@ -42,7 +51,7 @@
 }
 
 .rs-round-icon-button:disabled:hover {
-  background-color: transparent;
+  background-color: var(--rs-button-bg);
 }
 
 .rs-round-icon-button:focus-visible {

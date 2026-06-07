@@ -60,7 +60,7 @@ export const routes: Routes = [
   },
   {
     path: ROUTE_PATHS.changePassword,
-    loadComponent: () => import("./features/change-email/change-email.view").then((module) => module.ChangeEmailView),
+    loadComponent: () => import("./features/change-password/change-password.view").then((module) => module.ChangePasswordView),
     title: "CHANGE_PASSWORD",
     data: {
       hideTopBar: true
@@ -178,6 +178,12 @@ export const routes: Routes = [
                 title: "MANAGE_PROFILE"
               },
               {
+                path: `${ROUTE_PATHS.participants}/:${ROUTE_PATHS.id}`,
+                loadComponent: () => import("./features/tale-participant-profile/tale-participant-profile.view").then((module) => module.TaleParticipantProfileView),
+                canActivate: [TaleParticipantGuard],
+                title: "TALE_PARTICIPANT_PROFILE"
+              },
+              {
                 path: `${ROUTE_PATHS.locations}/${ROUTE_PATHS.creation}`,
                 loadComponent: () => import("./features/location-creation/location-creation.view").then((module) => module.LocationCreationView),
                 canActivate: [TaleParticipantGuard],
@@ -241,7 +247,7 @@ export const routes: Routes = [
       {
         path: `${ROUTE_PATHS.letters}/:${ROUTE_PATHS.letterId}`,
         loadComponent: () => import("./features/letter-read/letter-read.view").then((module) => module.LetterReadView),
-        title: "LETTER_READ"
+        title: "LETTER"
       },
       {
         path: ROUTE_PATHS.contacts,

@@ -1,0 +1,171 @@
+<section class="redsun-sheet" [attr.aria-label]="'REDSUN_CHARACTER_SHEET' | translate">
+  <section class="sheet-section">
+    <h3 class="section-title">{{ "IDENTIFICATION" | translate }}</h3>
+    <div class="field-grid field-grid--two">
+      <rs-input
+        [label]="'NATURE' | translate"
+        [value]="controls.nature.value"
+        [blocked]="!sheetEditable()"
+        (valueChanged)="setTextValue(controls.nature, $event)"
+      />
+      <rs-input
+        [label]="'DEMEANOR' | translate"
+        [value]="controls.demeanor.value"
+        [blocked]="!sheetEditable()"
+        (valueChanged)="setTextValue(controls.demeanor, $event)"
+      />
+    </div>
+  </section>
+  <rs-divider type="solid" />
+
+  <section class="sheet-section">
+    <h3 class="section-title">{{ "ATTRIBUTES" | translate }}</h3>
+    <div class="column-grid">
+      <article class="sheet-group">
+        <h3 class="section-title">{{ "PHYSICAL" | translate }}</h3>
+        <rs-skill-bullets [skillName]="'STRENGTH' | translate" [levelValue]="controls.strength.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.strength, $event)" />
+        <rs-skill-bullets [skillName]="'DEXTERITY' | translate" [levelValue]="controls.dexterity.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.dexterity, $event)" />
+        <rs-skill-bullets [skillName]="'VIGOR' | translate" [levelValue]="controls.stamina.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setStaminaValue($event)" />
+      </article>
+
+      <article class="sheet-group">
+        <h3 class="section-title">{{ "SOCIAL" | translate }}</h3>
+        <rs-skill-bullets [skillName]="'PRESENCE' | translate" [levelValue]="controls.presence.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.presence, $event)" />
+        <rs-skill-bullets [skillName]="'EMPATHY' | translate" [levelValue]="controls.empathy.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.empathy, $event)" />
+        <rs-skill-bullets [skillName]="'INFLUENCE' | translate" [levelValue]="controls.influence.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.influence, $event)" />
+      </article>
+
+      <article class="sheet-group">
+        <h3 class="section-title">{{ "MENTAL" | translate }}</h3>
+        <rs-skill-bullets [skillName]="'PERCEPTION' | translate" [levelValue]="controls.perception.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.perception, $event)" />
+        <rs-skill-bullets [skillName]="'INTELLECT' | translate" [levelValue]="controls.intellect.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.intellect, $event)" />
+        <rs-skill-bullets [skillName]="'DETERMINATION' | translate" [levelValue]="controls.determination.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.determination, $event)" />
+      </article>
+    </div>
+  </section>
+  <rs-divider type="solid" />
+
+  <section class="sheet-section">
+    <h3 class="section-title">{{ "ABILITIES" | translate }}</h3>
+    <div class="column-grid">
+      <article class="sheet-group">
+        <h3 class="section-title">{{ "TALENTS" | translate }}</h3>
+        <rs-skill-bullets [skillName]="'ALERTNESS' | translate" [levelValue]="controls.alertness.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.alertness, $event)" />
+        <rs-skill-bullets [skillName]="'SPORTS' | translate" [levelValue]="controls.sports.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.sports, $event)" />
+        <rs-skill-bullets [skillName]="'INTUITION' | translate" [levelValue]="controls.intuition.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.intuition, $event)" />
+        <rs-skill-bullets [skillName]="'INTIMIDATION' | translate" [levelValue]="controls.intimidation.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.intimidation, $event)" />
+        <rs-skill-bullets [skillName]="'SUBTERFUGE' | translate" [levelValue]="controls.subterfuge.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.subterfuge, $event)" />
+        <rs-skill-bullets [skillName]="'LEADERSHIP' | translate" [levelValue]="controls.leadership.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.leadership, $event)" />
+        <rs-skill-bullets [skillName]="'DIPLOMACY' | translate" [levelValue]="controls.diplomacy.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.diplomacy, $event)" />
+        <rs-skill-bullets [skillName]="controls.talent1Name.value" [levelValue]="controls.talent1Level.value" [minLevel]="false" [editable]="sheetEditable()" [levelEditable]="sheetEditable()" (skillNameChanged)="setTextValue(controls.talent1Name, $event)" (levelValueChanged)="setRankValue(controls.talent1Level, $event)" />
+        <rs-skill-bullets [skillName]="controls.talent2Name.value" [levelValue]="controls.talent2Level.value" [minLevel]="false" [editable]="sheetEditable()" [levelEditable]="sheetEditable()" (skillNameChanged)="setTextValue(controls.talent2Name, $event)" (levelValueChanged)="setRankValue(controls.talent2Level, $event)" />
+      </article>
+
+      <article class="sheet-group">
+        <h3 class="section-title">{{ "SKILLS" | translate }}</h3>
+        <rs-skill-bullets [skillName]="'ANIMAL_HANDLING' | translate" [levelValue]="controls.animalHandling.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.animalHandling, $event)" />
+        <rs-skill-bullets [skillName]="'RIDING' | translate" [levelValue]="controls.riding.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.riding, $event)" />
+        <rs-skill-bullets [skillName]="'LEGERDEMAIN' | translate" [levelValue]="controls.legerdemain.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.legerdemain, $event)" />
+        <rs-skill-bullets [skillName]="'SURVIVAL' | translate" [levelValue]="controls.survival.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.survival, $event)" />
+        <rs-skill-bullets [skillName]="'STEALTH' | translate" [levelValue]="controls.stealth.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.stealth, $event)" />
+        <rs-skill-bullets [skillName]="'ATHLETICS' | translate" [levelValue]="controls.athletics.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.athletics, $event)" />
+        <rs-skill-bullets [skillName]="'PERFORMANCE' | translate" [levelValue]="controls.performance.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.performance, $event)" />
+      </article>
+
+      <article class="sheet-group">
+        <h3 class="section-title">{{ "KNOWLEDGE" | translate }}</h3>
+        <rs-skill-bullets [skillName]="'HISTORY' | translate" [levelValue]="controls.history.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.history, $event)" />
+        <rs-skill-bullets [skillName]="'RELIGION' | translate" [levelValue]="controls.religion.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.religion, $event)" />
+        <rs-skill-bullets [skillName]="'LANGUAGE' | translate" [levelValue]="controls.language.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.language, $event)" />
+        <rs-skill-bullets [skillName]="'OCCULTISM' | translate" [levelValue]="controls.occultism.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.occultism, $event)" />
+        <rs-skill-bullets [skillName]="'INVESTIGATION' | translate" [levelValue]="controls.investigation.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.investigation, $event)" />
+        <rs-skill-bullets [skillName]="'PSYCHOLOGY' | translate" [levelValue]="controls.psychology.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.psychology, $event)" />
+        <rs-skill-bullets [skillName]="'BUSINESS' | translate" [levelValue]="controls.business.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.business, $event)" />
+      </article>
+    </div>
+  </section>
+  <rs-divider type="solid" />
+
+  <section class="sheet-section">
+    <h3 class="section-title">{{ "ADVANTAGES" | translate }}</h3>
+    <div class="column-grid">
+      <article class="sheet-group">
+        <h3 class="section-title">{{ "CALLINGS" | translate }}</h3>
+        <rs-skill-bullets [skillName]="controls.calling1Name.value" [levelValue]="controls.calling1Level.value" [minLevel]="false" [editable]="sheetEditable()" [levelEditable]="sheetEditable()" (skillNameChanged)="setTextValue(controls.calling1Name, $event)" (levelValueChanged)="setRankValue(controls.calling1Level, $event)" />
+        <rs-skill-bullets [skillName]="controls.calling2Name.value" [levelValue]="controls.calling2Level.value" [minLevel]="false" [editable]="sheetEditable()" [levelEditable]="sheetEditable()" (skillNameChanged)="setTextValue(controls.calling2Name, $event)" (levelValueChanged)="setRankValue(controls.calling2Level, $event)" />
+        <rs-skill-bullets [skillName]="controls.calling3Name.value" [levelValue]="controls.calling3Level.value" [minLevel]="false" [editable]="sheetEditable()" [levelEditable]="sheetEditable()" (skillNameChanged)="setTextValue(controls.calling3Name, $event)" (levelValueChanged)="setRankValue(controls.calling3Level, $event)" />
+        <rs-skill-bullets [skillName]="controls.calling4Name.value" [levelValue]="controls.calling4Level.value" [minLevel]="false" [editable]="sheetEditable()" [levelEditable]="sheetEditable()" (skillNameChanged)="setTextValue(controls.calling4Name, $event)" (levelValueChanged)="setRankValue(controls.calling4Level, $event)" />
+        <rs-skill-bullets [skillName]="controls.calling5Name.value" [levelValue]="controls.calling5Level.value" [minLevel]="false" [editable]="sheetEditable()" [levelEditable]="sheetEditable()" (skillNameChanged)="setTextValue(controls.calling5Name, $event)" (levelValueChanged)="setRankValue(controls.calling5Level, $event)" />
+      </article>
+
+      <article class="sheet-group">
+        <h3 class="section-title">{{ "SPECIALIZATIONS" | translate }}</h3>
+        <rs-skill-bullets [skillName]="'MARTIAL_ARTS' | translate" [levelValue]="controls.martialArts.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.martialArts, $event)" />
+        <rs-skill-bullets [skillName]="'HERBALISM' | translate" [levelValue]="controls.herbalism.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.herbalism, $event)" />
+        <rs-skill-bullets [skillName]="'RITUALS' | translate" [levelValue]="controls.rituals.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.rituals, $event)" />
+        <rs-skill-bullets [skillName]="'MEDITATION' | translate" [levelValue]="controls.meditation.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.meditation, $event)" />
+        <rs-skill-bullets [skillName]="'CRAFT' | translate" [levelValue]="controls.craft.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.craft, $event)" />
+      </article>
+
+      <article class="sheet-group">
+        <h3 class="section-title">{{ "COMBAT" | translate }}</h3>
+        <rs-skill-bullets [skillName]="'MELEE_WEAPONS' | translate" [levelValue]="controls.meleeThrowing.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.meleeThrowing, $event)" />
+        <rs-skill-bullets [skillName]="'RANGED_WEAPONS' | translate" [levelValue]="controls.rangedWeapons.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.rangedWeapons, $event)" />
+        <rs-skill-bullets [skillName]="'UNARMED' | translate" [levelValue]="controls.unarmed.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.unarmed, $event)" />
+        <rs-skill-bullets [skillName]="'THROWING' | translate" [levelValue]="controls.throwing.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.throwing, $event)" />
+        <rs-skill-bullets [skillName]="'EXOTIC_WEAPONS' | translate" [levelValue]="controls.exoticWeapons.value" [minLevel]="false" [levelEditable]="sheetEditable()" (levelValueChanged)="setRankValue(controls.exoticWeapons, $event)" />
+      </article>
+    </div>
+  </section>
+  <rs-divider type="solid" />
+
+  <section class="sheet-section">
+    <h3 class="section-title">{{ "RESOURCES" | translate }}</h3>
+    <div class="resource-grid">
+      <rs-limited-resources
+        [resourceName]="'WILLPOWER' | translate"
+        [maximumValue]="controls.willpowerMax.value"
+        [currentValue]="controls.willpowerCurrent.value"
+        [slots]="resourceSlots"
+        [editable]="sheetEditable()"
+        (maximumValueChanged)="setWillpowerMaximum($event)"
+        (currentValueChanged)="setWillpowerCurrent($event)"
+      />
+      <rs-limited-resources
+        [resourceName]="'IMPETUS' | translate"
+        [maximumValue]="controls.impetusMax.value"
+        [currentValue]="controls.impetusCurrent.value"
+        [slots]="resourceSlots"
+        [editable]="sheetEditable()"
+        (maximumValueChanged)="setImpetusMaximum($event)"
+        (currentValueChanged)="setImpetusCurrent($event)"
+      />
+    </div>
+  </section>
+  <rs-divider type="solid" />
+
+  <section class="sheet-section sheet-section--vitality">
+    <rs-vitality-track
+      [damageValue]="controls.vitalityDamage.value"
+      [staminaValue]="controls.stamina.value"
+      [editable]="sheetEditable()"
+      (damageValueChanged)="setVitalityDamage($event)"
+    />
+  </section>
+  <rs-divider type="solid" />
+
+  <section class="sheet-section">
+    <h3 class="section-title">{{ "DETAILS" | translate }}</h3>
+    <div class="textarea-grid">
+      <rs-textarea [label]="'EXPERIENCE' | translate" [rows]="5" [value]="controls.experience.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.experience, $event)" />
+      <rs-textarea [label]="'EQUIPMENT' | translate" [rows]="5" [value]="controls.equipment.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.equipment, $event)" />
+      <rs-textarea [label]="'NOTES' | translate" [rows]="5" [value]="controls.notes.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.notes, $event)" />
+      <rs-textarea [label]="'ACTIVE_RITUALS_EFFECTS' | translate" [rows]="5" [value]="controls.activeRitualsEffects.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.activeRitualsEffects, $event)" />
+      <rs-textarea [label]="'COMBAT_MANEUVERS' | translate" [rows]="5" [value]="controls.combatManeuvers.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.combatManeuvers, $event)" />
+      <rs-textarea [label]="'ARSENAL' | translate" [rows]="5" [value]="controls.arsenal.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.arsenal, $event)" />
+      <rs-textarea [label]="'LEARNED_RITUALS' | translate" [rows]="5" [value]="controls.learnedRituals.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.learnedRituals, $event)" />
+      <rs-textarea [label]="'CRAFT' | translate" [rows]="5" [value]="controls.craftDetails.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.craftDetails, $event)" />
+    </div>
+  </section>
+  <rs-divider type="solid" />
+</section>

@@ -1,0 +1,20 @@
+<div class="track" [class.is-read-only]="!editable()">
+  <h3 class="section-title">{{ "REDSUN_VITALITY" | translate }}</h3>
+
+  <div class="grid" role="group" [attr.aria-label]="'REDSUN_VITALITY' | translate">
+    @for (row of visibleRows(); track row.labelKey; let damage = $index) {
+      <button
+        class="row"
+        type="button"
+        [class.is-selected]="damage <= selectedDamage()"
+        [disabled]="!editable()"
+        [attr.aria-pressed]="damage <= selectedDamage()"
+        (click)="setDamageValue(damage)"
+      >
+        <span class="label">{{ row.labelKey | translate }}</span>
+        <span class="penalty">{{ penaltyFor(damage) }}</span>
+        <span class="box" aria-hidden="true"></span>
+      </button>
+    }
+  </div>
+</div>

@@ -16,6 +16,16 @@ REVOKE ALL ON SEQUENCES FROM anon, authenticated;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public
 REVOKE ALL ON FUNCTIONS FROM anon, authenticated;
 
+DROP POLICY IF EXISTS tale_read ON public.tales;
+DROP POLICY IF EXISTS tale_insert_owner ON public.tales;
+DROP POLICY IF EXISTS tale_update_owner ON public.tales;
+DROP POLICY IF EXISTS tale_delete_owner ON public.tales;
+
+DROP POLICY IF EXISTS post_read ON public.posts;
+DROP POLICY IF EXISTS post_insert_author_member ON public.posts;
+DROP POLICY IF EXISTS post_update_author ON public.posts;
+DROP POLICY IF EXISTS post_delete_tale_owner ON public.posts;
+
 ALTER TABLE IF EXISTS public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.subscriptions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.user_contacts ENABLE ROW LEVEL SECURITY;

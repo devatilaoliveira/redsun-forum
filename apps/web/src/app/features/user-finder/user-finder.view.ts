@@ -202,7 +202,7 @@ export class UserFinderView implements OnInit {
       this.selectedRole.set(null);
       this.selectedRules.set(null);
       this.selectedLanguage.set(null);
-      this.openToast(this._translateService.instant("FIND_USERS_INVALID_FILTERS"));
+      this.openToast(this._translateService.instant("INVALID_FILTERS_RESET"));
       if (!append) {
         this.loadUsers(0, false);
       }
@@ -216,7 +216,7 @@ export class UserFinderView implements OnInit {
       return;
     }
 
-    this.openToast(this._translateService.instant("FIND_USERS_LOAD_FAILED"));
+    this.openToast(this._translateService.instant("COULD_NOT_LOAD_USERS"));
   }
 
   private openToast(message: string): void {

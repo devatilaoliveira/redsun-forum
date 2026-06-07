@@ -1,14 +1,12 @@
 import {ERuleSystem} from "../../enums/ERuleSystem";
+import {BasicSheetDTO} from "./BasicSheetDTO";
+import {RedSunSheetResponseDTO} from "./RedSunSheetResponseDTO";
 
-export interface BasicSheetDTO {
-  id: string | null;
-  characterId: string | null;
-  characterName: string | null;
-  characterDescription: string | null;
-  characterImageUrl: string | null;
-}
+export type {BasicSheetDTO} from "./BasicSheetDTO";
+
+export type CharacterSheetDTO = BasicSheetDTO | RedSunSheetResponseDTO;
 
 export interface CharacterSheetResponseDTO {
   ruleSystem: ERuleSystem;
-  sheet: BasicSheetDTO;
+  sheet: CharacterSheetDTO;
 }

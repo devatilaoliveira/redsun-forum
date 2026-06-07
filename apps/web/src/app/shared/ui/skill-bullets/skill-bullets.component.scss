@@ -1,0 +1,51 @@
+:host {
+  display: block;
+}
+
+.skill-bullets {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-0-5);
+  min-height: 42px;
+}
+
+.skill-name {
+  min-width: 0;
+}
+
+.skill-name-input {
+  min-width: 0;
+}
+
+.bullets {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.bullet {
+  width: 21px;
+  height: 21px;
+  border: 1px solid var(--color-muted);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 120ms ease, background-color 120ms ease;
+}
+
+.bullet.is-filled {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+}
+
+.bullets.is-read-only .bullet:disabled {
+  cursor: default;
+}
+
+.bullet:focus-visible {
+  border-color: var(--color-primary);
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}

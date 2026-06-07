@@ -13,8 +13,6 @@ public interface RuleCharacterSheetHandler {
 
   Object toResponseSheet(CharacterSheet sheet);
 
-  void applyUpdate(CharacterSheet sheet, Object payload);
-
   void save(CharacterSheet sheet);
 
   void deleteByTale(Tale tale);

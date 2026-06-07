@@ -10,11 +10,12 @@ import {RsDivider} from "../../fragments/rsDivider/rs.divider";
 import {ETheme} from "../../../../interface/enums/ETheme";
 import {RsDot} from "../../fragments/rsDot/rs.dot";
 import {RsTooltip} from "../../fragments/rsTooltip/rs.tooltip";
+import {RsImg} from "../../fragments/rsImg/rs.img";
 
 @Component({
   selector: "rs-tale-card",
   standalone: true,
-  imports: [DatePipe, TranslatePipe, RsBadge, RsBoxClickable, RsDivider, RsDot, RsTooltip],
+  imports: [DatePipe, TranslatePipe, RsBadge, RsBoxClickable, RsDivider, RsDot, RsTooltip, RsImg],
   templateUrl: "./tale-card.component.html",
   styleUrl: "./tale-card.component.scss"
 })
@@ -29,7 +30,6 @@ export class TaleCardComponent implements OnInit {
   protected lastActiveVariant!: EVariant;
   protected hasImage!: boolean;
   protected initials!: string;
-  protected imageLoaded = false;
   protected readonly EVariant = EVariant;
   protected readonly ETheme = ETheme;
 
@@ -45,14 +45,9 @@ export class TaleCardComponent implements OnInit {
     const url: string | null = tale.imageUrl;
     this.hasImage = !!url && url.trim().length > 0;
     this.initials = UtilFunctions.getInitials(tale.taleName);
-    this.imageLoaded = false;
   }
 
   protected onCardPressed(): void {
     this.pressed.emit(this.tale.id);
-  }
-
-  protected onImageLoad(): void {
-    this.imageLoaded = true;
   }
 }

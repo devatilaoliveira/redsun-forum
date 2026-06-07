@@ -4,15 +4,16 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum ERuleSystem {
-  DND_5E(1),
-  STORYTELLER(2),
-  PATHFINDER_2E(3),
-  BRP(4),
-  GURPS(4),
-  SWADE(6),
-  OTHER(7),
-  CUSTOM(8),
-  FIM_DO_MUNDO(9);
+  REDSUN(1),
+  FIM_DO_MUNDO(2),
+  DND(3),
+  STORYTELLER(4),
+  PATHFINDER(5),
+  BRP(6),
+  GURPS(7),
+  SWADE(8),
+  OTHER(9),
+  CUSTOM(10);
 
   private final int value;
 

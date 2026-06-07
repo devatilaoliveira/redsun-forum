@@ -1,14 +1,12 @@
 <rs-box class="tale-details-card" [minHeight]="420">
   <div class="cover">
     @if (hasImage()) {
-      <img
+      <rs-img
         class="card-image"
         [src]="tale().imageUrl!"
         [alt]="tale().taleName + ' cover'"
-        (load)="onImageLoad()"
         loading="lazy"
         decoding="async"
-        [class.loaded]="imageLoaded"
       />
     } @else {
       <div class="placeholder">

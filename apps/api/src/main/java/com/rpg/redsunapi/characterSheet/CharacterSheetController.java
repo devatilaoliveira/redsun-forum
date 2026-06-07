@@ -1,8 +1,8 @@
 package com.rpg.redsunapi.characterSheet;
 
 import com.rpg.redsunapi.authentication.AuthenticatedUser;
+import com.rpg.redsunapi.characterSheet.dto.BasicSheetUpsertDTO;
 import com.rpg.redsunapi.characterSheet.dto.CharacterSheetResponseDTO;
-import com.rpg.redsunapi.characterSheet.dto.CharacterSheetUpsertRequestDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.MediaType;
@@ -41,14 +41,25 @@ public class CharacterSheetController {
     return ResponseEntity.ok(dto);
   }
 
-  @PutMapping(value = "/{taleId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<CharacterSheetResponseDTO> putSheet(
+  @PutMapping(value = "/{taleId}/basic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<CharacterSheetResponseDTO> putBasicSheet(
     @AuthenticationPrincipal AuthenticatedUser principal,
     @PathVariable @NotNull UUID taleId,
     @RequestParam("characterSheetId") @NotNull UUID characterSheetId,
-    @RequestPart("request") @NotNull @Valid CharacterSheetUpsertRequestDTO dto,
+    @RequestPart("request") @NotNull @Valid BasicSheetUpsertDTO dto,
     @RequestPart(value = "avatar", required = false) MultipartFile avatar) throws IOException {
-    CharacterSheetResponseDTO updated = characterSheetService.putSheet(taleId, characterSheetId, principal.user(), dto, avatar);
+    CharacterSheetResponseDTO updated = characterSheetService.putBasicSheet(taleId, characterSheetId, principal.user(), dto, avatar);
+    return ResponseEntity.ok(updated);
+  }
+
+  @PutMapping(value = "/{taleId}/redsun", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<CharacterSheetResponseDTO> putRedSunSheet(
+    @AuthenticationPrincipal AuthenticatedUser principal,
+    @PathVariable @NotNull UUID taleId,
+    @RequestParam("characterSheetId") @NotNull UUID characterSheetId,
+    @RequestPart("request") @NotNull @Valid RedSunSheetUpsertDTO dto,
+    @RequestPart(value = "avatar", required = false) MultipartFile avatar) throws IOException {
+    CharacterSheetResponseDTO updated = characterSheetService.putRedSunSheet(taleId, characterSheetId, principal.user(), dto, avatar);
     return ResponseEntity.ok(updated);
   }
 }

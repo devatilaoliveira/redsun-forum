@@ -346,8 +346,8 @@ public class UserService {
       if (normalizedUsername.isEmpty()) {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is required");
       }
-      if (normalizedUsername.length() > 20) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username must be at most 20 characters");
+      if (normalizedUsername.length() > 25) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username must be at most 25 characters");
       }
       if (!normalizedUsername.matches("^[A-Za-z0-9]+$")) {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username may contain only letters and numbers");

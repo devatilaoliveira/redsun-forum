@@ -41,9 +41,9 @@
 
     @if (hasPreview()) {
       @if (uploadable()) {
-        <img class="photo" [src]="src()!" [alt]="alt()" />
+        <rs-img class="photo" [src]="src()!" [alt]="alt()" />
       } @else {
-        <img class="photo" [ngSrc]="src()!" [alt]="alt()" fill priority/>
+        <rs-img class="photo" [ngSrc]="src()!" [alt]="alt()" fill priority />
       }
     } @else {
       <span class="placeholder">{{ alt() }}</span>

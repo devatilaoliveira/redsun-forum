@@ -7,15 +7,16 @@ import {
   OutputEmitterRef,
   Signal
 } from "@angular/core";
-import {NgOptimizedImage, NgTemplateOutlet} from "@angular/common";
+import {NgTemplateOutlet} from "@angular/common";
 import {UTIL_CONSTANTS} from "../../../../interface/constants/util.constants";
+import {RsImg} from "../rsImg/rs.img";
 
 @Component({
   selector: "rs-image-preview",
   standalone: true,
   imports: [
-    NgOptimizedImage,
-    NgTemplateOutlet
+    NgTemplateOutlet,
+    RsImg
   ],
   templateUrl: "./rs.image-preview.html",
   styleUrl: "./rs.image-preview.scss"

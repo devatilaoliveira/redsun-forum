@@ -16,11 +16,20 @@ $min-content: bp.$bp-sm;
   width: min($min-content, 100%);
 }
 
+.content--wide {
+  width: min(980px, 100%);
+}
+
+.sheet-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
 .form {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  min-height: calc(100vh - (var(--space-4, 2rem) + 58px + 58px + var(--space-2, 1rem) + var(--space-4, 2rem)));
 }
 
 .character-fields {
@@ -29,13 +38,15 @@ $min-content: bp.$bp-sm;
   gap: var(--space-1);
 }
 
-.cta-btn {
-  margin-top: auto;
-  padding-bottom: var(--space-1-5);
-}
-
 .quit-button {
   align-self: flex-start;
+}
+
+.sheet-edit-button {
+  position: fixed;
+  right: var(--space-1);
+  bottom: var(--space-1);
+  z-index: 10;
 }
 
 .status {

@@ -9,18 +9,22 @@
       <rs-view-header [title]="location.locationName" />
       <div class="post-form">
         <div class="input-toggle">
-          <rs-round-icon-button
-            [iconSrc]="'/assets/svgs/post.svg'"
-            [ariaLabel]="'Show post input'"
-            [disabled]="postInProgress()"
-            (pressed)="onShowPostInput()"
-          />
-          <rs-round-icon-button
-            [iconSrc]="'/assets/svgs/dice.svg'"
-            [ariaLabel]="'Show dice input'"
-            [disabled]="postInProgress()"
-            (pressed)="onShowDiceInput()"
-          />
+          <rs-tooltip [text]="'SHOW_POST_INPUT' | translate" align="start">
+            <rs-round-icon-button
+              [iconSrc]="'/assets/svgs/post.svg'"
+              [ariaLabel]="'SHOW_POST_INPUT' | translate"
+              [disabled]="postInProgress()"
+              (pressed)="onShowPostInput()"
+            />
+          </rs-tooltip>
+          <rs-tooltip [text]="'SHOW_DICE_INPUT' | translate" align="end">
+            <rs-round-icon-button
+              [iconSrc]="'/assets/svgs/dice.svg'"
+              [ariaLabel]="'SHOW_DICE_INPUT' | translate"
+              [disabled]="postInProgress()"
+              (pressed)="onShowDiceInput()"
+            />
+          </rs-tooltip>
         </div>
         @if (!showDiceInput()) {
           <div class="input-row">

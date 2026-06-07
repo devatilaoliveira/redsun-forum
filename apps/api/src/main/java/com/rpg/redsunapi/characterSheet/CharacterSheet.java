@@ -8,6 +8,8 @@ public interface CharacterSheet {
 
   UUID getCharacterId();
 
+  String getCharacterName();
+
   void setCharacterName(String characterName);
 
   String getCharacterImageUrl();

@@ -38,11 +38,11 @@
     @if (hasImage()) {
       @if (uploadable()) {
         <div class="image-container" [attr.aria-label]="alt()" role="img">
-          <img class="avatar-image" [src]="src()!" [alt]="alt()" />
+          <rs-img class="avatar-image" [src]="src()!" [alt]="alt()" />
         </div>
       } @else {
         <div class="image-container" [attr.aria-label]="alt()" role="img">
-          <img class="avatar-image" [ngSrc]="src()!" [alt]="alt()" fill priority/>
+          <rs-img class="avatar-image" [ngSrc]="src()!" [alt]="alt()" fill priority />
         </div>
       }
     } @else {

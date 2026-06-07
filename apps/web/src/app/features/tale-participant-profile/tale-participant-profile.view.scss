@@ -1,0 +1,59 @@
+@use "../../../styles/mixins" as mix;
+
+$max-content: 980px;
+
+:host {
+  @include mix.main-host();
+}
+
+.tale-participant-profile-view {
+  @include mix.main-wrapper();
+  gap: var(--space-1);
+}
+
+.content {
+  width: min($max-content, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64px;
+}
+
+.profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  text-align: center;
+}
+
+.identity {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--space-0-5);
+}
+
+.identity h2,
+.identity p,
+.empty {
+  margin: 0;
+}
+
+.identity p {
+  overflow-wrap: anywhere;
+}
+
+.rule-sheet {
+  width: 100%;
+}
+
+.empty {
+  text-align: center;
+}

@@ -4,52 +4,50 @@
     [subTittle]="'CHARACTER_SHEET_SUBTITLE' | translate"
   />
 
-  <div class="content">
+  <div class="content" [class.content--wide]="isRedSunSheet()">
     @if (sheetLoading()) {
       <div class="status">
         <rs-spinner [variant]="EVariant.PRIMARY" />
       </div>
     } @else {
-      <form class="form" [formGroup]="characterSheetFormGroup" (submit)="$event.preventDefault(); onSubmit()">
-        <div class="avatar-field avatar-field--hero">
-          <rs-avatar
-            [src]="avatarImageSrc()"
-            [userName]="controls.characterName.value || null"
-            [size]="200"
-            [uploadable]="true"
-            [deletable]="false"
-            (fileSelected)="onAvatarFileSelected($event)"
-          />
-        </div>
+      <div class="sheet-content">
+        <form class="form" [formGroup]="characterSheetFormGroup" (submit)="$event.preventDefault(); onSheetButtonPressed()">
+          <div class="avatar-field avatar-field--hero">
+            <rs-avatar
+              [src]="avatarImageSrc()"
+              [userName]="controls.characterName.value || null"
+              [size]="200"
+              [uploadable]="sheetEditable()"
+              [deletable]="false"
+              (fileSelected)="onAvatarFileSelected($event)"
+            />
+          </div>
 
-        <div class="character-fields">
-          <rs-input
-            [label]="'CHARACTER_SHEET_NAME' | translate"
-            [maxLength]="40"
-            [placeholder]="'CHARACTER_SHEET_NAME_PLACEHOLDER' | translate"
-            [value]="controls.characterName.value"
-            (valueChanged)="onValueChange(controls.characterName, $event)"
-          />
+          <div class="character-fields">
+            <rs-input
+              [label]="'CHARACTER_SHEET_NAME' | translate"
+              [maxLength]="40"
+              [placeholder]="'CHARACTER_SHEET_NAME_PLACEHOLDER' | translate"
+              [value]="controls.characterName.value"
+              [blocked]="!sheetEditable()"
+              (valueChanged)="onValueChange(controls.characterName, $event)"
+            />
 
-          <rs-textarea
-            [label]="'CHARACTER_SHEET_DESCRIPTION' | translate"
-            [maxLength]="500"
-            [placeholder]="'CHARACTER_SHEET_DESCRIPTION_PLACEHOLDER' | translate"
-            [rows]="8"
-            [value]="controls.characterDescription.value"
-            (valueChanged)="onValueChange(controls.characterDescription, $event)"
-          />
-        </div>
+            <rs-textarea
+              [label]="'CHARACTER_SHEET_DESCRIPTION' | translate"
+              [maxLength]="500"
+              [placeholder]="'CHARACTER_SHEET_DESCRIPTION_PLACEHOLDER' | translate"
+              [rows]="8"
+              [value]="controls.characterDescription.value"
+              [blocked]="!sheetEditable()"
+              (valueChanged)="onValueChange(controls.characterDescription, $event)"
+            />
+          </div>
+        </form>
 
-        <div class="cta-btn">
-          <rs-button
-            [inProgress]="saveInProgress()"
-            [disabled]="characterSheetFormGroup.invalid || saveInProgress() || avatarUploading() || !hasChanges()"
-            (pressed)="onSubmit()"
-          >
-            {{ 'SAVE' | translate }}
-          </rs-button>
-        </div>
+        @if (isRedSunSheet()) {
+          <rs-redsun-sheet [sheet]="redSunSheet()" [sheetEditable]="sheetEditable()" />
+        }
 
         @if (!isTaleOwner()) {
           <rs-button
@@ -61,9 +59,20 @@
             {{ 'QUIT_TALE' | translate }}
           </rs-button>
         }
-      </form>
+      </div>
     }
   </div>
+
+  @if (!sheetLoading()) {
+    <rs-round-icon-button
+      class="sheet-edit-button"
+      [iconSrc]="sheetButtonIcon()"
+      [ariaLabel]="sheetButtonLabel()"
+      [disabled]="saveInProgress() || avatarUploading()"
+      [variant]="EVariant.PRIMARY"
+      (pressed)="onSheetButtonPressed()"
+    />
+  }
 </section>
 
 @if (confirmQuitOpen()) {
