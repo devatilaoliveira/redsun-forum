@@ -85,6 +85,7 @@ FROM pg_tables
 WHERE schemaname = 'public'
   AND tablename IN (
     'users',
+    'client_error_reports',
     'subscriptions',
     'user_contacts',
     'user_favorite_languages',
@@ -93,6 +94,7 @@ WHERE schemaname = 'public'
     'tales',
     'tale_participants',
     'basic_sheets',
+    'redsun_sheets',
     'locations',
     'posts',
     'letters',
@@ -111,6 +113,7 @@ FROM pg_tables
 WHERE schemaname = 'public'
   AND tablename IN (
     'users',
+    'client_error_reports',
     'subscriptions',
     'user_contacts',
     'user_favorite_languages',
@@ -119,6 +122,7 @@ WHERE schemaname = 'public'
     'tales',
     'tale_participants',
     'basic_sheets',
+    'redsun_sheets',
     'locations',
     'posts',
     'letters',

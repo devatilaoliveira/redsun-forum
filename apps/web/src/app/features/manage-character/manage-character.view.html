@@ -1,7 +1,7 @@
 <section class="manage-character-view">
   <rs-view-header
-    [title]="'MANAGE_PROFILE' | translate"
-    [subTittle]="'CHARACTER_SHEET_SUBTITLE' | translate"
+    [title]="headerTitleKey() | translate"
+    [subTittle]="headerSubtitleKey() | translate"
   />
 
   <div class="content" [class.content--wide]="isRedSunSheet()">
@@ -49,7 +49,7 @@
           <rs-redsun-sheet [sheet]="redSunSheet()" [sheetEditable]="sheetEditable()" />
         }
 
-        @if (!isTaleOwner()) {
+        @if (canQuitTale()) {
           <rs-button
             class="quit-button"
             [variant]="EVariant.WARNING"
@@ -91,30 +91,16 @@
 }
 
 @if (avatarCropOpen()) {
-  <rs-dialog-modal
-    [title]="'CROP_IMAGE' | translate"
-    [ctaBtnOne]="{ label: ('CANCEL' | translate), variant: EVariant.SECONDARY, disabled: avatarUploading() }"
-    [ctaBtnTwo]="{ label: ('SAVE' | translate), variant: EVariant.PRIMARY, disabled: !avatarCropBlob() || avatarUploading(), inProgress: avatarUploading() }"
-    (closePressed)="closeAvatarCrop()"
-    (ctaBtnOnePressed)="closeAvatarCrop()"
-    (ctaBtnTwoPressed)="confirmAvatarCrop()"
-  >
-    <ng-template>
-      <div class="avatar-cropper">
-        <image-cropper
-          [imageFile]="avatarCropFile()"
-          [maintainAspectRatio]="true"
-          [aspectRatio]="1"
-          [roundCropper]="true"
-          [resizeToWidth]="200"
-          [resizeToHeight]="200"
-          [onlyScaleDown]="true"
-          [output]="'blob'"
-          [format]="'jpeg'"
-          [imageQuality]="92"
-          (imageCropped)="onAvatarCropped($event)"
-        ></image-cropper>
-      </div>
-    </ng-template>
-  </rs-dialog-modal>
+  <rs-image-crop-dialog
+    [imageFile]="avatarCropFile()"
+    [cropProcessing]="avatarUploading()"
+    [saveDisabled]="!avatarCropBlob()"
+    [aspectRatio]="1"
+    [roundCropper]="true"
+    [resizeToWidth]="200"
+    [resizeToHeight]="200"
+    (cropped)="onAvatarCropped($event)"
+    (closed)="closeAvatarCrop()"
+    (confirmed)="confirmAvatarCrop()"
+  />
 }

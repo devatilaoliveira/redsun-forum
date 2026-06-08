@@ -172,6 +172,12 @@ export const routes: Routes = [
                 title: "TALE_MANAGER"
               },
               {
+                path: `${ROUTE_PATHS.profile}/:${ROUTE_PATHS.id}`,
+                loadComponent: () => import("./features/manage-character/manage-character.view").then((module) => module.ManageCharacterView),
+                canActivate: [TaleOwnerGuard],
+                title: "MANAGE_PROFILE"
+              },
+              {
                 path: ROUTE_PATHS.profile,
                 loadComponent: () => import("./features/manage-character/manage-character.view").then((module) => module.ManageCharacterView),
                 canActivate: [TaleParticipantGuard],

@@ -16,6 +16,8 @@
           [userName]="displayName() || null"
           [alt]="displayName()"
           [size]="200"
+          [uploadable]="false"
+          [deletable]="false"
         />
 
         <div class="identity">
@@ -40,4 +42,14 @@
       <p class="empty">{{ 'PARTICIPANT_PROFILE_NOT_FOUND' | translate }}</p>
     }
   </div>
+
+  @if (!isLoading() && canEdit() && sheet()) {
+    <rs-round-icon-button
+      class="sheet-edit-button"
+      [iconSrc]="'/assets/svgs/edit.svg'"
+      [ariaLabel]="'EDIT' | translate"
+      [variant]="EVariant.PRIMARY"
+      (pressed)="onEditCharacterSheet()"
+    />
+  }
 </section>

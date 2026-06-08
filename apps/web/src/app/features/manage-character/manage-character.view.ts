@@ -27,11 +27,11 @@ import {RedSunSheetResponseDTO} from "../../../interface/dtos/characterSheet/Red
 import {IPrinter, Printer} from "../../../infra/miscellaneous/printer.handler";
 import {RsAvatar} from "../../shared/fragments/rsAvatar/rs.avatar";
 import {RsRoundIconButton} from "../../shared/fragments/rsRoundIconButton/rs.round-icon-button";
-import {ImageCropperComponent, ImageCroppedEvent} from "ngx-image-cropper";
 import {ImageHandler} from "../../../infra/miscellaneous/image.handler";
 import {IToastService, ToastService} from "../../../services/toast.service";
 import {TalesContextService} from "../../../stateServices/tales-context.service";
 import {RedSunSheetComponent} from "./redsun-sheet/redsun-sheet.component";
+import {RsImageCropDialogComponent} from "../../shared/ui/image-crop-dialog/image-crop-dialog.component";
 
 interface CharacterSheetFormControls {
   characterName: FormControl<string>;
@@ -54,8 +54,8 @@ type CharacterSheetFormValue = { [K in keyof CharacterSheetFormControls]: string
     RsDialogModalComponent,
     RsAvatar,
     RsRoundIconButton,
-    ImageCropperComponent,
-    RedSunSheetComponent
+    RedSunSheetComponent,
+    RsImageCropDialogComponent
   ],
   templateUrl: "./manage-character.view.html",
   styleUrl: "./manage-character.view.scss"
@@ -74,7 +74,9 @@ export class ManageCharacterView implements OnInit, OnDestroy {
   private readonly _toastService: IToastService = inject(ToastService);
   private readonly _talesContext: TalesContextService = inject(TalesContextService);
   private readonly taleId: string = this._route.snapshot.paramMap.get(ROUTE_PATHS.taleId)!;
-  private readonly characterSheetId: string = this._localStoreService.getAuthenticatedUser().id;
+  private readonly authenticatedUserId: string = this._localStoreService.getAuthenticatedUser().id;
+  private readonly characterSheetId: string = this._route.snapshot.paramMap.get(ROUTE_PATHS.id) ?? this.authenticatedUserId;
+  private readonly isSelfProfile: boolean = this.characterSheetId === this.authenticatedUserId;
   private initialState: CharacterSheetFormValue | null = null;
   private avatarPreviewObjectUrl: string | null = null;
   private currentRuleSystem: ERuleSystem | null = null;
@@ -97,7 +99,14 @@ export class ManageCharacterView implements OnInit, OnDestroy {
   protected readonly avatarCropBlob: WritableSignal<Blob | null> = signal<Blob | null>(null);
   protected readonly avatarUploading: WritableSignal<boolean> = signal<boolean>(false);
   protected readonly sheetEditable: WritableSignal<boolean> = signal<boolean>(false);
-  protected readonly isTaleOwner: Signal<boolean> = computed(() => this._talesContext.owner()?.id === this.characterSheetId);
+  protected readonly isTargetTaleOwner: Signal<boolean> = computed(() => this._talesContext.owner()?.id === this.characterSheetId);
+  protected readonly canQuitTale: Signal<boolean> = computed(() => this.isSelfProfile && !this.isTargetTaleOwner());
+  protected readonly headerTitleKey: Signal<string> = computed(() =>
+    this.isSelfProfile ? "MANAGE_PROFILE" : "TALE_PARTICIPANT_PROFILE"
+  );
+  protected readonly headerSubtitleKey: Signal<string> = computed(() =>
+    this.isSelfProfile ? "CHARACTER_SHEET_SUBTITLE" : "TALE_PARTICIPANT_PROFILE_SUBTITLE"
+  );
   protected readonly sheetButtonIcon: Signal<string> = computed<string>(() => {
     return this.sheetEditable() ? "/assets/svgs/save.svg" : "/assets/svgs/edit.svg";
   });
@@ -107,7 +116,7 @@ export class ManageCharacterView implements OnInit, OnDestroy {
   protected readonly EVariant = EVariant;
 
   public ngOnInit(): void {
-    this._characterSheetService.getMyCharacterSheet(this.taleId, this.characterSheetId).pipe(
+    this._characterSheetService.getCharacterSheet(this.taleId, this.characterSheetId).pipe(
       finalize(() => this.sheetLoading.set(false))
     ).subscribe({
       next: (response: CharacterSheetResponseDTO) => this.applyLoadedSheet(response),
@@ -119,7 +128,7 @@ export class ManageCharacterView implements OnInit, OnDestroy {
   }
 
   protected isRedSunSheet(): boolean {
-    return this.currentRuleSystem === ERuleSystem.REDSUN && !this.isTaleOwner();
+    return this.currentRuleSystem === ERuleSystem.REDSUN && !this.isTargetTaleOwner();
   }
 
   public ngOnDestroy(): void {
@@ -145,8 +154,8 @@ export class ManageCharacterView implements OnInit, OnDestroy {
     this.avatarCropOpen.set(true);
   }
 
-  protected onAvatarCropped(event: ImageCroppedEvent): void {
-    this.avatarCropBlob.set(event.blob ?? null);
+  protected onAvatarCropped(blob: Blob | null): void {
+    this.avatarCropBlob.set(blob);
   }
 
   protected closeAvatarCrop(): void {
@@ -218,7 +227,7 @@ export class ManageCharacterView implements OnInit, OnDestroy {
       this.requireRuleSystem(),
       this.toUpsertRequest(),
       this.pendingAvatarFile(),
-      this.isTaleOwner()
+      this.isTargetTaleOwner()
     ).pipe(
       finalize(() => this.saveInProgress.set(false))
     ).subscribe({
@@ -235,7 +244,7 @@ export class ManageCharacterView implements OnInit, OnDestroy {
   }
 
   protected onQuitPressed(): void {
-    if (this.isTaleOwner()) {
+    if (!this.canQuitTale()) {
       return;
     }
 
@@ -247,7 +256,7 @@ export class ManageCharacterView implements OnInit, OnDestroy {
   }
 
   protected confirmQuit(): void {
-    if (this.isTaleOwner() || this.leavingInProgress()) {
+    if (!this.canQuitTale() || this.leavingInProgress()) {
       return;
     }
 

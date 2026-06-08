@@ -20,6 +20,10 @@ export class RsImageCropDialogComponent {
   public readonly imageFile: InputSignal<File | undefined> = input<File | undefined>(undefined);
   public readonly cropProcessing: InputSignal<boolean> = input<boolean>(false);
   public readonly saveDisabled: InputSignal<boolean> = input<boolean>(false);
+  public readonly aspectRatio: InputSignal<number> = input<number>(16 / 9);
+  public readonly roundCropper: InputSignal<boolean> = input<boolean>(false);
+  public readonly resizeToWidth: InputSignal<number> = input<number>(UTIL_CONSTANTS.DEFAULT_RESIZE_WIDTH);
+  public readonly resizeToHeight: InputSignal<number> = input<number>(UTIL_CONSTANTS.DEFAULT_RESIZE_HEIGHT);
 
   public readonly cropped: OutputEmitterRef<Blob | null> = output<Blob | null>();
   public readonly closed: OutputEmitterRef<void> = output<void>();
@@ -38,5 +42,4 @@ export class RsImageCropDialogComponent {
   }
 
   protected readonly EVariant = EVariant;
-  protected readonly UTIL_CONSTANTS = UTIL_CONSTANTS;
 }
