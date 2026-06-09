@@ -54,6 +54,8 @@
   "ROLE_PLAYER": "Player",
   "EDIT": "Edit",
   "SAVE": "Save",
+  "SHOW_MORE": "Show more",
+  "SHOW_LESS": "Show less",
   "CROP_IMAGE": "Crop image",
   "AVATAR_UPDATE_FAILED": "Avatar update failed.",
   "LOGIN_VALIDATION_ERROR": "Please provide a valid email and password.",

@@ -19,9 +19,11 @@
   </div>
 
   <div class="body">
-    <p class="description">
-      {{ tale().description || ('NO_DESCRIPTION' | translate) }}
-    </p>
+    <rs-expandable-text
+      class="description"
+      [text]="tale().description || ('NO_DESCRIPTION' | translate)"
+      [maxLines]="6"
+    />
 
     <div class="info">
       <rs-divider

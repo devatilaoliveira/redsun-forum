@@ -1,0 +1,19 @@
+<p
+  #content
+  class="content"
+  [class.content--collapsed]="!expanded()"
+  [style.--rs-expandable-max-lines]="maxLines()"
+>
+  {{ text() }}
+</p>
+
+@if (canToggle()) {
+  <rs-button-text
+    class="toggle"
+    type="button"
+    variant="muted"
+    (pressed)="toggleExpanded()"
+  >
+    {{ (expanded() ? 'SHOW_LESS' : 'SHOW_MORE') | translate }}
+  </rs-button-text>
+}

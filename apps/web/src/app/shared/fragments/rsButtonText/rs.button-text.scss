@@ -71,11 +71,6 @@
   --rs-text-fc: var(--color-primary);
 }
 
-.rs-button-text:not(:disabled):not(.is-disabled):hover .label,
-.rs-button-text:not(:disabled):not(.is-disabled):focus-visible .label {
-  text-decoration: underline;
-}
-
 .rs-button-text:disabled,
 .rs-button-text.is-disabled {
   opacity: 0.6;
