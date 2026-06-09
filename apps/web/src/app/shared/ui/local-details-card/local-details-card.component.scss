@@ -7,7 +7,8 @@
 .card {
   .cover {
     position: relative;
-    height: 480px;
+    aspect-ratio: 16 / 9;
+    width: 100%;
     overflow: hidden;
 
     ::ng-deep .image {

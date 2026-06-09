@@ -1,6 +1,7 @@
 import {Component, effect, input, InputSignal} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
 import {TranslatePipe} from "@ngx-translate/core";
+import {UTIL_CONSTANTS} from "../../../../interface/constants/util.constants";
 import {RedSunSheetResponseDTO} from "../../../../interface/dtos/characterSheet/RedSunSheetResponseDTO";
 import {UpsertRedSunSheetDTO} from "../../../../interface/dtos/characterSheet/UpsertRedSunSheetDTO";
 import {RsDivider} from "../../../shared/fragments/rsDivider/rs.divider";
@@ -110,6 +111,7 @@ export class RedSunSheetComponent {
   public readonly sheetEditable: InputSignal<boolean> = input<boolean>(false);
 
   protected readonly resourceSlots: number = 10;
+  protected readonly SHORT_TEXT_LENGTH: number = UTIL_CONSTANTS.SHORT_TEXT_LENGTH;
   protected readonly form: FormGroup<RedSunSheetFormControls> = new FormGroup<RedSunSheetFormControls>({
     nature: new FormControl<string>("", {nonNullable: true}),
     demeanor: new FormControl<string>("", {nonNullable: true}),

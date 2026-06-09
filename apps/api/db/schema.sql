@@ -207,7 +207,7 @@ CREATE TABLE public.redsun_sheets (
   impetus_max integer NOT NULL DEFAULT 0,
   impetus_current integer NOT NULL DEFAULT 0,
   vitality_damage integer NOT NULL DEFAULT 0,
-  experience varchar(120),
+  experience text,
   equipment text,
   notes text,
   active_rituals_effects text,

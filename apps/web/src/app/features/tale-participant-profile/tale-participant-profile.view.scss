@@ -57,3 +57,10 @@ $max-content: 980px;
 .empty {
   text-align: center;
 }
+
+.sheet-edit-button {
+  position: fixed;
+  right: var(--space-1);
+  bottom: var(--space-1);
+  z-index: 10;
+}

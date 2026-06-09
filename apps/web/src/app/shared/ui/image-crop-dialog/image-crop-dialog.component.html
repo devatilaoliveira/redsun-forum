@@ -7,13 +7,14 @@
   (ctaBtnTwoPressed)="onConfirm()"
 >
   <ng-template>
-    <div class="cover-cropper">
+    <div class="image-cropper">
       <image-cropper
         [imageFile]="imageFile()"
         [maintainAspectRatio]="true"
-        [aspectRatio]="16 / 9"
-        [resizeToWidth]="UTIL_CONSTANTS.DEFAULT_RESIZE_WIDTH"
-        [resizeToHeight]="UTIL_CONSTANTS.DEFAULT_RESIZE_HEIGHT"
+        [aspectRatio]="aspectRatio()"
+        [roundCropper]="roundCropper()"
+        [resizeToWidth]="resizeToWidth()"
+        [resizeToHeight]="resizeToHeight()"
         [onlyScaleDown]="true"
         [output]="'blob'"
         [format]="'jpeg'"

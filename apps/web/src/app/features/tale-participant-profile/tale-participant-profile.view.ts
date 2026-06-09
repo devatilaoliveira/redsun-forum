@@ -18,6 +18,8 @@ import {RsAvatar} from "../../shared/fragments/rsAvatar/rs.avatar";
 import {RsButton} from "../../shared/fragments/rsButton/rs.button";
 import {EVariant} from "../../../interface/enums/EVariant";
 import {RedSunSheetComponent} from "../manage-character/redsun-sheet/redsun-sheet.component";
+import {TaleAccessRole} from "../../../interface/enums/TaleAccessRole";
+import {RsRoundIconButton} from "../../shared/fragments/rsRoundIconButton/rs.round-icon-button";
 
 @Component({
   selector: "rs-tale-participant-profile",
@@ -28,7 +30,8 @@ import {RedSunSheetComponent} from "../manage-character/redsun-sheet/redsun-shee
     RsSpinner,
     RsAvatar,
     RsButton,
-    RedSunSheetComponent
+    RedSunSheetComponent,
+    RsRoundIconButton
   ],
   templateUrl: "./tale-participant-profile.view.html",
   styleUrl: "./tale-participant-profile.view.scss"
@@ -45,6 +48,9 @@ export class TaleParticipantProfileView implements OnInit {
   protected readonly sheet: WritableSignal<CharacterSheetDTO | null> = signal<CharacterSheetDTO | null>(null);
   protected readonly isLoading: WritableSignal<boolean> = signal<boolean>(true);
   protected readonly EVariant = EVariant;
+  protected readonly canEdit: Signal<boolean> = computed(() =>
+    this._talesContext.role() === TaleAccessRole.Owner && !!this.sheet() && !!this.participantId
+  );
   protected readonly participant: Signal<TaleParticipantProfileDTO | null> = computed(() => {
     const participantId = this.participantId;
     if (!participantId) {
@@ -97,6 +103,14 @@ export class TaleParticipantProfileView implements OnInit {
     }
 
     void this._router.navigate(["/", ROUTE_PATHS.contacts, ROUTE_PATHS.details, this.participantId]);
+  }
+
+  protected onEditCharacterSheet(): void {
+    if (!this.taleId || !this.participantId || !this.canEdit()) {
+      return;
+    }
+
+    void this._router.navigate(["/", ROUTE_PATHS.tales, this.taleId, ROUTE_PATHS.profile, this.participantId]);
   }
 
   private isRedSunSheet(sheet: CharacterSheetDTO | null): sheet is RedSunSheetResponseDTO {

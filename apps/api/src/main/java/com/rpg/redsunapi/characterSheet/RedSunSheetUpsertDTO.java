@@ -2,6 +2,7 @@ package com.rpg.redsunapi.characterSheet;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -71,13 +72,13 @@ public record RedSunSheetUpsertDTO(
   @Nullable Integer impetusMax,
   @Nullable Integer impetusCurrent,
   @Nullable Integer vitalityDamage,
-  @Nullable String experience,
-  @Nullable String equipment,
-  @Nullable String notes,
-  @Nullable String activeRitualsEffects,
-  @Nullable String combatManeuvers,
-  @Nullable String arsenal,
-  @Nullable String learnedRituals,
-  @Nullable String craftDetails
+  @Nullable @Size(max = 500) String experience,
+  @Nullable @Size(max = 500) String equipment,
+  @Nullable @Size(max = 500) String notes,
+  @Nullable @Size(max = 500) String activeRitualsEffects,
+  @Nullable @Size(max = 500) String combatManeuvers,
+  @Nullable @Size(max = 500) String arsenal,
+  @Nullable @Size(max = 500) String learnedRituals,
+  @Nullable @Size(max = 500) String craftDetails
 ) {
 }

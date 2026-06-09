@@ -157,14 +157,14 @@
   <section class="sheet-section">
     <h3 class="section-title">{{ "DETAILS" | translate }}</h3>
     <div class="textarea-grid">
-      <rs-textarea [label]="'EXPERIENCE' | translate" [rows]="5" [value]="controls.experience.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.experience, $event)" />
-      <rs-textarea [label]="'EQUIPMENT' | translate" [rows]="5" [value]="controls.equipment.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.equipment, $event)" />
-      <rs-textarea [label]="'NOTES' | translate" [rows]="5" [value]="controls.notes.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.notes, $event)" />
-      <rs-textarea [label]="'ACTIVE_RITUALS_EFFECTS' | translate" [rows]="5" [value]="controls.activeRitualsEffects.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.activeRitualsEffects, $event)" />
-      <rs-textarea [label]="'COMBAT_MANEUVERS' | translate" [rows]="5" [value]="controls.combatManeuvers.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.combatManeuvers, $event)" />
-      <rs-textarea [label]="'ARSENAL' | translate" [rows]="5" [value]="controls.arsenal.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.arsenal, $event)" />
-      <rs-textarea [label]="'LEARNED_RITUALS' | translate" [rows]="5" [value]="controls.learnedRituals.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.learnedRituals, $event)" />
-      <rs-textarea [label]="'CRAFT' | translate" [rows]="5" [value]="controls.craftDetails.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.craftDetails, $event)" />
+      <rs-textarea [label]="'EXPERIENCE' | translate" [rows]="5" [maxLength]="SHORT_TEXT_LENGTH" [value]="controls.experience.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.experience, $event)" />
+      <rs-textarea [label]="'EQUIPMENT' | translate" [rows]="5" [maxLength]="SHORT_TEXT_LENGTH" [value]="controls.equipment.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.equipment, $event)" />
+      <rs-textarea [label]="'NOTES' | translate" [rows]="5" [maxLength]="SHORT_TEXT_LENGTH" [value]="controls.notes.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.notes, $event)" />
+      <rs-textarea [label]="'ACTIVE_RITUALS_EFFECTS' | translate" [rows]="5" [maxLength]="SHORT_TEXT_LENGTH" [value]="controls.activeRitualsEffects.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.activeRitualsEffects, $event)" />
+      <rs-textarea [label]="'COMBAT_MANEUVERS' | translate" [rows]="5" [maxLength]="SHORT_TEXT_LENGTH" [value]="controls.combatManeuvers.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.combatManeuvers, $event)" />
+      <rs-textarea [label]="'ARSENAL' | translate" [rows]="5" [maxLength]="SHORT_TEXT_LENGTH" [value]="controls.arsenal.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.arsenal, $event)" />
+      <rs-textarea [label]="'LEARNED_RITUALS' | translate" [rows]="5" [maxLength]="SHORT_TEXT_LENGTH" [value]="controls.learnedRituals.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.learnedRituals, $event)" />
+      <rs-textarea [label]="'CRAFT' | translate" [rows]="5" [maxLength]="SHORT_TEXT_LENGTH" [value]="controls.craftDetails.value" [blocked]="!sheetEditable()" (valueChanged)="setTextValue(controls.craftDetails, $event)" />
     </div>
   </section>
   <rs-divider type="solid" />
