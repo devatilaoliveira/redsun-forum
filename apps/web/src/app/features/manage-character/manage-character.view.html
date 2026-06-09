@@ -26,7 +26,7 @@
           <div class="character-fields">
             <rs-input
               [label]="'CHARACTER_SHEET_NAME' | translate"
-              [maxLength]="40"
+              [maxLength]="characterNameMaxLength"
               [placeholder]="'CHARACTER_SHEET_NAME_PLACEHOLDER' | translate"
               [value]="controls.characterName.value"
               [blocked]="!sheetEditable()"
@@ -35,7 +35,7 @@
 
             <rs-textarea
               [label]="'CHARACTER_SHEET_DESCRIPTION' | translate"
-              [maxLength]="500"
+              [maxLength]="characterDescriptionMaxLength"
               [placeholder]="'CHARACTER_SHEET_DESCRIPTION_PLACEHOLDER' | translate"
               [rows]="8"
               [value]="controls.characterDescription.value"

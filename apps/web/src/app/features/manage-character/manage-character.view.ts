@@ -32,6 +32,7 @@ import {IToastService, ToastService} from "../../../services/toast.service";
 import {TalesContextService} from "../../../stateServices/tales-context.service";
 import {RedSunSheetComponent} from "./redsun-sheet/redsun-sheet.component";
 import {RsImageCropDialogComponent} from "../../shared/ui/image-crop-dialog/image-crop-dialog.component";
+import {UTIL_CONSTANTS} from "../../../interface/constants/util.constants";
 
 interface CharacterSheetFormControls {
   characterName: FormControl<string>;
@@ -81,9 +82,15 @@ export class ManageCharacterView implements OnInit, OnDestroy {
   private avatarPreviewObjectUrl: string | null = null;
   private currentRuleSystem: ERuleSystem | null = null;
 
+  protected readonly characterNameMaxLength: number = UTIL_CONSTANTS.USERNAME_MAX_LENGTH;
+  protected readonly characterDescriptionMaxLength: number = UTIL_CONSTANTS.EXTRA_LONG_TEXT_LENGTH;
   protected readonly characterSheetFormGroup: FormGroup<CharacterSheetFormControls> = this._formBuilder.group({
-    characterName: this._formBuilder.control<string>("", {validators: [Validators.required, Validators.pattern(/\S/)]}),
-    characterDescription: this._formBuilder.control<string>("")
+    characterName: this._formBuilder.control<string>("", {
+      validators: [Validators.required, Validators.pattern(/\S/), Validators.maxLength(this.characterNameMaxLength)]
+    }),
+    characterDescription: this._formBuilder.control<string>("", {
+      validators: [Validators.maxLength(this.characterDescriptionMaxLength)]
+    })
   });
   protected readonly controls = this.characterSheetFormGroup.controls;
   protected readonly sheetLoading: WritableSignal<boolean> = signal(true);
