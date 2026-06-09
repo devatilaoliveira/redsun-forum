@@ -34,7 +34,6 @@ export class RsImg {
   public readonly sizes: InputSignal<string | null> = input<string | null>(null);
   public readonly loading: InputSignal<"eager" | "lazy" | null> = input<"eager" | "lazy" | null>(null);
   public readonly decoding: InputSignal<"sync" | "async" | "auto" | null> = input<"sync" | "async" | "auto" | null>(null);
-  public readonly fetchPriority: InputSignal<"high" | "low" | "auto" | null> = input<"high" | "low" | "auto" | null>(null);
   public readonly fill = input(false, {transform: booleanAttribute});
   public readonly priority = input(false, {transform: booleanAttribute});
   public readonly ariaHidden: InputSignal<boolean | string | null> = input<boolean | string | null>(null, {alias: "aria-hidden"});
