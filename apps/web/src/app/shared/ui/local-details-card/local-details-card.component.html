@@ -3,9 +3,12 @@
     <div class="cover">
       <rs-img
         class="image"
-        [src]="location().imageUrl!"
-        [alt]="location().imageUrl || ''"
-        loading="lazy"
+        [ngSrc]="location().imageUrl!"
+        [alt]="location().locationName"
+        [sizes]="locationImageSizes"
+        priority="high"
+        fill
+        loading="eager"
       />
     </div>
   }

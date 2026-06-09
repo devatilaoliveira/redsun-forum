@@ -15,6 +15,7 @@ import {RsImg} from "../../fragments/rsImg/rs.img";
 })
 export class LocalDetailsCardComponent {
   public readonly location: InputSignal<LocationDetailsDTO> = input.required<LocationDetailsDTO>();
+  protected readonly locationImageSizes = "(max-width: 718px) 100%, 718px";
 
   protected readonly hasImage = computed<boolean>(() => {
     const url = this.location().imageUrl;
