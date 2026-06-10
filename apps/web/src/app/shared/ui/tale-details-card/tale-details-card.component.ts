@@ -12,11 +12,12 @@ import {RsDot} from "../../fragments/rsDot/rs.dot";
 import {ROUTE_PATHS} from "../../../../interface/constants/route-path.constants";
 import {LocationDTO} from "../../../../interface/dtos/location/LocationDTO";
 import {RsImg} from "../../fragments/rsImg/rs.img";
+import {RsExpandableText} from "../../fragments/rsExpandableText/rs.expandable-text";
 
 @Component({
   selector: "rs-tale-details-card",
   standalone: true,
-  imports: [DatePipe, TranslatePipe, RsBox, RsDivider, RsDot, RsImg],
+  imports: [DatePipe, TranslatePipe, RsBox, RsDivider, RsDot, RsImg, RsExpandableText],
   templateUrl: "./tale-details-card.component.html",
   styleUrl: "./tale-details-card.component.scss"
 })

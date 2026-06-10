@@ -54,6 +54,8 @@
   "ROLE_PLAYER": "Jogador",
   "EDIT": "Editar",
   "SAVE": "Salvar",
+  "SHOW_MORE": "Mostrar mais",
+  "SHOW_LESS": "Mostrar menos",
   "CROP_IMAGE": "Recortar imagem",
   "AVATAR_UPDATE_FAILED": "Falha ao atualizar o avatar.",
   "LOGIN_VALIDATION_ERROR": "Informe e-mail e senha válidos.",

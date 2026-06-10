@@ -58,7 +58,7 @@ The API project lives in `apps/api`.
 
 Environment files, Docker Compose files, SQL files, and database scripts are app-local:
 
-- `apps/api/.env.local`
+- `apps/api/.env`
 - `apps/api/.env.prod`
 - `apps/api/docker-compose.yml`
 - `apps/api/docker-compose.debug.yml`
@@ -70,10 +70,10 @@ Environment files, Docker Compose files, SQL files, and database scripts are app
 Create an app-local environment file before running the API:
 
 ```powershell
-Copy-Item apps\api\.env.template apps\api\.env.local
+Copy-Item apps\api\.env.template apps\api\.env
 ```
 
-Edit `apps/api/.env.local` with the Supabase, database, JWT, and email values for the target environment.
+Edit `apps/api/.env` with the Supabase, database, JWT, and email values for the target environment.
 
 ### Docker
 
@@ -167,7 +167,7 @@ WITH LOGIN PASSWORD 'use-the-same-value-as-DB_PASSWORD'
 NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
 ```
 
-2. Prepare `apps/api/.env.local` from `apps/api/.env.template`. The relevant values should follow this pattern:
+2. Prepare `apps/api/.env` from `apps/api/.env.template`. The relevant values should follow this pattern:
 
 ```dotenv
 DB_APP_ROLE=redsun_dev
@@ -181,7 +181,7 @@ DB_PASSWORD=use-the-same-value-as-the-role-password
 
 ```powershell
 Push-Location apps\api
-.\scripts\run-supabase-sql.ps1 -EnvFile .env.local -OverrideEnv
+.\scripts\run-supabase-sql.ps1 -EnvFile .env -OverrideEnv
 Pop-Location
 ```
 
@@ -207,14 +207,14 @@ Use `-SqlFiles` to run one file without performing a full reset:
 
 ```powershell
 Push-Location apps\api
-.\scripts\run-supabase-sql.ps1 -EnvFile .env.local -OverrideEnv -SqlFiles db/app-role-grants.sql
+.\scripts\run-supabase-sql.ps1 -EnvFile .env -OverrideEnv -SqlFiles db/app-role-grants.sql
 Pop-Location
 ```
 
 Pass a comma-separated list to run several files in the specified order:
 
 ```powershell
-.\scripts\run-supabase-sql.ps1 -EnvFile .env.local -OverrideEnv -SqlFiles db/data-api-hardening.sql,db/app-role-grants.sql
+.\scripts\run-supabase-sql.ps1 -EnvFile .env -OverrideEnv -SqlFiles db/data-api-hardening.sql,db/app-role-grants.sql
 ```
 
 `-SqlFiles` replaces the default list; it does not add files to the default reset.
@@ -225,7 +225,7 @@ Pass a comma-separated list to run several files in the specified order:
 
 ```powershell
 # Local configuration
-.\scripts\run-supabase-sql.ps1 -EnvFile .env.local -OverrideEnv
+.\scripts\run-supabase-sql.ps1 -EnvFile .env -OverrideEnv
 
 # Production configuration
 .\scripts\run-supabase-sql.ps1 -EnvFile .env.prod -OverrideEnv
@@ -243,7 +243,7 @@ Create a backup:
 
 ```powershell
 Push-Location apps\api
-.\scripts\backup-db.ps1 -EnvFile .env.local -OverrideEnv
+.\scripts\backup-db.ps1 -EnvFile .env -OverrideEnv
 Pop-Location
 ```
 
@@ -251,7 +251,7 @@ Include Supabase auth and storage schemas when a test snapshot needs them:
 
 ```powershell
 Push-Location apps\api
-.\scripts\backup-db.ps1 -Schemas public,private,auth,storage -EnvFile .env.local -OverrideEnv
+.\scripts\backup-db.ps1 -Schemas public,private,auth,storage -EnvFile .env -OverrideEnv
 Pop-Location
 ```
 
@@ -278,7 +278,7 @@ After restoring a snapshot, refresh the application role grants:
 
 ```powershell
 Push-Location apps\api
-.\scripts\run-supabase-sql.ps1 -EnvFile .env.local -OverrideEnv -SqlFiles db/app-role-grants.sql
+.\scripts\run-supabase-sql.ps1 -EnvFile .env -OverrideEnv -SqlFiles db/app-role-grants.sql
 Pop-Location
 ```
 
@@ -286,7 +286,7 @@ Reapply Supabase Data API hardening as well:
 
 ```powershell
 Push-Location apps\api
-.\scripts\run-supabase-sql.ps1 -EnvFile .env.local -OverrideEnv -SqlFiles db/data-api-hardening.sql,db/app-role-grants.sql
+.\scripts\run-supabase-sql.ps1 -EnvFile .env -OverrideEnv -SqlFiles db/data-api-hardening.sql,db/app-role-grants.sql
 Pop-Location
 ```
 

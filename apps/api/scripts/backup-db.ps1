@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-  [string]$EnvFile = ".env.local",
+  [string]$EnvFile = ".env",
   [string]$OutputDir = "backups",
   [string[]]$Schemas = @("public", "private"),
   [string]$PgDumpPath,

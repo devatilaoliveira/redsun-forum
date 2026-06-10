@@ -7,7 +7,7 @@ services:
     image: redsun-api:latest
     container_name: redsun-api
     env_file:
-      - ${APP_ENV_FILE:-.env.local}
+      - ${APP_ENV_FILE:-.env}
     ports:
       - "8080:8080"
     restart: unless-stopped

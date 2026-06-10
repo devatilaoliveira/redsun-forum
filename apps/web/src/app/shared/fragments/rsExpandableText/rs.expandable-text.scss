@@ -1,0 +1,19 @@
+:host {
+  display: block;
+}
+
+.content {
+  margin: 0;
+  white-space: pre-line;
+}
+
+.content--collapsed {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--rs-expandable-max-lines);
+}
+
+.toggle {
+  margin-top: 0.4rem;
+}

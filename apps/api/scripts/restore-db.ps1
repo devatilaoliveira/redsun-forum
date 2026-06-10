@@ -4,7 +4,7 @@ param(
   [string]$BackupFile,
   [Parameter(Mandatory = $true)]
   [string]$ConfirmRestore,
-  [string]$EnvFile = ".env.local",
+  [string]$EnvFile = ".env",
   [string]$PgRestorePath,
   [string]$SslMode = "require",
   [switch]$OverrideEnv,
