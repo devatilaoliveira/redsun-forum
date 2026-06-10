@@ -19,7 +19,6 @@ import {RsButton} from "../../shared/fragments/rsButton/rs.button";
 import {EVariant} from "../../../interface/enums/EVariant";
 import {RedSunSheetComponent} from "../manage-character/redsun-sheet/redsun-sheet.component";
 import {TaleAccessRole} from "../../../interface/enums/TaleAccessRole";
-import {RsRoundIconButton} from "../../shared/fragments/rsRoundIconButton/rs.round-icon-button";
 
 @Component({
   selector: "rs-tale-participant-profile",
@@ -30,8 +29,7 @@ import {RsRoundIconButton} from "../../shared/fragments/rsRoundIconButton/rs.rou
     RsSpinner,
     RsAvatar,
     RsButton,
-    RedSunSheetComponent,
-    RsRoundIconButton
+    RedSunSheetComponent
   ],
   templateUrl: "./tale-participant-profile.view.html",
   styleUrl: "./tale-participant-profile.view.scss"
