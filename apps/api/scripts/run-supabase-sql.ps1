@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-  [string]$EnvFile = ".env.local",
+  [string]$EnvFile = ".env",
   [string[]]$SqlFiles = @("db/schema.sql", "db/private-wipe.sql", "db/storage.sql", "db/storage-wipe.sql", "db/auth-wipe.sql", "db/data-api-hardening.sql", "db/app-role-grants.sql"),
   [string]$PsqlPath,
   [string]$SslMode = "require",
