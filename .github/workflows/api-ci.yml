@@ -10,6 +10,7 @@ jobs:
   maven-test:
     name: Maven test
     runs-on: ubuntu-latest
+    environment: stage
 
     defaults:
       run:
@@ -30,4 +31,11 @@ jobs:
         run: chmod +x mvnw
 
       - name: Run tests
+        env:
+          SPRING_DATASOURCE_URL: ${{ secrets.SPRING_DATASOURCE_URL }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          SUPABASE_STORAGE_URL: ${{ vars.SUPABASE_STORAGE_URL }}
         run: ./mvnw -B -ntp test
