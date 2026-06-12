@@ -19,12 +19,19 @@ export interface SupabasePasswordResetRequest {
   redirectTo: string;
 }
 
+export interface SupabasePasswordUpdateRequest {
+  password: string;
+  currentPassword?: string;
+  nonce?: string;
+}
+
 export interface ISupabaseAuthClient {
   signInWithOAuth(input: { provider: ELoginProvider, options: IOAuthOptions }): Promise<{ url: string }>;
   signInWithPassword(input: SupabaseEmailCredentials): Promise<void>;
   signUp(input: SupabaseSignUpCredentials): Promise<void>;
   resetPasswordForEmail(input: SupabasePasswordResetRequest): Promise<void>;
-  updatePassword(password: string): Promise<void>;
+  reauthenticate(): Promise<void>;
+  updatePassword(input: SupabasePasswordUpdateRequest): Promise<void>;
   exchangeCodeForSession(code: string): Promise<Session>;
   getSession(): Promise<Session | null>;
   signOut(): Promise<void>;
@@ -82,8 +89,32 @@ export class SupabaseAuthClientAdapter implements ISupabaseAuthClient {
     }
   }
 
-  public async updatePassword(password: string): Promise<void> {
-    const {error} = await this._supabaseAuthClient.updateUser({password});
+  public async reauthenticate(): Promise<void> {
+    const {error} = await this._supabaseAuthClient.reauthenticate();
+
+    if (error) {
+      throw error;
+    }
+  }
+
+  public async updatePassword(input: SupabasePasswordUpdateRequest): Promise<void> {
+    const attributes: {
+      password: string;
+      nonce?: string;
+      current_password?: string;
+    } = {
+      password: input.password
+    };
+
+    if (input.nonce) {
+      attributes.nonce = input.nonce;
+    }
+
+    if (input.currentPassword) {
+      attributes.current_password = input.currentPassword;
+    }
+
+    const {error} = await this._supabaseAuthClient.updateUser(attributes);
 
     if (error) {
       throw error;

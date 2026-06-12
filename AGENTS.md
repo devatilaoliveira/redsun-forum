@@ -14,6 +14,11 @@ This repository uses layered instruction files stored under the root `.agents/` 
   4. Project-specific files
   5. Stack-specific files
 
+## Known Verification Constraint
+
+- Do not run full frontend build commands from the agent environment, such as `npm run build` or `ng build`; this environment is known to fail those commands with `spawn EPERM` because child process spawning is blocked by authorization.
+- For frontend changes, prefer the smallest relevant alternative checks that do not hit the blocked build path. If no safe check is available, report that build verification is skipped because of the known `spawn EPERM` agent-environment limitation.
+
 ## App Selection
 
 Use `scripts/rsAgents.ps1` from the repository root to start a layered Codex session.
