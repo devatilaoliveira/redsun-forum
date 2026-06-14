@@ -46,7 +46,13 @@
           </rs-button>
         </div>
         <div>
-          <rs-button (pressed)="logout()" [inProgress]="inProgress()" [variant]="EVariant.BLACK" [customStyle]="customStyle">
+          <rs-button
+            testId="side-nav-logout"
+            (pressed)="logout()"
+            [inProgress]="inProgress()"
+            [variant]="EVariant.BLACK"
+            [customStyle]="customStyle"
+          >
             <img rsButtonIcon ngSrc="/assets/svgs/logout.svg" alt="" aria-hidden="true" height="24" width="24"/>
             {{ 'LOG_OUT' | translate }}
           </rs-button>

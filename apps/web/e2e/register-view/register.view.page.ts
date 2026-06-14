@@ -1,4 +1,4 @@
-import { Locator, Page, Request } from '@playwright/test';
+import { Locator, Page, Request } from "@playwright/test";
 
 export class RegisterViewE2e {
   private page: Page;
@@ -13,18 +13,18 @@ export class RegisterViewE2e {
 
   constructor(page: Page) {
     this.page = page;
-    this.registerSubmitBtn = page.getByTestId('register-submit');
-    this.registerEmailInput = page.getByTestId('register-email-input');
-    this.registerPasswordInput = page.getByTestId('register-password-input');
-    this.registerConfirmPasswordInput = page.getByTestId('register-confirm-password-input');
-    this.registerAcceptedLegalInput = page.getByTestId('register-accepted-legal');
-    this.registerTermsLink = page.getByTestId('register-terms-link');
-    this.registerPrivacyLink = page.getByTestId('register-privacy-link');
-    this.registerCheckEmail = page.getByTestId('register-check-email');
+    this.registerSubmitBtn = page.getByTestId("register-submit");
+    this.registerEmailInput = page.getByTestId("register-email-input");
+    this.registerPasswordInput = page.getByTestId("register-password-input");
+    this.registerConfirmPasswordInput = page.getByTestId("register-confirm-password-input");
+    this.registerAcceptedLegalInput = page.getByTestId("register-accepted-legal");
+    this.registerTermsLink = page.getByTestId("register-terms-link");
+    this.registerPrivacyLink = page.getByTestId("register-privacy-link");
+    this.registerCheckEmail = page.getByTestId("register-check-email");
   }
 
   async navigateToRegisterView() {
-    await this.page.goto('/register');
+    await this.page.goto("/register");
   }
 
   async register(email: string, password: string, confirmPassword: string = password) {
@@ -68,7 +68,7 @@ export class RegisterViewE2e {
   }
 
   async waitForCheckEmailMessage() {
-    await this.registerCheckEmail.waitFor({ state: 'visible' });
+    await this.registerCheckEmail.waitFor({ state: "visible" });
   }
 
   async isSubmitDisabled(): Promise<boolean> {
@@ -86,7 +86,7 @@ export class RegisterViewE2e {
   async waitForSupabaseSignUpRequest(): Promise<Request> {
     return this.page.waitForRequest((request) => {
       const url = new URL(request.url());
-      return request.method() === 'POST' && url.pathname.endsWith('/auth/v1/signup');
+      return request.method() === "POST" && url.pathname.endsWith("/auth/v1/signup");
     });
   }
 }

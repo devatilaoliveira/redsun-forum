@@ -1,15 +1,16 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
-import { test as base } from '@playwright/test';
-import { TestProfile } from '../models/TestProfile';
+/* eslint-disable @typescript-eslint/no-empty-object-type, no-empty-pattern */
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { test as base } from "@playwright/test";
+import { TestProfile } from "../models/TestProfile";
 
-const TEST_PROFILES_PATH = resolve(__dirname, '../config/test-profiles.json');
+const TEST_PROFILES_PATH = resolve(__dirname, "../config/test-profiles.json");
 
 function loadTestProfiles(): TestProfile[] {
-  const profiles = JSON.parse(readFileSync(TEST_PROFILES_PATH, 'utf-8')) as TestProfile[];
+  const profiles = JSON.parse(readFileSync(TEST_PROFILES_PATH, "utf-8")) as TestProfile[];
 
   if (!Array.isArray(profiles) || profiles.length === 0) {
-    throw new Error('At least one E2E test profile must be configured.');
+    throw new Error("At least one E2E test profile must be configured.");
   }
 
   return profiles;
@@ -34,5 +35,5 @@ export const test = base.extend<
     }
 
     await use(testProfile);
-  }, { scope: 'worker' }],
+  }, { scope: "worker" }],
 });

@@ -1,5 +1,5 @@
-import { Locator, Page } from '@playwright/test';
-import { USER_STORE_KEY } from '../../src/interface/constants/store.constants';
+import { Locator, Page } from "@playwright/test";
+import { USER_STORE_KEY } from "../../src/interface/constants/store.constants";
 
 export class LoginViewE2e {
   private page: Page;
@@ -11,15 +11,15 @@ export class LoginViewE2e {
 
   constructor(page: Page) {
     this.page = page;
-    this.loginSubmitBtn = page.getByTestId('login-submit');
-    this.loginEmailInput = page.getByTestId('login-email-input');
-    this.loginPasswordInput = page.getByTestId('login-password-input');
-    this.loginEmailError = page.getByTestId('login-email-input-error');
-    this.loginPasswordError = page.getByTestId('login-password-input-error');
+    this.loginSubmitBtn = page.getByTestId("login-submit");
+    this.loginEmailInput = page.getByTestId("login-email-input");
+    this.loginPasswordInput = page.getByTestId("login-password-input");
+    this.loginEmailError = page.getByTestId("login-email-input-error");
+    this.loginPasswordError = page.getByTestId("login-password-input-error");
   }
 
   async navigateToLoginView() {
-    await this.page.goto('/login');
+    await this.page.goto("/login");
   }
 
   async login(email: string, password: string) {
@@ -73,7 +73,7 @@ export class LoginViewE2e {
   }
 
   async getEmailErrorText(): Promise<string> {
-    return (await this.loginEmailError.textContent())?.trim() ?? '';
+    return (await this.loginEmailError.textContent())?.trim() ?? "";
   }
 
   async isPasswordRequiredMissing(): Promise<boolean> {
@@ -85,7 +85,11 @@ export class LoginViewE2e {
   }
 
   async getPasswordErrorText(): Promise<string> {
-    return (await this.loginPasswordError.textContent())?.trim() ?? '';
+    return (await this.loginPasswordError.textContent())?.trim() ?? "";
+  }
+
+  async isEmailInputVisible(): Promise<boolean> {
+    return this.loginEmailInput.isVisible();
   }
 
   async isSubmitDisabled(): Promise<boolean> {
