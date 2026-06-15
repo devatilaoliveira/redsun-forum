@@ -77,11 +77,32 @@
               "extractLicenses": false,
               "sourceMap": true
             },
-            "local-production": {
+            "local": {
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.local.ts"
+                }
+              ],
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "700kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "stage": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.stage.ts"
                 }
               ],
               "budgets": [
@@ -113,8 +134,11 @@
             "development": {
               "buildTarget": "redsun-web:build:development"
             },
-            "local-production": {
-              "buildTarget": "redsun-web:build:local-production"
+            "local": {
+              "buildTarget": "redsun-web:build:local"
+            },
+            "stage": {
+              "buildTarget": "redsun-web:build:stage"
             }
           },
           "defaultConfiguration": "development"
