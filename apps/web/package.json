@@ -6,9 +6,11 @@
     "start": "ng serve --port 4200",
     "prebuild": "node scripts/write-env.js",
     "build": "ng build",
-    "build:local": "ng build --configuration local-production",
+    "build:local": "ng build --configuration local",
+    "build:stage": "ng build --configuration stage",
     "build:prod": "ng build --configuration prod",
-    "start:local": "ng serve --configuration local-production --port 4200",
+    "start:local": "ng serve --configuration local --port 4200",
+    "start:stage": "ng serve --configuration stage --port 4200",
     "start:prod": "ng serve --configuration prod --port 4200",
     "watch": "ng build --watch --configuration development",
     "lint": "ng lint",
@@ -16,18 +18,6 @@
     "rsAgents": "powershell -ExecutionPolicy Bypass -File ../../scripts/rsAgents.ps1 -App web",
     "e2e": "npx playwright test",
     "e2e:ui": "npx playwright test --ui"
-  },
-  "prettier": {
-    "printWidth": 100,
-    "singleQuote": true,
-    "overrides": [
-      {
-        "files": "*.html",
-        "options": {
-          "parser": "angular"
-        }
-      }
-    ]
   },
   "private": true,
   "dependencies": {

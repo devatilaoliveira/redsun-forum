@@ -147,10 +147,16 @@ public class PostService {
     Post post = postRepository.findById(postId)
       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
 
-    User author = post.getAuthor();
-    if (author == null || !requester.getId().equals(author.getId())) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the owner of this post");
+    UUID locationId = post.getLocationId();
+    if (locationId == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Location not found");
     }
+
+    Location location = locationRepository.findById(locationId)
+      .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Location not found"));
+
+    Tale tale = loadTaleForLocation(location);
+    ensureCanModeratePost(post, tale, requester, "You are not allowed to delete this post");
 
     postRepository.delete(post);
   }
@@ -169,14 +175,17 @@ public class PostService {
       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Location not found"));
 
     Tale tale = loadTaleForLocation(location);
+    ensureCanModeratePost(post, tale, requester, "You are not allowed to update this post");
 
+    post.setStatus(EPostStatus.INACTIVE);
+  }
+
+  private void ensureCanModeratePost(Post post, Tale tale, User requester, String errorMessage) {
     boolean isPostOwner = post.getAuthor() != null && requester.getId().equals(post.getAuthor().getId());
     boolean isTaleOwner = tale.getOwnerId() != null && tale.getOwnerId().equals(requester.getId());
     if (!isPostOwner && !isTaleOwner) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to update this post");
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
     }
-
-    post.setStatus(EPostStatus.INACTIVE);
   }
 
   private Tale loadTaleForLocation(Location location) {

@@ -1,4 +1,4 @@
-import { Locator, Page, Request } from '@playwright/test';
+import { Locator, Page, Request } from "@playwright/test";
 
 export class LegalAcceptanceViewE2e {
   private acceptedTermsInput: Locator;
@@ -6,9 +6,9 @@ export class LegalAcceptanceViewE2e {
   private submitBtn: Locator;
 
   constructor(private readonly page: Page) {
-    this.acceptedTermsInput = page.getByTestId('legal-acceptance-terms');
-    this.acknowledgedPrivacyInput = page.getByTestId('legal-acceptance-privacy');
-    this.submitBtn = page.getByTestId('legal-acceptance-submit');
+    this.acceptedTermsInput = page.getByTestId("legal-acceptance-terms");
+    this.acknowledgedPrivacyInput = page.getByTestId("legal-acceptance-privacy");
+    this.submitBtn = page.getByTestId("legal-acceptance-submit");
   }
 
   async acceptTerms() {
@@ -38,7 +38,7 @@ export class LegalAcceptanceViewE2e {
   async waitForLegalAcknowledgementRequest(): Promise<Request> {
     return this.page.waitForRequest((request) => {
       const url = new URL(request.url());
-      return request.method() === 'POST' && url.pathname.endsWith('/user/me/legal-acknowledgement');
+      return request.method() === "POST" && url.pathname.endsWith("/user/me/legal-acknowledgement");
     });
   }
 }

@@ -7,7 +7,6 @@ jobs:
   maven-test:
     name: Maven test
     runs-on: ubuntu-latest
-    environment: stage
 
     defaults:
       run:
@@ -24,18 +23,31 @@ jobs:
           java-version: "21"
           cache: maven
 
+      - name: Set up Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+        working-directory: .
+
       - name: Make Maven wrapper executable
         run: chmod +x mvnw
 
+      - name: Start local Supabase
+        run: supabase start
+        working-directory: .
+
+      - name: Prepare local API environment
+        shell: pwsh
+        run: ./scripts/prepare-local-api-env.ps1 -OutputFile .env.local.ci
+
+      - name: Reset local Supabase database
+        shell: pwsh
+        run: ./scripts/reset-local-supabase.ps1 -EnvFile .env.local.ci -OverrideEnv
+
       - name: Run tests
-        env:
-          SPRING_DATASOURCE_URL: ${{ secrets.SPRING_DATASOURCE_URL }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
-          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
-          SUPABASE_STORAGE_URL: ${{ vars.SUPABASE_STORAGE_URL }}
-          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
-          BREVO_SENDER_EMAIL: ${{ vars.BREVO_SENDER_EMAIL }}
-          BREVO_SENDER_NAME: ${{ vars.BREVO_SENDER_EMAIL }}
         run: ./mvnw -B -ntp test

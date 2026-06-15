@@ -22,7 +22,7 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
 
       return next(requestToSend).pipe(
         catchError((error: HttpErrorResponse): Observable<never> => {
-          if (error.status === 401 || error.status === 403) {
+          if (error.status === 401) {
             if (req.url.includes("/authentication/")) {
               return throwError(() => error);
             }

@@ -15,6 +15,7 @@ import {InterpolatableTranslation, provideTranslateService, TranslateService} fr
 import {provideTranslateHttpLoader} from "@ngx-translate/http-loader";
 import {TitleI18nHandler} from "../infra/miscellaneous/title-I18n.handler";
 import {authInterceptor} from "../infra/interceptor/auth.interceptor";
+import {apiErrorInterceptor} from "../infra/interceptor/api-error.interceptor";
 import {ELanguage} from "../interface/enums/ELanguage";
 import {UTIL_CONSTANTS} from "../interface/constants/util.constants";
 import {ILocalStoreService, LocalStoreService} from "../services/local-store.service";
@@ -26,7 +27,7 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes),
     provideHttpClient(
-      withInterceptors([authInterceptor])
+      withInterceptors([authInterceptor, apiErrorInterceptor])
     ),
     {
       provide: ErrorHandler,

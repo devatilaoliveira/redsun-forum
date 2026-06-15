@@ -40,7 +40,8 @@ libpeerconnection.log
 !.env*.template
 !**/.env.template
 !**/.env*.template
-apps/web/src/environments/environment.local.ts
+!apps/api/.env.local
+apps/web/src/environments/environment.stage.ts
 apps/web/src/environments/environment.prod.ts
 apps/web/e2e/.env.e2e.local
 

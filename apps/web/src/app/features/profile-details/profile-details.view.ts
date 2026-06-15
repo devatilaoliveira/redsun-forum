@@ -310,7 +310,7 @@ export class ProfileDetailsView {
   }
 
   protected navigateToChangePassword(): void {
-    void this._router.navigate(["/", ROUTE_PATHS.changePassword]);
+    void this._router.navigateByUrl(`/${ROUTE_PATHS.changePassword}`);
   }
 
   protected confirmDeleteAccount(): void {
