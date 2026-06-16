@@ -5,11 +5,12 @@ import {RsBox} from "../../fragments/rsBox/rs.box";
 import {LocationDetailsDTO} from "../../../../interface/dtos/location/LocationDetailsDTO";
 import {RsAvatar} from "../../fragments/rsAvatar/rs.avatar";
 import {RsImg} from "../../fragments/rsImg/rs.img";
+import {RsExpandableText} from "../../fragments/rsExpandableText/rs.expandable-text";
 
 @Component({
   selector: "rs-local-details-card",
   standalone: true,
-  imports: [DatePipe, TranslatePipe, RsBox, RsAvatar, RsImg],
+  imports: [DatePipe, TranslatePipe, RsBox, RsAvatar, RsImg, RsExpandableText],
   templateUrl: "./local-details-card.component.html",
   styleUrl: "./local-details-card.component.scss"
 })
