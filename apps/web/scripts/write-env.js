@@ -9,6 +9,11 @@ const env = {
     process.env.SUPABASE_PUBLISHABLE_KEY || '__SUPABASE_PUBLISHABLE_KEY__',
 };
 
+env.baseUrl = env.BASE_URL;
+env.apiBaseUrl = env.API_BASE_URL;
+env.supabaseUrl = env.SUPABASE_URL;
+env.supabasePublishableKey = env.SUPABASE_PUBLISHABLE_KEY;
+
 const serializedEnv = JSON.stringify(env, null, 2)
   .split('\n')
   .map((line, index) => (index === 0 ? line : `  ${line}`))

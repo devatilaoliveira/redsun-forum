@@ -2,10 +2,6 @@ name: API CI
 
 on:
   workflow_dispatch:
-  pull_request:
-  push:
-    branches:
-      - main
 
 jobs:
   maven-test:
