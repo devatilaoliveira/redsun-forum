@@ -3,8 +3,7 @@ param(
   [string]$OutputFile = ".env.local.ci",
   [string]$GitHubEnvFile = $env:GITHUB_ENV,
   [string]$SupabaseStatusFile = "supabase-status.env",
-  [string]$SupabaseWorkdir,
-  [string]$AppTestCleanupToken = "ci-test-cleanup-token"
+  [string]$SupabaseWorkdir
 )
 
 function Get-LocalSupabaseServiceRoleKey {
@@ -90,7 +89,6 @@ $envValues = [ordered]@{
   BREVO_API_KEY = "ci-placeholder"
   BREVO_SENDER_EMAIL = "ci-placeholder@redsun.invalid"
   BREVO_SENDER_NAME = "RedSun_CI"
-  APP_TEST_CLEANUP_TOKEN = $AppTestCleanupToken
 }
 
 Write-EnvFile -Path $OutputFile -Values $envValues

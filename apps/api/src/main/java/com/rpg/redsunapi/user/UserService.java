@@ -32,9 +32,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -475,34 +473,6 @@ public class UserService {
     return users;
   }
 
-  @Transactional
-  public DeleteUsersByEmailResult deleteUsersByEmails(List<String> emails) {
-    Set<String> normalizedEmails = new LinkedHashSet<>();
-    for (String email : emails) {
-      String normalizedEmail = GeneralUtil.normalizeEmail(email);
-      if (normalizedEmail.isBlank()) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Emails must not be blank");
-      }
-      normalizedEmails.add(normalizedEmail);
-    }
-
-    List<String> deleted = new ArrayList<>();
-    List<String> notFound = new ArrayList<>();
-
-    for (String email : normalizedEmails) {
-      User user = userRepository.findByEmail(email).orElse(null);
-      if (user == null) {
-        notFound.add(email);
-        continue;
-      }
-
-      deleteMe(user.getId());
-      deleted.add(email);
-    }
-
-    return new DeleteUsersByEmailResult(deleted, notFound);
-  }
-
   private static String buildDeletedUsername(UUID userId) {
     String compact = userId.toString().replace("-", "");
     String suffix = compact.length() > 12 ? compact.substring(0, 12) : compact;
@@ -564,8 +534,5 @@ public class UserService {
     if (user.isDeleted()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
     }
-  }
-
-  public record DeleteUsersByEmailResult(List<String> deleted, List<String> notFound) {
   }
 }

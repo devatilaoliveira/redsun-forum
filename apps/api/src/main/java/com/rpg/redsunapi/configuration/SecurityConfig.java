@@ -20,13 +20,9 @@ import jakarta.servlet.http.HttpServletResponse;
 public class SecurityConfig {
 
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
-  private final TestCleanupTokenFilter testCleanupTokenFilter;
 
-  public SecurityConfig(
-      JwtAuthenticationFilter jwtAuthenticationFilter,
-      TestCleanupTokenFilter testCleanupTokenFilter) {
+  public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
     this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-    this.testCleanupTokenFilter = testCleanupTokenFilter;
   }
 
   @Bean
@@ -44,13 +40,11 @@ public class SecurityConfig {
         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
         .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**").permitAll()
         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-        .requestMatchers("/test/**").permitAll()
         .requestMatchers(HttpMethod.GET, "/legal/documents/current").permitAll()
         .requestMatchers(HttpMethod.POST, "/authentication/session-established").authenticated()
         .requestMatchers("/user/**", "/tales/**").authenticated()
         .anyRequest().authenticated()
       )
-      .addFilterBefore(testCleanupTokenFilter, UsernamePasswordAuthenticationFilter.class)
       .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
