@@ -26,7 +26,10 @@
           }
         </p>
       </div>
-      <p>{{ location().description || ('NO_DESCRIPTION' | translate) }}</p>
+      <rs-expandable-text
+        [text]="location().description || ('NO_DESCRIPTION' | translate)"
+        [maxLines]="6"
+      />
     </div>
   </div>
 </rs-box>
