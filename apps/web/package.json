@@ -21,12 +21,12 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/common": "^20.3.0",
-    "@angular/compiler": "^20.3.0",
-    "@angular/core": "^20.3.0",
-    "@angular/forms": "^20.3.0",
-    "@angular/platform-browser": "^20.3.0",
-    "@angular/router": "^20.3.0",
+    "@angular/common": "^22.0.1",
+    "@angular/compiler": "^22.0.1",
+    "@angular/core": "^22.0.1",
+    "@angular/forms": "^22.0.1",
+    "@angular/platform-browser": "^22.0.1",
+    "@angular/router": "^22.0.1",
     "@ngx-translate/core": "^17.0.0",
     "@ngx-translate/http-loader": "^17.0.0",
     "@supabase/supabase-js": "^2.80.0",
@@ -36,15 +36,15 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@angular/build": "^20.3.6",
-    "@angular/cli": "^20.3.6",
-    "@angular/compiler-cli": "^20.3.0",
+    "@angular/build": "^22.0.1",
+    "@angular/cli": "^22.0.1",
+    "@angular/compiler-cli": "^22.0.1",
     "@playwright/test": "^1.58.2",
     "@types/node": "^25.5.0",
-    "angular-eslint": "20.6.0",
+    "angular-eslint": "^22.0.0",
     "baseline-browser-mapping": "^2.9.11",
     "eslint": "^9.39.0",
-    "typescript": "~5.9.2",
-    "typescript-eslint": "8.46.3"
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.61.1"
   }
 }
