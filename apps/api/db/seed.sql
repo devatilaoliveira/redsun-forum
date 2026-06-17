@@ -146,9 +146,9 @@ VALUES
     'EMAIL',
     'Seeded local worker user 1.',
     '2026-01-01T00:00:00Z',
-    'seed',
+    '1.0',
     '2026-01-01T00:00:00Z',
-    'seed'
+    '1.0'
   ),
   (
     '00000000-0000-0000-0000-000000000102',
@@ -157,9 +157,9 @@ VALUES
     'EMAIL',
     'Seeded local worker user 2.',
     '2026-01-01T00:00:00Z',
-    'seed',
+    '1.0',
     '2026-01-01T00:00:00Z',
-    'seed'
+    '1.0'
   ),
   (
     '00000000-0000-0000-0000-000000000103',
@@ -168,9 +168,9 @@ VALUES
     'EMAIL',
     'Seeded local worker user 3.',
     '2026-01-01T00:00:00Z',
-    'seed',
+    '1.0',
     '2026-01-01T00:00:00Z',
-    'seed'
+    '1.0'
   )
 ON CONFLICT (id) DO NOTHING;
 
