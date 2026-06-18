@@ -25,8 +25,19 @@
               (pressed)="onShowDiceInput()"
             />
           </rs-tooltip>
+          @if (isRedsunTale()) {
+            <rs-tooltip [text]="'SHOW_REDSUN_DICE_INPUT' | translate" align="end">
+              <rs-round-icon-button
+                class="redsun-dice-toggle"
+                [iconSrc]="'/assets/svgs/rs-white.svg'"
+                [ariaLabel]="'SHOW_REDSUN_DICE_INPUT' | translate"
+                [disabled]="postInProgress()"
+                (pressed)="onShowRedsunDiceInput()"
+              />
+            </rs-tooltip>
+          }
         </div>
-        @if (!showDiceInput()) {
+        @if (postInputMode() === "post") {
           <div class="input-row">
             <rs-avatar
               [src]="currentTaleParticipant()?.characterImageUrl || ''"
@@ -44,20 +55,26 @@
               />
             </div>
           </div>
-        } @else {
+        } @else if (showDiceInput()) {
           <div class="dice-row">
             <rs-dice-input
-              [label]="'DICE_BUILD_PROMPT' | translate"
               [disabled]="postInProgress()"
               (valueChanged)="onDiceValueChange($event)"
             ></rs-dice-input>
+          </div>
+        } @else {
+          <div class="dice-row">
+            <rs-redsun-dice-input
+              [disabled]="postInProgress()"
+              (valueChanged)="onRedsunDiceValueChange($event)"
+            ></rs-redsun-dice-input>
           </div>
         }
 
         <div class="post-actions">
           <rs-button
             [inProgress]="postInProgress()"
-            [disabled]="postInProgress() || (showDiceInput() ? !hasDiceCount() : postFormGroup.invalid || postControls.content.value.trim().length === 0)"
+            [disabled]="postInProgress() || !canSubmitCurrentInput()"
             (pressed)="onSubmitPost(location.id)"
           >
             {{ 'POST_SUBMIT' | translate }}

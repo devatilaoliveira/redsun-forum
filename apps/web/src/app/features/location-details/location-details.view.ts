@@ -22,6 +22,7 @@ import {MeResponseDTO} from "../../../interface/dtos/user/MeResponseDTO";
 import {RsAvatar} from "../../shared/fragments/rsAvatar/rs.avatar";
 import {UTIL_CONSTANTS} from "../../../interface/constants/util.constants";
 import {RsDiceInput, RsDiceListValue} from "../../shared/fragments/rsDiceInput/rs.dice-input";
+import {RsRedsunDiceInput, RsRedsunDiceListValue} from "../../shared/fragments/rsRedsunDiceInput/rs.redsun-dice-input";
 import {RsRoundIconButton} from "../../shared/fragments/rsRoundIconButton/rs.round-icon-button";
 import {RsMoreOption} from "../../shared/fragments/rsMoreOptions/rs.more-options";
 import {RsDialogModalComponent} from "../../shared/ui/dialog-modal/dialog-modal.component";
@@ -30,10 +31,13 @@ import {ROUTE_PATHS} from "../../../interface/constants/route-path.constants";
 import {TaleParticipantProfileDTO} from "../../../interface/dtos/tale/TaleParticipantProfileDTO";
 import {TalesContextService} from "../../../stateServices/tales-context.service";
 import {RsTooltip} from "../../shared/fragments/rsTooltip/rs.tooltip";
+import {ERuleSystem} from "../../../interface/enums/ERuleSystem";
 
 type PostFormGroup = FormGroup<{
   content: FormControl<string>;
 }>;
+
+type PostInputMode = "post" | "dice" | "redsunDice";
 
 type LocationDetailsViewModel = LocationDetailsDTO & {
   posts: PostDTO[];
@@ -62,6 +66,7 @@ interface VisiblePostViewModel {
     LocalDetailsCardComponent,
     RsAvatar,
     RsDiceInput,
+    RsRedsunDiceInput,
     RsRoundIconButton,
     RsTooltip,
     RsDialogModalComponent,
@@ -73,6 +78,8 @@ interface VisiblePostViewModel {
 export class LocationDetailsView implements OnInit, OnDestroy {
   @ViewChild(RsDiceInput)
   private diceInput?: RsDiceInput;
+  @ViewChild(RsRedsunDiceInput)
+  private redsunDiceInput?: RsRedsunDiceInput;
   private readonly loadMoreObserver: IntersectionObserver | null = typeof IntersectionObserver === "undefined"
     ? null
     : new IntersectionObserver(
@@ -104,7 +111,8 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   protected readonly isLoadingMore: WritableSignal<boolean> = signal(false);
   protected readonly locationDetails: WritableSignal<LocationDetailsViewModel | null> = signal(null);
   protected readonly diceValues: WritableSignal<RsDiceListValue> = signal<RsDiceListValue>([]);
-  protected readonly showDiceInput: WritableSignal<boolean> = signal<boolean>(false);
+  protected readonly redsunDiceValues: WritableSignal<RsRedsunDiceListValue> = signal<RsRedsunDiceListValue>([]);
+  protected readonly postInputMode: WritableSignal<PostInputMode> = signal<PostInputMode>("post");
   protected readonly totalPosts: WritableSignal<number | null> = signal<number | null>(null);
   protected readonly nextPage: WritableSignal<number> = signal(0);
   protected readonly isCurrentUserTaleOwner: Signal<boolean> = computed(() => {
@@ -115,6 +123,26 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   protected readonly hasDiceCount: Signal<boolean> = computed(() => (
     this.diceValues().some((value) => value.diceCount > 0)
   ));
+  protected readonly hasRedsunDiceRoll: Signal<boolean> = computed(() => (
+    this.redsunDiceValues().some((value) => value.diceCount > 0 && value.difficulty > 0)
+  ));
+  protected readonly isRedsunTale: Signal<boolean> = computed(() => (
+    this._talesContext.tale()?.rules === ERuleSystem.REDSUN
+  ));
+  protected readonly showDiceInput: Signal<boolean> = computed(() => this.postInputMode() === "dice");
+  protected readonly showRedsunDiceInput: Signal<boolean> = computed(() => this.postInputMode() === "redsunDice");
+  protected readonly isDiceInputMode: Signal<boolean> = computed(() => this.postInputMode() !== "post");
+  protected readonly canSubmitCurrentInput: Signal<boolean> = computed(() => {
+    switch (this.postInputMode()) {
+    case "dice":
+      return this.hasDiceCount();
+    case "redsunDice":
+      return this.hasRedsunDiceRoll();
+    case "post":
+    default:
+      return this.postFormGroup.valid && this.postControls.content.value.trim().length > 0;
+    }
+  });
   private readonly visiblePosts: Signal<PostDTO[]> = computed(() => {
     const location = this.locationDetails();
     if (!location) return [];
@@ -203,14 +231,22 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   }
 
   protected onShowPostInput(): void {
-    if (!this.showDiceInput()) return;
-    this.showDiceInput.set(false);
-    this.resetDiceInput();
+    if (this.postInputMode() === "post") return;
+    this.postInputMode.set("post");
+    this.resetDiceInputs();
   }
 
   protected onShowDiceInput(): void {
-    if (this.showDiceInput()) return;
-    this.showDiceInput.set(true);
+    if (this.postInputMode() === "dice") return;
+    this.postInputMode.set("dice");
+    this.resetRedsunDiceInput();
+    this.resetPostContent();
+  }
+
+  protected onShowRedsunDiceInput(): void {
+    if (!this.isRedsunTale() || this.postInputMode() === "redsunDice") return;
+    this.postInputMode.set("redsunDice");
+    this.resetDiceInput();
     this.resetPostContent();
   }
 
@@ -219,6 +255,12 @@ export class LocationDetailsView implements OnInit, OnDestroy {
 
     if (this.showDiceInput() && this.hasDiceCount()) {
       const diceContent: string = this.diceInput?.buildPostContent(this.diceValues()) ?? "";
+      this.postControls.content.setValue(diceContent);
+      this.postControls.content.markAsDirty();
+    }
+
+    if (this.showRedsunDiceInput() && this.hasRedsunDiceRoll()) {
+      const diceContent: string = this.redsunDiceInput?.buildPostContent(this.redsunDiceValues()) ?? "";
       this.postControls.content.setValue(diceContent);
       this.postControls.content.markAsDirty();
     }
@@ -238,9 +280,10 @@ export class LocationDetailsView implements OnInit, OnDestroy {
       finalize(() => {
         this.postInProgress.set(false);
         this.postFormGroup.reset({content: ""});
-        if (this.showDiceInput()) {
-          this.resetDiceInput();
+        if (this.isDiceInputMode()) {
+          this.resetDiceInputs();
           this.diceInput?.resetFields();
+          this.redsunDiceInput?.resetFields();
         }
       })
     ).subscribe({
@@ -259,6 +302,10 @@ export class LocationDetailsView implements OnInit, OnDestroy {
 
   protected onDiceValueChange(values: RsDiceListValue): void {
     this.diceValues.set(values);
+  }
+
+  protected onRedsunDiceValueChange(values: RsRedsunDiceListValue): void {
+    this.redsunDiceValues.set(values);
   }
 
   private canDeactivatePost(post: PostDTO): boolean {
@@ -459,6 +506,15 @@ export class LocationDetailsView implements OnInit, OnDestroy {
 
   private resetDiceInput(): void {
     this.diceValues.set([]);
+  }
+
+  private resetRedsunDiceInput(): void {
+    this.redsunDiceValues.set([]);
+  }
+
+  private resetDiceInputs(): void {
+    this.resetDiceInput();
+    this.resetRedsunDiceInput();
   }
 
   private canDeactivatePostForUser(post: PostDTO, currentUserId: string | null, isTaleOwner: boolean): boolean {

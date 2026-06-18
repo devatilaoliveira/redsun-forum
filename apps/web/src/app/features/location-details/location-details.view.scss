@@ -42,6 +42,10 @@ $min-content: bp.$bp-sm;
       justify-content: flex-end;
       align-items: center;
       gap: var(--space-0-5, 1rem);
+
+      .redsun-dice-toggle {
+        --rs-icon-color: var(--color-white);
+      }
     }
 
     .input-row {

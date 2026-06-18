@@ -124,7 +124,6 @@ export class RsDiceInput {
   private readonly _translate: TranslateService = inject(TranslateService);
   private nextEntryId: number = 0;
 
-  public readonly label: InputSignal<string | null> = input<string | null>(null);
   public readonly value: InputSignal<RsDiceListValue | null> = input<RsDiceListValue | null>(null);
   public readonly disabled: InputSignal<boolean> = input<boolean>(false);
   public readonly id: InputSignal<string | null> = input<string | null>(null);
@@ -134,12 +133,6 @@ export class RsDiceInput {
   protected readonly entries: WritableSignal<DiceEntry[]> = signal<DiceEntry[]>([]);
   protected readonly baseId: Signal<string> = computed<string>(() => this.id() ?? this.uniqueId);
   protected readonly diceOptions = DICE_OPTIONS;
-  protected readonly actionPlaceholderKeys: readonly string[] = [
-    "DICE_ACTION_PLACEHOLDER_1",
-    "DICE_ACTION_PLACEHOLDER_2",
-    "DICE_ACTION_PLACEHOLDER_3",
-    "DICE_ACTION_PLACEHOLDER_4"
-  ];
 
   constructor() {
     effect(() => {
@@ -239,16 +232,6 @@ export class RsDiceInput {
   protected diceCountValue(entry: DiceEntry): string {
     if (entry.value.diceCount <= 0) return "";
     return `${entry.value.diceCount}`;
-  }
-
-  protected firstActionId(): string {
-    const first: DiceEntry | undefined = this.entries()[0];
-    return first ? this.actionId(first) : `${this.baseId()}-action`;
-  }
-
-  protected actionPlaceholderKey(index: number): string {
-    if (index < 0) return "DICE_ACTION_PLACEHOLDER_1";
-    return this.actionPlaceholderKeys[index] ?? this.actionPlaceholderKeys[this.actionPlaceholderKeys.length - 1];
   }
 
   private setEntries(entries: DiceEntry[]): void {
