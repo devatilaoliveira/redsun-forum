@@ -191,13 +191,13 @@ export const routes: Routes = [
               },
               {
                 path: `${ROUTE_PATHS.locations}/${ROUTE_PATHS.creation}`,
-                loadComponent: () => import("./features/location-creation/location-creation.view").then((module) => module.LocationCreationView),
+                loadComponent: () => import("./features/location-form/location-form.view").then((module) => module.LocationFormView),
                 canActivate: [TaleParticipantGuard],
                 title: "CREATE_LOCATION"
               },
               {
                 path: `${ROUTE_PATHS.locations}/:${ROUTE_PATHS.locationId}/${ROUTE_PATHS.edit}`,
-                loadComponent: () => import("./features/location-creation/location-creation.view").then((module) => module.LocationCreationView),
+                loadComponent: () => import("./features/location-form/location-form.view").then((module) => module.LocationFormView),
                 canActivate: [TaleParticipantGuard],
                 title: "EDIT_LOCATION"
               },

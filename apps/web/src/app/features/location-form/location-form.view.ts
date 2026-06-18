@@ -28,7 +28,7 @@ type CreateLocationFormGroup = FormGroup<{
 }>;
 
 @Component({
-  selector: "rs-location-creation",
+  selector: "rs-location-form",
   standalone: true,
   imports: [
     TranslatePipe,
@@ -41,10 +41,10 @@ type CreateLocationFormGroup = FormGroup<{
     RsImageCropDialogComponent,
     RsSpinner
   ],
-  templateUrl: "./location-creation.view.html",
-  styleUrl: "./location-creation.view.scss"
+  templateUrl: "./location-form.view.html",
+  styleUrl: "./location-form.view.scss"
 })
-export class LocationCreationView implements OnInit, OnDestroy {
+export class LocationFormView implements OnInit, OnDestroy {
   private readonly _fb: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly _route: ActivatedRoute = inject(ActivatedRoute);
   private readonly _locationService: ILocationService = inject(LocationService);

@@ -138,6 +138,7 @@ CREATE TABLE public.basic_sheets (
   character_name varchar(120),
   character_description varchar(4000),
   character_image_url varchar(500),
+  change_history text,
   CONSTRAINT uk_basic_sheets_tale_character UNIQUE (tale_id, character_id)
 );
 CREATE INDEX idx_basic_sheets_tale ON public.basic_sheets(tale_id);

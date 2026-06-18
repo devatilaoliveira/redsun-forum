@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -119,6 +120,7 @@ public class CharacterSheetService {
     }
 
     CharacterSheet sheet = handler.getOrCreateSheet(tale, characterSheetId);
+    CharacterSheetChangeHistory.Snapshot beforeChanges = CharacterSheetChangeHistory.snapshot(sheet);
     @Nullable String oldAvatarUrl = sheet.getCharacterImageUrl();
     @Nullable String newAvatarUrl = null;
     boolean hasAvatarUpload = avatarFile != null && !avatarFile.isEmpty();
@@ -132,6 +134,13 @@ public class CharacterSheetService {
 
       updater.apply(sheet);
       sheet.setCharacterImageUrl(effectiveCharacterImageUrl);
+      CharacterSheetChangeHistory.appendChanges(
+        sheet,
+        beforeChanges,
+        CharacterSheetChangeHistory.snapshot(sheet),
+        requester,
+        Instant.now()
+      );
       handler.save(sheet);
 
       if (hasAvatarUpload && oldAvatarUrl != null && !oldAvatarUrl.isBlank() && !Objects.equals(oldAvatarUrl, newAvatarUrl)) {
