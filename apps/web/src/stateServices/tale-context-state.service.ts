@@ -9,24 +9,25 @@ export class TaleContextStateService {
   private readonly _localStore: LocalStoreService = inject(LocalStoreService);
   private readonly _taleId: WritableSignal<string | null> = signal<string | null>(null);
   private readonly _tale: WritableSignal<TaleDetailDTO | null> = signal<TaleDetailDTO | null>(null);
-  private readonly _role: WritableSignal<TaleAccessRole> = signal<TaleAccessRole>(TaleAccessRole.None);
   private readonly _isLoading: WritableSignal<boolean> = signal<boolean>(false);
 
   public readonly taleId: Signal<string | null> = this._taleId.asReadonly();
   public readonly tale: Signal<TaleDetailDTO | null> = this._tale.asReadonly();
-  public readonly role: Signal<TaleAccessRole> = this._role.asReadonly();
+  public readonly role: Signal<TaleAccessRole> = computed(() =>
+    this.resolveRole(this._tale(), this._localStore.user()?.id)
+  );
   public readonly isLoading: Signal<boolean> = this._isLoading.asReadonly();
   public readonly participants: Signal<TaleParticipantProfileDTO[]> = computed(() => this._tale()?.participants ?? []);
   public readonly owner: Signal<TaleParticipantProfileDTO | null> = computed(() => this._tale()?.author ?? null);
-  public readonly canManage: Signal<boolean> = computed(() => this._role() === TaleAccessRole.Owner);
-  public readonly canPlay: Signal<boolean> = computed(() => (
-    this._role() === TaleAccessRole.Owner || this._role() === TaleAccessRole.Participant
-  ));
+  public readonly canManage: Signal<boolean> = computed(() => this.role() === TaleAccessRole.Owner);
+  public readonly canPlay: Signal<boolean> = computed(() => {
+    const role: TaleAccessRole = this.role();
+    return role === TaleAccessRole.Owner || role === TaleAccessRole.Participant;
+  });
 
   public startLoading(taleId: string | null): void {
     this._taleId.set(taleId);
     this._tale.set(null);
-    this._role.set(TaleAccessRole.None);
     this._isLoading.set(!!taleId);
   }
 
@@ -37,20 +38,17 @@ export class TaleContextStateService {
   public setTale(tale: TaleDetailDTO): void {
     this._tale.set(tale);
     this._taleId.set(tale.id);
-    this._role.set(this.resolveRole(tale));
   }
 
   public clear(): void {
     this._taleId.set(null);
     this._tale.set(null);
-    this._role.set(TaleAccessRole.None);
     this._isLoading.set(false);
   }
 
   public clearTale(taleId: string | null = this._taleId()): void {
     this._taleId.set(taleId);
     this._tale.set(null);
-    this._role.set(TaleAccessRole.None);
     this._isLoading.set(false);
   }
 
@@ -62,8 +60,7 @@ export class TaleContextStateService {
     this.clear();
   }
 
-  private resolveRole(tale: TaleDetailDTO | null): TaleAccessRole {
-    const userId: string | undefined = this._localStore.user()?.id;
+  private resolveRole(tale: TaleDetailDTO | null, userId: string | undefined): TaleAccessRole {
     if (!tale || !userId) {
       return TaleAccessRole.None;
     }

@@ -15,6 +15,7 @@ import {ISupabaseAuthClient, SupabaseAuthClientAdapter} from "./supabase-auth-cl
 import {IUserProfileService, UserProfileService} from "./user-profile.service";
 import {MeResponseDTO} from "../interface/dtos/user/MeResponseDTO";
 import {UtilFunctions} from "../infra/miscellaneous/util.functions";
+import {TaleContextStateService} from "../stateServices/tale-context-state.service";
 
 export interface IAuthService {
   loginWithProvider(provider: ELoginProvider): Promise<void>;
@@ -37,6 +38,7 @@ export class AuthService implements IAuthService {
   private readonly _userProfileService: IUserProfileService = inject(UserProfileService);
   private readonly _printer: IPrinter = inject(Printer);
   private readonly _oauthPopupHandler: IOAuthPopupHandler = inject(OAuthPopupHandler);
+  private readonly _taleContextState: TaleContextStateService = inject(TaleContextStateService);
 
   public async loginWithProvider(provider: ELoginProvider): Promise<void> {
     const options: IOAuthOptions = this._getOAuthOptions(provider);
@@ -79,6 +81,7 @@ export class AuthService implements IAuthService {
     this._oauthPopupHandler.reset();
     this._authSessionService.clearCachedSession();
     this._localStoreService.removeUser();
+    this._taleContextState.clear();
 
     try {
       await this._supabaseAuthClient.signOut();
