@@ -38,7 +38,7 @@ public record RedSunSheetUpsertDTO(
   @Nullable Integer legerdemain,
   @Nullable Integer survival,
   @Nullable Integer stealth,
-  @Nullable Integer athletics,
+  @Nullable Integer etiquette,
   @Nullable Integer performance,
   @Nullable Integer history,
   @Nullable Integer religion,

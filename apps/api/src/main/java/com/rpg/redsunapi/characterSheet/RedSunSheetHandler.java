@@ -119,7 +119,7 @@ public class RedSunSheetHandler implements RuleCharacterSheetHandler {
     sheet.legerdemain = rank(dto.legerdemain());
     sheet.survival = rank(dto.survival());
     sheet.stealth = rank(dto.stealth());
-    sheet.athletics = rank(dto.athletics());
+    sheet.etiquette = rank(dto.etiquette());
     sheet.performance = rank(dto.performance());
     sheet.history = rank(dto.history());
     sheet.religion = rank(dto.religion());

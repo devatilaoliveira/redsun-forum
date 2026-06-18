@@ -51,7 +51,7 @@ final class CharacterSheetChangeHistory {
       put(values, "Legerdemain", redSunSheet.legerdemain);
       put(values, "Survival", redSunSheet.survival);
       put(values, "Stealth", redSunSheet.stealth);
-      put(values, "Athletics", redSunSheet.athletics);
+      put(values, "Etiquette", redSunSheet.etiquette);
       put(values, "Performance", redSunSheet.performance);
       put(values, "History", redSunSheet.history);
       put(values, "Religion", redSunSheet.religion);

@@ -28,7 +28,7 @@ export interface RedSunSheetResponseDTO extends BasicSheetDTO {
   legerdemain: number;
   survival: number;
   stealth: number;
-  athletics: number;
+  etiquette: number;
   performance: number;
   history: number;
   religion: number;
