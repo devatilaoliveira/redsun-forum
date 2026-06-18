@@ -196,6 +196,12 @@ export const routes: Routes = [
                 title: "CREATE_LOCATION"
               },
               {
+                path: `${ROUTE_PATHS.locations}/:${ROUTE_PATHS.locationId}/${ROUTE_PATHS.edit}`,
+                loadComponent: () => import("./features/location-creation/location-creation.view").then((module) => module.LocationCreationView),
+                canActivate: [TaleParticipantGuard],
+                title: "EDIT_LOCATION"
+              },
+              {
                 path: `${ROUTE_PATHS.locations}/:${ROUTE_PATHS.locationId}`,
                 loadComponent: () => import("./features/location-details/location-details.view").then((module) => module.LocationDetailsView),
                 title: "LOCATION_NAME"

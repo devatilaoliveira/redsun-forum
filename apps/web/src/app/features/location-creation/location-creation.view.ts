@@ -1,4 +1,4 @@
-import {Component, inject, OnDestroy, signal, WritableSignal} from "@angular/core";
+import {Component, inject, OnDestroy, OnInit, signal, WritableSignal} from "@angular/core";
 import {ActivatedRoute, Router} from "@angular/router";
 import {ITranslateService, TranslatePipe, TranslateService} from "@ngx-translate/core";
 import {FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
@@ -12,11 +12,14 @@ import {ROUTE_PATHS} from "../../../interface/constants/route-path.constants";
 import {ILocationService, LocationService} from "../../../services/location.service";
 import {UTIL_CONSTANTS} from "../../../interface/constants/util.constants";
 import {LocationCreateRequestDTO} from "../../../interface/dtos/location/LocationCreateRequestDTO";
+import {LocationUpdateRequestDTO} from "../../../interface/dtos/location/LocationUpdateRequestDTO";
 import {ImageHandler} from "../../../infra/miscellaneous/image.handler";
 import {EVariant} from "../../../interface/enums/EVariant";
 import {IToastService, ToastService} from "../../../services/toast.service";
 import {TalesContextService} from "../../../stateServices/tales-context.service";
 import {RsImageCropDialogComponent} from "../../shared/ui/image-crop-dialog/image-crop-dialog.component";
+import {LocationDetailsDTO} from "../../../interface/dtos/location/LocationDetailsDTO";
+import {RsSpinner} from "../../shared/fragments/rsSpinner/rs.spinner";
 
 type CreateLocationFormGroup = FormGroup<{
   locationName: FormControl<string>;
@@ -35,12 +38,13 @@ type CreateLocationFormGroup = FormGroup<{
     RsButton,
     RsImagePreview,
     RsViewHeader,
-    RsImageCropDialogComponent
+    RsImageCropDialogComponent,
+    RsSpinner
   ],
   templateUrl: "./location-creation.view.html",
   styleUrl: "./location-creation.view.scss"
 })
-export class LocationCreationView implements OnDestroy {
+export class LocationCreationView implements OnInit, OnDestroy {
   private readonly _fb: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly _route: ActivatedRoute = inject(ActivatedRoute);
   private readonly _locationService: ILocationService = inject(LocationService);
@@ -49,6 +53,13 @@ export class LocationCreationView implements OnDestroy {
   private readonly _toastService: IToastService = inject(ToastService);
   private readonly _talesContext: TalesContextService = inject(TalesContextService);
   private imagePreviewUrl: string | null = null;
+  private locationId: string | null = null;
+  private taleId: string | null = null;
+  private initialState: {
+    locationName: string | null;
+    description: string | null;
+    imageUrl: string | null;
+  } | null = null;
 
   protected readonly UTIL_CONSTANTS = UTIL_CONSTANTS;
   protected readonly createNewLocationFormGroup: CreateLocationFormGroup = this._fb.group({
@@ -58,6 +69,9 @@ export class LocationCreationView implements OnDestroy {
   });
   protected readonly locationFormControls = this.createNewLocationFormGroup.controls;
   protected readonly inProgress: WritableSignal<boolean> = signal(false);
+  protected readonly isLoading: WritableSignal<boolean> = signal(false);
+  protected readonly isEditMode: WritableSignal<boolean> = signal(false);
+  protected readonly removeImage: WritableSignal<boolean> = signal(false);
   protected readonly imageCropOpen: WritableSignal<boolean> = signal<boolean>(false);
   protected readonly imageCropFile: WritableSignal<File | undefined> = signal<File | undefined>(undefined);
   protected readonly imageCropBlob: WritableSignal<Blob | null> = signal<Blob | null>(null);
@@ -65,6 +79,23 @@ export class LocationCreationView implements OnDestroy {
   protected readonly imagePreview: WritableSignal<string | null> = signal<string | null>(null);
 
   protected readonly locationNamePattern: RegExp = new RegExp(`^.{1,${UTIL_CONSTANTS.EXTRA_SHORT_TEXT_LENGTH}}$`);
+
+  public ngOnInit(): void {
+    this.taleId = this._route.snapshot.paramMap.get(ROUTE_PATHS.taleId);
+    this.locationId = this._route.snapshot.paramMap.get(ROUTE_PATHS.locationId);
+    this.isEditMode.set(!!this.locationId);
+
+    if (!this.locationId) {
+      return;
+    }
+
+    this.isLoading.set(true);
+    this._locationService.getLocationDetails(this.locationId).pipe(
+      finalize(() => this.isLoading.set(false))
+    ).subscribe({
+      next: (location) => this.applyLocationToForm(location),
+    });
+  }
 
   protected onNameChange(value: string): void {
     this.locationFormControls.locationName.setValue(value);
@@ -88,6 +119,7 @@ export class LocationCreationView implements OnDestroy {
   protected onImageCleared(): void {
     this.locationFormControls.image.setValue(null);
     this.locationFormControls.image.markAsDirty();
+    this.removeImage.set(this.isEditMode() && !!this.initialState?.imageUrl);
     this.setImagePreview(null);
   }
 
@@ -121,6 +153,7 @@ export class LocationCreationView implements OnDestroy {
       );
       this.locationFormControls.image.setValue(processed);
       this.locationFormControls.image.markAsDirty();
+      this.removeImage.set(false);
       this.setImagePreview(processed);
       this.resetImageCrop();
     } catch (err) {
@@ -132,15 +165,21 @@ export class LocationCreationView implements OnDestroy {
 
   protected onSubmit(): void {
     this.createNewLocationFormGroup.markAllAsTouched();
-    if (this.createNewLocationFormGroup.invalid || this.inProgress()) {
+    if (!this.canSubmit()) {
       return;
     }
-    const taleId = this._route.snapshot.paramMap.get(ROUTE_PATHS.taleId);
-    if (!taleId) {
+
+    if (this.isEditMode()) {
+      this.updateLocation();
+      return;
+    }
+
+    if (!this.taleId) {
       this.openToast(this._translateService.instant("LOCATION_CREATE_ERROR"));
       return;
     }
 
+    const taleId = this.taleId;
     this.inProgress.set(true);
     const payload: LocationCreateRequestDTO = {
       taleId,
@@ -174,6 +213,83 @@ export class LocationCreationView implements OnDestroy {
     }
   }
 
+  protected hasChanges(): boolean {
+    if (!this.isEditMode()) {
+      return true;
+    }
+    if (!this.initialState) {
+      return false;
+    }
+    if (this.locationFormControls.locationName.value !== this.initialState.locationName) {
+      return true;
+    }
+    if (this.locationFormControls.description.value !== this.initialState.description) {
+      return true;
+    }
+    if (this.locationFormControls.image.value) {
+      return true;
+    }
+    return this.removeImage();
+  }
+
+  protected canSubmit(): boolean {
+    if (this.createNewLocationFormGroup.invalid || this.inProgress() || this.isLoading()) {
+      return false;
+    }
+    return !this.isEditMode() || this.hasChanges();
+  }
+
+  private updateLocation(): void {
+    if (!this.locationId || !this.taleId) {
+      this.openToast(this._translateService.instant("LOCATION_UPDATE_ERROR"));
+      return;
+    }
+
+    const locationId = this.locationId;
+    const taleId = this.taleId;
+    this.inProgress.set(true);
+    const payload: LocationUpdateRequestDTO = {
+      locationName: this.locationFormControls.locationName.value,
+      description: this.locationFormControls.description.value,
+      image: this.locationFormControls.image.value,
+      removeImage: this.removeImage()
+    };
+
+    this._locationService.updateLocation(locationId, payload).pipe(
+      finalize(() => this.inProgress.set(false))
+    ).subscribe({
+      next: (response) => {
+        this._talesContext.refreshTale();
+        this.applyLocationToForm(response);
+        void this._router.navigate(
+          ["/", ROUTE_PATHS.tales, taleId, ROUTE_PATHS.locations, response.id],
+          {replaceUrl: true}
+        );
+      },
+      error: (err) => {
+        console.log("Error updating location:", err);
+        this.openToast(this._translateService.instant("LOCATION_UPDATE_ERROR"));
+      }
+    });
+  }
+
+  private applyLocationToForm(location: LocationDetailsDTO): void {
+    this.createNewLocationFormGroup.patchValue({
+      locationName: location.locationName,
+      description: location.description,
+      image: null
+    }, {emitEvent: false});
+    this.createNewLocationFormGroup.markAsPristine();
+    this.createNewLocationFormGroup.markAsUntouched();
+    this.initialState = {
+      locationName: location.locationName,
+      description: location.description,
+      imageUrl: location.imageUrl
+    };
+    this.removeImage.set(false);
+    this.setExistingImagePreview(location.imageUrl);
+  }
+
   private resetImageCrop(): void {
     this.imageCropOpen.set(false);
     this.imageCropFile.set(undefined);
@@ -191,6 +307,14 @@ export class LocationCreationView implements OnDestroy {
     }
     const url = URL.createObjectURL(file);
     this.imagePreviewUrl = url;
+    this.imagePreview.set(url);
+  }
+
+  private setExistingImagePreview(url: string | null): void {
+    if (this.imagePreviewUrl) {
+      URL.revokeObjectURL(this.imagePreviewUrl);
+      this.imagePreviewUrl = null;
+    }
     this.imagePreview.set(url);
   }
 

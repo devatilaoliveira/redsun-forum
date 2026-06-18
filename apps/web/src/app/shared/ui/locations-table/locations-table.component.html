@@ -32,8 +32,11 @@
           </div>
           <div class="actions-column">
             <rs-more-options
-              [options]="[{ text: ('DELETE_LOCATION' | translate), action: EAction.DELETE }]"
-              [disabled]="!canDeleteLocation(location)"
+              [options]="[
+                { text: ('EDIT_LOCATION' | translate), action: EAction.UPDATE },
+                { text: ('DELETE_LOCATION' | translate), action: EAction.DELETE }
+              ]"
+              [disabled]="!canModifyLocation(location)"
               (actionSelected)="onOptionSelected(location, index, $event)"
             ></rs-more-options>
           </div>
