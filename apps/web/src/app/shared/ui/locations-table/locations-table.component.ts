@@ -64,7 +64,13 @@ export class LocationsTableComponent {
       return false;
     }
 
-    const isTaleOwner = this._talesContext?.role() === TaleAccessRole.Owner;
+    const taleRole = this._talesContext?.role() ?? TaleAccessRole.None;
+    const isTaleOwner = taleRole === TaleAccessRole.Owner;
+    const isTaleParticipant = taleRole === TaleAccessRole.Participant;
+    if (!isTaleOwner && !isTaleParticipant) {
+      return false;
+    }
+
     return currentUser.id === location.authorId || isTaleOwner;
   }
 
@@ -116,6 +122,10 @@ export class LocationsTableComponent {
     const index = this.pendingDeleteIndex();
     if (!location?.id) return;
     if (index < 0) return;
+    if (!this.canModifyLocation(location)) {
+      this.closeDeleteConfirm();
+      return;
+    }
 
     this._locationService.deleteLocation(location.id).subscribe({
       next: () => {

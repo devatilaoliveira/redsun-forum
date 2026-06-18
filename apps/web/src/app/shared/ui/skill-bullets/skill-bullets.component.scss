@@ -14,6 +14,10 @@
   min-width: 0;
 }
 
+.skill-bullets.is-read-only .skill-name {
+  color: var(--color-muted);
+}
+
 .skill-name-input {
   min-width: 0;
 }
@@ -40,7 +44,16 @@
   background: var(--color-primary);
 }
 
-.bullets.is-read-only .bullet:disabled {
+.skill-bullets.is-read-only .bullet {
+  border-color: var(--color-muted);
+}
+
+.skill-bullets.is-read-only .bullet.is-filled {
+  border-color: var(--color-muted);
+  background: var(--color-muted);
+}
+
+.skill-bullets.is-read-only .bullet:disabled {
   cursor: default;
 }
 

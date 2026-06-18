@@ -49,6 +49,13 @@ $min-content: bp.$bp-sm;
   z-index: 10;
 }
 
+.sheet-cancel-button {
+  position: fixed;
+  right: var(--space-1);
+  bottom: calc(var(--space-1) + 56px);
+  z-index: 10;
+}
+
 .status {
   display: flex;
   align-items: center;

@@ -16,6 +16,10 @@
   }
 }
 
+.track.is-read-only .section-title {
+  color: var(--color-muted);
+}
+
 .grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -51,6 +55,21 @@
   .box {
     border-color: var(--color-primary);
     background: var(--color-primary);
+  }
+}
+
+.track.is-read-only .row {
+  color: var(--color-muted);
+}
+
+.track.is-read-only .box {
+  border-color: var(--color-muted);
+}
+
+.track.is-read-only .row.is-selected {
+  .box {
+    border-color: var(--color-muted);
+    background: var(--color-muted);
   }
 }
 
