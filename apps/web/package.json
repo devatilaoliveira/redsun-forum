@@ -2,7 +2,7 @@
   "name": "redsun-web",
   "version": "0.0.0",
   "engines": {
-    "node": ">=24.15.0"
+    "node": ">=24.15.0 <25"
   },
   "scripts": {
     "ng": "ng",
@@ -23,9 +23,6 @@
     "e2e:ui": "npx playwright test --ui"
   },
   "private": true,
-  "overrides": {
-    "vite": "8.0.16"
-  },
   "dependencies": {
     "@angular/common": "^22.0.1",
     "@angular/compiler": "^22.0.1",
