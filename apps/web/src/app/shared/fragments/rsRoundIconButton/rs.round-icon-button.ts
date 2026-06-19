@@ -1,7 +1,7 @@
 import {Component, input, InputSignal, output, OutputEmitterRef} from "@angular/core";
 import {EVariant} from "../../../../interface/enums/EVariant";
 
-export type RsRoundIconButtonVariant = EVariant.PRIMARY | "default";
+export type RsRoundIconButtonVariant = EVariant.PRIMARY | EVariant.PREMIUM | "default";
 
 @Component({
   selector: "rs-round-icon-button",

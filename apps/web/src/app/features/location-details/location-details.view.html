@@ -49,8 +49,8 @@
                 [placeholder]="'POST_PLACEHOLDER' | translate"
                 [maxLength]="UTIL_CONSTANTS.MEDIUM_TEXT_LENGTH"
                 [rows]="4"
-                [blocked]="postInProgress()"
-                [value]="postControls.content.value"
+                [blocked]="postInProgress() || improvePostInProgress()"
+                [value]="postContent()"
                 (valueChanged)="onPostContentChange($event)"
               />
             </div>
@@ -72,6 +72,17 @@
         }
 
         <div class="post-actions">
+          @if (isPremium()) {
+            <rs-tooltip [text]="'IMPROVE_POST_TEXT_WITH_AI' | translate" align="end">
+              <rs-round-icon-button
+                [iconSrc]="'/assets/svgs/ai_assistant.svg'"
+                [ariaLabel]="'IMPROVE_POST_TEXT_WITH_AI' | translate"
+                [disabled]="postInProgress() || improvePostInProgress() || postInputMode() !== 'post' || !canImprovePostText()"
+                [variant]="EVariant.PREMIUM"
+                (pressed)="improvePostTextWithAI()"
+              />
+            </rs-tooltip>
+          }
           <rs-button
             [inProgress]="postInProgress()"
             [disabled]="postInProgress() || !canSubmitCurrentInput()"

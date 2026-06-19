@@ -32,6 +32,8 @@ import {TaleParticipantProfileDTO} from "../../../interface/dtos/tale/TalePartic
 import {TalesContextService} from "../../../stateServices/tales-context.service";
 import {RsTooltip} from "../../shared/fragments/rsTooltip/rs.tooltip";
 import {ERuleSystem} from "../../../interface/enums/ERuleSystem";
+import {ESubscriptionPlan} from "../../../interface/enums/ESubscriptionPlan";
+import {IToastService, ToastService} from "../../../services/toast.service";
 
 type PostFormGroup = FormGroup<{
   content: FormControl<string>;
@@ -101,15 +103,19 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   private readonly _LocalStoreService: LocalStoreService = inject(LocalStoreService);
   private readonly _talesContext: TalesContextService = inject(TalesContextService);
   private readonly _translateService: ITranslateService = inject(TranslateService);
+  private readonly _toastService: IToastService = inject(ToastService);
 
   protected user: Signal<MeResponseDTO | null> = this._LocalStoreService.user;
+  protected readonly currentUserId: Signal<string | null> = computed(() => this.user()?.id ?? null);
   protected readonly EVariant = EVariant;
   protected readonly locationId: string | null = this._activatedRoute.snapshot.paramMap.get(ROUTE_PATHS.locationId);
   protected readonly postInProgress: WritableSignal<boolean> = signal(false);
+  protected readonly improvePostInProgress: WritableSignal<boolean> = signal(false);
   protected readonly isLoading: WritableSignal<boolean> = signal(false);
   protected readonly isLoadingPosts: WritableSignal<boolean> = signal(false);
   protected readonly isLoadingMore: WritableSignal<boolean> = signal(false);
   protected readonly locationDetails: WritableSignal<LocationDetailsViewModel | null> = signal(null);
+  protected readonly postContent: WritableSignal<string> = signal("");
   protected readonly diceValues: WritableSignal<RsDiceListValue> = signal<RsDiceListValue>([]);
   protected readonly redsunDiceValues: WritableSignal<RsRedsunDiceListValue> = signal<RsRedsunDiceListValue>([]);
   protected readonly postInputMode: WritableSignal<PostInputMode> = signal<PostInputMode>("post");
@@ -129,6 +135,10 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   protected readonly isRedsunTale: Signal<boolean> = computed(() => (
     this._talesContext.tale()?.rules === ERuleSystem.REDSUN
   ));
+  protected readonly isPremium: Signal<boolean> = computed(() => (
+    this.user()?.subscription?.plan === ESubscriptionPlan.PREMIUM
+    || this.user()?.subscription?.plan === ESubscriptionPlan.MAX
+  ));
   protected readonly showDiceInput: Signal<boolean> = computed(() => this.postInputMode() === "dice");
   protected readonly showRedsunDiceInput: Signal<boolean> = computed(() => this.postInputMode() === "redsunDice");
   protected readonly isDiceInputMode: Signal<boolean> = computed(() => this.postInputMode() !== "post");
@@ -140,7 +150,7 @@ export class LocationDetailsView implements OnInit, OnDestroy {
       return this.hasRedsunDiceRoll();
     case "post":
     default:
-      return this.postFormGroup.valid && this.postControls.content.value.trim().length > 0;
+      return this.postFormGroup.valid && this.postContent().trim().length > 0;
     }
   });
   private readonly visiblePosts: Signal<PostDTO[]> = computed(() => {
@@ -160,7 +170,7 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   protected readonly visiblePostViewModels: Signal<VisiblePostViewModel[]> = computed(() => {
     const labels = this.postOptionLabels();
     const isTaleOwner = this.isCurrentUserTaleOwner();
-    const currentUserId = this.user()?.id ?? null;
+    const currentUserId = this.currentUserId();
 
     return this.visiblePosts().map((post) => {
       const canCancel = this.canDeactivatePostForUser(post, currentUserId, isTaleOwner);
@@ -226,8 +236,7 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   }
 
   protected onPostContentChange(value: string): void {
-    this.postControls.content.setValue(value);
-    this.postControls.content.markAsDirty();
+    this.setPostContent(value);
   }
 
   protected onShowPostInput(): void {
@@ -280,6 +289,7 @@ export class LocationDetailsView implements OnInit, OnDestroy {
       finalize(() => {
         this.postInProgress.set(false);
         this.postFormGroup.reset({content: ""});
+        this.postContent.set("");
         if (this.isDiceInputMode()) {
           this.resetDiceInputs();
           this.diceInput?.resetFields();
@@ -309,7 +319,7 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   }
 
   private canDeactivatePost(post: PostDTO): boolean {
-    return this.canDeactivatePostForUser(post, this.user()?.id ?? null, this.isCurrentUserTaleOwner());
+    return this.canDeactivatePostForUser(post, this.currentUserId(), this.isCurrentUserTaleOwner());
   }
 
   private buildPostOptions(canCancel: boolean, canDelete: boolean, cancelLabel: string, deleteLabel: string): RsMoreOption[] {
@@ -500,6 +510,7 @@ export class LocationDetailsView implements OnInit, OnDestroy {
 
   private resetPostContent(): void {
     this.postControls.content.setValue("");
+    this.postContent.set("");
     this.postControls.content.markAsPristine();
     this.postControls.content.markAsUntouched();
   }
@@ -527,5 +538,46 @@ export class LocationDetailsView implements OnInit, OnDestroy {
       cancel: this._translateService.instant("CANCEL_ACTION"),
       delete: this._translateService.instant("DELETE")
     };
+  }
+
+  protected canImprovePostText(): boolean {
+    return this.postInputMode() === "post" && this.postContent().trim().length > 0;
+  }
+
+  protected improvePostTextWithAI(): void {
+    if (this.postInputMode() !== "post" || this.postInProgress() || this.improvePostInProgress()) {
+      return;
+    }
+
+    const originalContent: string = this.postControls.content.value;
+    const content: string = originalContent.trim();
+    if (!content) {
+      return;
+    }
+
+    this.improvePostInProgress.set(true);
+
+    this._postService.improvePostTextWithAI(content).pipe(
+      finalize(() => this.improvePostInProgress.set(false))
+    ).subscribe({
+      next: (response) => {
+        this.setPostContent(response.content);
+      },
+      error: (err) => {
+        this.setPostContent(originalContent);
+        this._printer.error("failed to improve post text with AI", err);
+        this._toastService.show({
+          label: this._translateService.instant("ERROR"),
+          message: this._translateService.instant("IMPROVE_POST_TEXT_WITH_AI_FAILED"),
+          variant: EVariant.DANGER
+        });
+      }
+    });
+  }
+
+  private setPostContent(value: string): void {
+    this.postControls.content.setValue(value);
+    this.postControls.content.markAsDirty();
+    this.postContent.set(value);
   }
 }

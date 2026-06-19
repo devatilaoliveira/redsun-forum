@@ -4,6 +4,8 @@ import com.rpg.redsunapi.authentication.AuthenticatedUser;
 import com.rpg.redsunapi.post.dto.CreatedPostDTO;
 import com.rpg.redsunapi.post.dto.PostCreateRequestDTO;
 import com.rpg.redsunapi.post.dto.PostDTO;
+import com.rpg.redsunapi.post.dto.PostImproveTextRequestDTO;
+import com.rpg.redsunapi.post.dto.PostImproveTextResponseDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.jspecify.annotations.NullMarked;
@@ -42,6 +44,15 @@ public class PostController {
   ) {
     CreatedPostDTO createdPost = postService.createPost(request, principal.user());
     return ResponseEntity.status(HttpStatus.CREATED).body(PostDTO.from(createdPost.post(), createdPost.tale()));
+  }
+
+  @PostMapping("/improve-text")
+  public ResponseEntity<PostImproveTextResponseDTO> improveText(
+    @AuthenticationPrincipal AuthenticatedUser principal,
+    @Valid @RequestBody PostImproveTextRequestDTO request
+  ) {
+    String improvedContent = postService.improvePostText(request.content(), principal.user());
+    return ResponseEntity.ok(new PostImproveTextResponseDTO(improvedContent));
   }
 
   @GetMapping
