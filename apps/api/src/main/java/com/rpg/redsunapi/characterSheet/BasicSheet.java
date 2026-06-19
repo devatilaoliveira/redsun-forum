@@ -47,6 +47,9 @@ public class BasicSheet implements CharacterSheet {
   @Column(name = "character_image_url", length = 500)
   private String characterImageUrl;
 
+  @Column(name = "change_history", columnDefinition = "text")
+  private String changeHistory;
+
   public BasicSheet() {
   }
 
@@ -106,6 +109,14 @@ public class BasicSheet implements CharacterSheet {
   @Override
   public void setCharacterImageUrl(String characterImageUrl) {
     this.characterImageUrl = characterImageUrl;
+  }
+
+  public String getChangeHistory() {
+    return changeHistory;
+  }
+
+  public void setChangeHistory(String changeHistory) {
+    this.changeHistory = changeHistory;
   }
 
   @Override

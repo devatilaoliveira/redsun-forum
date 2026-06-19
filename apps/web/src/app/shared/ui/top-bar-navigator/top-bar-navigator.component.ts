@@ -28,7 +28,7 @@ export class RsTopBarNavigatorComponent implements OnInit {
   @ViewChild("playerButton", { read: ElementRef })
   private playerButtonRef?: ElementRef<HTMLElement>;
 
-  protected hideTopBar: boolean = false;
+  protected hideTopBar: boolean = true;
   protected hideBackBtn: boolean = false;
   protected backTarget: UrlTree | null = null;
   protected menuOpen: boolean = false;
@@ -58,11 +58,19 @@ export class RsTopBarNavigatorComponent implements OnInit {
     this.playerVisible = this._taleState.canPlay;
 
     effect(() => {
-      if (!this.manageVisible()) {
+      const manageVisible: boolean = this.manageVisible();
+      const playerVisible: boolean = this.playerVisible();
+
+      if (this.hideTopBar) {
+        this.closeAllMenus(false);
+        return;
+      }
+
+      if (!manageVisible) {
         this.closeManageMenu(false);
       }
 
-      if (!this.playerVisible() || this.manageVisible()) {
+      if (!playerVisible || manageVisible) {
         this.closePlayerMenu(false);
       }
     });
@@ -77,15 +85,7 @@ export class RsTopBarNavigatorComponent implements OnInit {
       )
       .subscribe(() => {
         this.updateRouteState();
-        if (this.menuOpen) {
-          this.closeMenu();
-        }
-        if (this.manageMenuOpen) {
-          this.closeManageMenu(false);
-        }
-        if (this.playerMenuOpen) {
-          this.closePlayerMenu(false);
-        }
+        this.closeAllMenus(!this.hideTopBar);
       });
     this._destroyRef.onDestroy(() => {
       if (this.menuOpen || this.manageMenuOpen || this.playerMenuOpen) {
@@ -273,6 +273,22 @@ export class RsTopBarNavigatorComponent implements OnInit {
     this.backTarget = backTo ?? null;
     this.updateManageItems(route);
     this.updatePlayerItems(route);
+
+    if (this.hideTopBar) {
+      this.closeAllMenus(false);
+    }
+  }
+
+  private closeAllMenus(restoreFocus: boolean = true): void {
+    if (this.menuOpen) {
+      this.closeMenu(restoreFocus);
+    }
+    if (this.manageMenuOpen) {
+      this.closeManageMenu(restoreFocus);
+    }
+    if (this.playerMenuOpen) {
+      this.closePlayerMenu(restoreFocus);
+    }
   }
 
   private getDeepestRoute(route: ActivatedRoute): ActivatedRoute {

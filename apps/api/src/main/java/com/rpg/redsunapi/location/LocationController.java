@@ -4,6 +4,7 @@ import com.rpg.redsunapi.authentication.AuthenticatedUser;
 import com.rpg.redsunapi.location.dto.LocationCreateRequestDTO;
 import com.rpg.redsunapi.location.dto.LocationDTO;
 import com.rpg.redsunapi.location.dto.LocationDetailDTO;
+import com.rpg.redsunapi.location.dto.LocationUpdateRequestDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -65,6 +67,16 @@ public class LocationController {
     @PathVariable("id") UUID locationId
   ) {
     LocationDetailDTO locationDetailDTO = locationReadService.findLocationDetailById(locationId, principal.user());
+    return ResponseEntity.ok(locationDetailDTO);
+  }
+
+  @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<LocationDetailDTO> updateLocation(
+    @AuthenticationPrincipal AuthenticatedUser principal,
+    @PathVariable("id") UUID locationId,
+    @Valid @ModelAttribute LocationUpdateRequestDTO request
+  ) throws IOException {
+    LocationDetailDTO locationDetailDTO = locationService.updateLocation(locationId, request, principal.user());
     return ResponseEntity.ok(locationDetailDTO);
   }
 

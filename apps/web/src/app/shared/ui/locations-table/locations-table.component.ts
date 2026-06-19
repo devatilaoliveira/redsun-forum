@@ -58,21 +58,31 @@ export class LocationsTableComponent {
     );
   }
 
-  protected canDeleteLocation(location: LocationDTO): boolean {
+  protected canModifyLocation(location: LocationDTO): boolean {
     const currentUser: MeResponseDTO | null = this.user();
     if (!currentUser) {
       return false;
     }
 
-    const isTaleOwner = this._talesContext?.role() === TaleAccessRole.Owner;
+    const taleRole = this._talesContext?.role() ?? TaleAccessRole.None;
+    const isTaleOwner = taleRole === TaleAccessRole.Owner;
+    const isTaleParticipant = taleRole === TaleAccessRole.Participant;
+    if (!isTaleOwner && !isTaleParticipant) {
+      return false;
+    }
+
     return currentUser.id === location.authorId || isTaleOwner;
   }
 
   protected onOptionSelected(location: LocationDTO, index: number, option: RsMoreOption): void {
     if (!location?.id) return;
-    if (option.action === EAction.DELETE && !this.canDeleteLocation(location)) return;
+    if ((option.action === EAction.UPDATE || option.action === EAction.DELETE) && !this.canModifyLocation(location)) return;
 
     switch (option.action) {
+    case EAction.UPDATE: {
+      this.navigateToLocationEdit(location);
+      break;
+    }
     case EAction.DELETE: {
       this.openDeleteConfirm(location, index);
       break;
@@ -80,6 +90,19 @@ export class LocationsTableComponent {
     default:
       break;
     }
+  }
+
+  protected navigateToLocationEdit(location: LocationDTO): void {
+    const taleId = this.taleId();
+    if (!taleId || !location.id) return;
+    void this._router.navigate([
+      "/",
+      ROUTE_PATHS.tales,
+      taleId,
+      ROUTE_PATHS.locations,
+      location.id,
+      ROUTE_PATHS.edit
+    ]);
   }
 
   protected openDeleteConfirm(location: LocationDTO, index: number): void {
@@ -99,6 +122,10 @@ export class LocationsTableComponent {
     const index = this.pendingDeleteIndex();
     if (!location?.id) return;
     if (index < 0) return;
+    if (!this.canModifyLocation(location)) {
+      this.closeDeleteConfirm();
+      return;
+    }
 
     this._locationService.deleteLocation(location.id).subscribe({
       next: () => {

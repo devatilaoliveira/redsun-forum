@@ -22,6 +22,7 @@ import {MeResponseDTO} from "../../../interface/dtos/user/MeResponseDTO";
 import {RsAvatar} from "../../shared/fragments/rsAvatar/rs.avatar";
 import {UTIL_CONSTANTS} from "../../../interface/constants/util.constants";
 import {RsDiceInput, RsDiceListValue} from "../../shared/fragments/rsDiceInput/rs.dice-input";
+import {RsRedsunDiceInput, RsRedsunDiceListValue} from "../../shared/fragments/rsRedsunDiceInput/rs.redsun-dice-input";
 import {RsRoundIconButton} from "../../shared/fragments/rsRoundIconButton/rs.round-icon-button";
 import {RsMoreOption} from "../../shared/fragments/rsMoreOptions/rs.more-options";
 import {RsDialogModalComponent} from "../../shared/ui/dialog-modal/dialog-modal.component";
@@ -30,10 +31,15 @@ import {ROUTE_PATHS} from "../../../interface/constants/route-path.constants";
 import {TaleParticipantProfileDTO} from "../../../interface/dtos/tale/TaleParticipantProfileDTO";
 import {TalesContextService} from "../../../stateServices/tales-context.service";
 import {RsTooltip} from "../../shared/fragments/rsTooltip/rs.tooltip";
+import {ERuleSystem} from "../../../interface/enums/ERuleSystem";
+import {ESubscriptionPlan} from "../../../interface/enums/ESubscriptionPlan";
+import {IToastService, ToastService} from "../../../services/toast.service";
 
 type PostFormGroup = FormGroup<{
   content: FormControl<string>;
 }>;
+
+type PostInputMode = "post" | "dice" | "redsunDice";
 
 type LocationDetailsViewModel = LocationDetailsDTO & {
   posts: PostDTO[];
@@ -62,6 +68,7 @@ interface VisiblePostViewModel {
     LocalDetailsCardComponent,
     RsAvatar,
     RsDiceInput,
+    RsRedsunDiceInput,
     RsRoundIconButton,
     RsTooltip,
     RsDialogModalComponent,
@@ -73,6 +80,8 @@ interface VisiblePostViewModel {
 export class LocationDetailsView implements OnInit, OnDestroy {
   @ViewChild(RsDiceInput)
   private diceInput?: RsDiceInput;
+  @ViewChild(RsRedsunDiceInput)
+  private redsunDiceInput?: RsRedsunDiceInput;
   private readonly loadMoreObserver: IntersectionObserver | null = typeof IntersectionObserver === "undefined"
     ? null
     : new IntersectionObserver(
@@ -94,17 +103,22 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   private readonly _LocalStoreService: LocalStoreService = inject(LocalStoreService);
   private readonly _talesContext: TalesContextService = inject(TalesContextService);
   private readonly _translateService: ITranslateService = inject(TranslateService);
+  private readonly _toastService: IToastService = inject(ToastService);
 
   protected user: Signal<MeResponseDTO | null> = this._LocalStoreService.user;
+  protected readonly currentUserId: Signal<string | null> = computed(() => this.user()?.id ?? null);
   protected readonly EVariant = EVariant;
   protected readonly locationId: string | null = this._activatedRoute.snapshot.paramMap.get(ROUTE_PATHS.locationId);
   protected readonly postInProgress: WritableSignal<boolean> = signal(false);
+  protected readonly improvePostInProgress: WritableSignal<boolean> = signal(false);
   protected readonly isLoading: WritableSignal<boolean> = signal(false);
   protected readonly isLoadingPosts: WritableSignal<boolean> = signal(false);
   protected readonly isLoadingMore: WritableSignal<boolean> = signal(false);
   protected readonly locationDetails: WritableSignal<LocationDetailsViewModel | null> = signal(null);
+  protected readonly postContent: WritableSignal<string> = signal("");
   protected readonly diceValues: WritableSignal<RsDiceListValue> = signal<RsDiceListValue>([]);
-  protected readonly showDiceInput: WritableSignal<boolean> = signal<boolean>(false);
+  protected readonly redsunDiceValues: WritableSignal<RsRedsunDiceListValue> = signal<RsRedsunDiceListValue>([]);
+  protected readonly postInputMode: WritableSignal<PostInputMode> = signal<PostInputMode>("post");
   protected readonly totalPosts: WritableSignal<number | null> = signal<number | null>(null);
   protected readonly nextPage: WritableSignal<number> = signal(0);
   protected readonly isCurrentUserTaleOwner: Signal<boolean> = computed(() => {
@@ -115,6 +129,30 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   protected readonly hasDiceCount: Signal<boolean> = computed(() => (
     this.diceValues().some((value) => value.diceCount > 0)
   ));
+  protected readonly hasRedsunDiceRoll: Signal<boolean> = computed(() => (
+    this.redsunDiceValues().some((value) => value.diceCount > 0 && value.difficulty > 0)
+  ));
+  protected readonly isRedsunTale: Signal<boolean> = computed(() => (
+    this._talesContext.tale()?.rules === ERuleSystem.REDSUN
+  ));
+  protected readonly isPremium: Signal<boolean> = computed(() => (
+    this.user()?.subscription?.plan === ESubscriptionPlan.PREMIUM
+    || this.user()?.subscription?.plan === ESubscriptionPlan.MAX
+  ));
+  protected readonly showDiceInput: Signal<boolean> = computed(() => this.postInputMode() === "dice");
+  protected readonly showRedsunDiceInput: Signal<boolean> = computed(() => this.postInputMode() === "redsunDice");
+  protected readonly isDiceInputMode: Signal<boolean> = computed(() => this.postInputMode() !== "post");
+  protected readonly canSubmitCurrentInput: Signal<boolean> = computed(() => {
+    switch (this.postInputMode()) {
+    case "dice":
+      return this.hasDiceCount();
+    case "redsunDice":
+      return this.hasRedsunDiceRoll();
+    case "post":
+    default:
+      return this.postFormGroup.valid && this.postContent().trim().length > 0;
+    }
+  });
   private readonly visiblePosts: Signal<PostDTO[]> = computed(() => {
     const location = this.locationDetails();
     if (!location) return [];
@@ -132,7 +170,7 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   protected readonly visiblePostViewModels: Signal<VisiblePostViewModel[]> = computed(() => {
     const labels = this.postOptionLabels();
     const isTaleOwner = this.isCurrentUserTaleOwner();
-    const currentUserId = this.user()?.id ?? null;
+    const currentUserId = this.currentUserId();
 
     return this.visiblePosts().map((post) => {
       const canCancel = this.canDeactivatePostForUser(post, currentUserId, isTaleOwner);
@@ -198,19 +236,26 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   }
 
   protected onPostContentChange(value: string): void {
-    this.postControls.content.setValue(value);
-    this.postControls.content.markAsDirty();
+    this.setPostContent(value);
   }
 
   protected onShowPostInput(): void {
-    if (!this.showDiceInput()) return;
-    this.showDiceInput.set(false);
-    this.resetDiceInput();
+    if (this.postInputMode() === "post") return;
+    this.postInputMode.set("post");
+    this.resetDiceInputs();
   }
 
   protected onShowDiceInput(): void {
-    if (this.showDiceInput()) return;
-    this.showDiceInput.set(true);
+    if (this.postInputMode() === "dice") return;
+    this.postInputMode.set("dice");
+    this.resetRedsunDiceInput();
+    this.resetPostContent();
+  }
+
+  protected onShowRedsunDiceInput(): void {
+    if (!this.isRedsunTale() || this.postInputMode() === "redsunDice") return;
+    this.postInputMode.set("redsunDice");
+    this.resetDiceInput();
     this.resetPostContent();
   }
 
@@ -219,6 +264,12 @@ export class LocationDetailsView implements OnInit, OnDestroy {
 
     if (this.showDiceInput() && this.hasDiceCount()) {
       const diceContent: string = this.diceInput?.buildPostContent(this.diceValues()) ?? "";
+      this.postControls.content.setValue(diceContent);
+      this.postControls.content.markAsDirty();
+    }
+
+    if (this.showRedsunDiceInput() && this.hasRedsunDiceRoll()) {
+      const diceContent: string = this.redsunDiceInput?.buildPostContent(this.redsunDiceValues()) ?? "";
       this.postControls.content.setValue(diceContent);
       this.postControls.content.markAsDirty();
     }
@@ -238,9 +289,11 @@ export class LocationDetailsView implements OnInit, OnDestroy {
       finalize(() => {
         this.postInProgress.set(false);
         this.postFormGroup.reset({content: ""});
-        if (this.showDiceInput()) {
-          this.resetDiceInput();
+        this.postContent.set("");
+        if (this.isDiceInputMode()) {
+          this.resetDiceInputs();
           this.diceInput?.resetFields();
+          this.redsunDiceInput?.resetFields();
         }
       })
     ).subscribe({
@@ -261,8 +314,12 @@ export class LocationDetailsView implements OnInit, OnDestroy {
     this.diceValues.set(values);
   }
 
+  protected onRedsunDiceValueChange(values: RsRedsunDiceListValue): void {
+    this.redsunDiceValues.set(values);
+  }
+
   private canDeactivatePost(post: PostDTO): boolean {
-    return this.canDeactivatePostForUser(post, this.user()?.id ?? null, this.isCurrentUserTaleOwner());
+    return this.canDeactivatePostForUser(post, this.currentUserId(), this.isCurrentUserTaleOwner());
   }
 
   private buildPostOptions(canCancel: boolean, canDelete: boolean, cancelLabel: string, deleteLabel: string): RsMoreOption[] {
@@ -453,12 +510,22 @@ export class LocationDetailsView implements OnInit, OnDestroy {
 
   private resetPostContent(): void {
     this.postControls.content.setValue("");
+    this.postContent.set("");
     this.postControls.content.markAsPristine();
     this.postControls.content.markAsUntouched();
   }
 
   private resetDiceInput(): void {
     this.diceValues.set([]);
+  }
+
+  private resetRedsunDiceInput(): void {
+    this.redsunDiceValues.set([]);
+  }
+
+  private resetDiceInputs(): void {
+    this.resetDiceInput();
+    this.resetRedsunDiceInput();
   }
 
   private canDeactivatePostForUser(post: PostDTO, currentUserId: string | null, isTaleOwner: boolean): boolean {
@@ -471,5 +538,46 @@ export class LocationDetailsView implements OnInit, OnDestroy {
       cancel: this._translateService.instant("CANCEL_ACTION"),
       delete: this._translateService.instant("DELETE")
     };
+  }
+
+  protected canImprovePostText(): boolean {
+    return this.postInputMode() === "post" && this.postContent().trim().length > 0;
+  }
+
+  protected improvePostTextWithAI(): void {
+    if (this.postInputMode() !== "post" || this.postInProgress() || this.improvePostInProgress()) {
+      return;
+    }
+
+    const originalContent: string = this.postControls.content.value;
+    const content: string = originalContent.trim();
+    if (!content) {
+      return;
+    }
+
+    this.improvePostInProgress.set(true);
+
+    this._postService.improvePostTextWithAI(content).pipe(
+      finalize(() => this.improvePostInProgress.set(false))
+    ).subscribe({
+      next: (response) => {
+        this.setPostContent(response.content);
+      },
+      error: (err) => {
+        this.setPostContent(originalContent);
+        this._printer.error("failed to improve post text with AI", err);
+        this._toastService.show({
+          label: this._translateService.instant("ERROR"),
+          message: this._translateService.instant("IMPROVE_POST_TEXT_WITH_AI_FAILED"),
+          variant: EVariant.DANGER
+        });
+      }
+    });
+  }
+
+  private setPostContent(value: string): void {
+    this.postControls.content.setValue(value);
+    this.postControls.content.markAsDirty();
+    this.postContent.set(value);
   }
 }

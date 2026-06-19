@@ -5,5 +5,6 @@ export enum EVariant {
   SUCCESS = "success",
   DANGER = "danger",
   WARNING = "warning",
-  BLACK = "black"
+  BLACK = "black",
+  PREMIUM = "premium",
 }

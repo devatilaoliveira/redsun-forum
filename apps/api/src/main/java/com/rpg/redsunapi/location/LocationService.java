@@ -2,6 +2,7 @@ package com.rpg.redsunapi.location;
 
 import com.rpg.redsunapi.location.dto.LocationCreateRequestDTO;
 import com.rpg.redsunapi.location.dto.LocationDetailDTO;
+import com.rpg.redsunapi.location.dto.LocationUpdateRequestDTO;
 import com.rpg.redsunapi.location.enums.ELocationStatus;
 import com.rpg.redsunapi.storage.LocationStorageService;
 import com.rpg.redsunapi.tale.Tale;
@@ -120,6 +121,95 @@ public class LocationService {
     Pageable pageable = PageRequest.of(safePage, boundedSize, sort);
 
     return locationRepository.findByTaleId(tale.getId(), pageable);
+  }
+
+  @Transactional
+  public LocationDetailDTO updateLocation(UUID locationId, LocationUpdateRequestDTO request, User requester) throws IOException {
+    if (requester == null) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User must be authenticated");
+    }
+
+    Location location = locationRepository.findById(locationId)
+      .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Location not found"));
+
+    Tale tale = loadTaleForLocation(location);
+
+    boolean isOwner = tale.getOwnerId() != null && tale.getOwnerId().equals(requester.getId());
+    boolean isAuthor = location.getAuthor() != null && requester.getId().equals(location.getAuthor().getId());
+
+    if (!isOwner && !isAuthor) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to update this location");
+    }
+
+    boolean hasUpdate = false;
+
+    if (request.locationName() != null) {
+      String normalizedName = request.locationName().trim();
+      if (normalizedName.isEmpty()) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Location name is required");
+      }
+      if (!normalizedName.equals(location.getLocationName())) {
+        location.setLocationName(normalizedName);
+        hasUpdate = true;
+      }
+    }
+
+    if (request.description() != null && !Objects.equals(request.description(), location.getDescription())) {
+      location.setDescription(request.description());
+      hasUpdate = true;
+    }
+
+    String oldImageUrl = location.getImageURL();
+    boolean hasImageUpdate = request.image() != null && request.image().isPresent() && !request.image().get().isEmpty();
+    boolean removeImage = Boolean.TRUE.equals(request.removeImage());
+    String newImageUrl = null;
+
+    try {
+      if (removeImage && hasImageUpdate) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot remove and update image at the same time");
+      }
+
+      if (removeImage && oldImageUrl != null && !oldImageUrl.isBlank()) {
+        location.setImageURL(null);
+        hasUpdate = true;
+      }
+
+      if (hasImageUpdate) {
+        newImageUrl = locationStorageService.uploadLocationImage(location.getId(), request.image().get());
+        if (!Objects.equals(newImageUrl, oldImageUrl)) {
+          location.setImageURL(newImageUrl);
+        }
+        hasUpdate = true;
+      }
+
+      if (!hasUpdate) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No updates provided");
+      }
+
+      Location saved = locationRepository.save(location);
+
+      if ((removeImage || hasImageUpdate)
+        && oldImageUrl != null
+        && !oldImageUrl.isBlank()
+        && !Objects.equals(oldImageUrl, saved.getImageURL())) {
+        try {
+          locationStorageService.deleteLocation(location.getId(), oldImageUrl);
+        } catch (Exception ex) {
+          log.warn("Failed to delete old location image {} for location {}", oldImageUrl, locationId, ex);
+        }
+      }
+
+      return LocationDetailDTO.from(saved, tale);
+    } catch (Exception ex) {
+      if (hasImageUpdate && newImageUrl != null && !newImageUrl.isBlank() && !Objects.equals(newImageUrl, oldImageUrl)) {
+        try {
+          locationStorageService.deleteLocation(location.getId(), newImageUrl);
+        } catch (Exception exception) {
+          log.warn("Failed to cleanup newly uploaded location image {}", newImageUrl, exception);
+        }
+      }
+      throw ex;
+    }
   }
 
   @Transactional

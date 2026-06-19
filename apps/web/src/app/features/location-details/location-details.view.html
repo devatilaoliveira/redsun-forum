@@ -9,7 +9,7 @@
       <rs-view-header [title]="location.locationName" />
       <div class="post-form">
         <div class="input-toggle">
-          <rs-tooltip [text]="'SHOW_POST_INPUT' | translate" align="start">
+          <rs-tooltip [text]="'SHOW_POST_INPUT' | translate" align="end">
             <rs-round-icon-button
               [iconSrc]="'/assets/svgs/post.svg'"
               [ariaLabel]="'SHOW_POST_INPUT' | translate"
@@ -25,8 +25,19 @@
               (pressed)="onShowDiceInput()"
             />
           </rs-tooltip>
+          @if (isRedsunTale()) {
+            <rs-tooltip [text]="'SHOW_REDSUN_DICE_INPUT' | translate" align="end">
+              <rs-round-icon-button
+                class="redsun-dice-toggle"
+                [iconSrc]="'/assets/svgs/rs-white.svg'"
+                [ariaLabel]="'SHOW_REDSUN_DICE_INPUT' | translate"
+                [disabled]="postInProgress()"
+                (pressed)="onShowRedsunDiceInput()"
+              />
+            </rs-tooltip>
+          }
         </div>
-        @if (!showDiceInput()) {
+        @if (postInputMode() === "post") {
           <div class="input-row">
             <rs-avatar
               [src]="currentTaleParticipant()?.characterImageUrl || ''"
@@ -38,26 +49,43 @@
                 [placeholder]="'POST_PLACEHOLDER' | translate"
                 [maxLength]="UTIL_CONSTANTS.MEDIUM_TEXT_LENGTH"
                 [rows]="4"
-                [blocked]="postInProgress()"
-                [value]="postControls.content.value"
+                [blocked]="postInProgress() || improvePostInProgress()"
+                [value]="postContent()"
                 (valueChanged)="onPostContentChange($event)"
               />
             </div>
           </div>
-        } @else {
+        } @else if (showDiceInput()) {
           <div class="dice-row">
             <rs-dice-input
-              [label]="'DICE_BUILD_PROMPT' | translate"
               [disabled]="postInProgress()"
               (valueChanged)="onDiceValueChange($event)"
             ></rs-dice-input>
           </div>
+        } @else {
+          <div class="dice-row">
+            <rs-redsun-dice-input
+              [disabled]="postInProgress()"
+              (valueChanged)="onRedsunDiceValueChange($event)"
+            ></rs-redsun-dice-input>
+          </div>
         }
 
         <div class="post-actions">
+          @if (isPremium()) {
+            <rs-tooltip [text]="'IMPROVE_POST_TEXT_WITH_AI' | translate" align="end">
+              <rs-round-icon-button
+                [iconSrc]="'/assets/svgs/ai_assistant.svg'"
+                [ariaLabel]="'IMPROVE_POST_TEXT_WITH_AI' | translate"
+                [disabled]="postInProgress() || improvePostInProgress() || postInputMode() !== 'post' || !canImprovePostText()"
+                [variant]="EVariant.PREMIUM"
+                (pressed)="improvePostTextWithAI()"
+              />
+            </rs-tooltip>
+          }
           <rs-button
             [inProgress]="postInProgress()"
-            [disabled]="postInProgress() || (showDiceInput() ? !hasDiceCount() : postFormGroup.invalid || postControls.content.value.trim().length === 0)"
+            [disabled]="postInProgress() || !canSubmitCurrentInput()"
             (pressed)="onSubmitPost(location.id)"
           >
             {{ 'POST_SUBMIT' | translate }}

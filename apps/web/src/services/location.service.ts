@@ -3,12 +3,15 @@ import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {environment} from "../environments/environment";
 import {LocationCreateRequestDTO} from "../interface/dtos/location/LocationCreateRequestDTO";
+import {LocationUpdateRequestDTO} from "../interface/dtos/location/LocationUpdateRequestDTO";
 import {LocationDetailsDTO} from "../interface/dtos/location/LocationDetailsDTO";
 import {LocationDTO} from "../interface/dtos/location/LocationDTO";
 import {PageResponse} from "../interface/dtos/general/PageResponse";
 
 export interface ILocationService {
   createLocation(payload: LocationCreateRequestDTO): Observable<LocationDetailsDTO>;
+
+  updateLocation(locationId: string, payload: LocationUpdateRequestDTO): Observable<LocationDetailsDTO>;
 
   listLocations(taleId: string, page?: number, size?: number): Observable<PageResponse<LocationDTO>>;
 
@@ -33,6 +36,28 @@ export class LocationService implements ILocationService {
 
     return this._http.post<LocationDetailsDTO>(
       `${environment.apiBaseUrl}/locations`,
+      formData
+    );
+  }
+
+  public updateLocation(locationId: string, request: LocationUpdateRequestDTO): Observable<LocationDetailsDTO> {
+    const formData = new FormData();
+
+    if (request.locationName != null) {
+      formData.append("locationName", request.locationName);
+    }
+    if (request.description != null) {
+      formData.append("description", request.description);
+    }
+    if (request.image) {
+      formData.append("image", request.image);
+    }
+    if (request.removeImage != null) {
+      formData.append("removeImage", String(request.removeImage));
+    }
+
+    return this._http.put<LocationDetailsDTO>(
+      `${environment.apiBaseUrl}/locations/${locationId}`,
       formData
     );
   }

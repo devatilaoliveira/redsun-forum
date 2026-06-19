@@ -15,6 +15,10 @@
   text-align: center;
 }
 
+.limited-resource.is-read-only .resource-name {
+  color: var(--color-muted);
+}
+
 .resource-tracks {
   display: flex;
   flex-direction: column;
@@ -49,6 +53,15 @@
 .resource-box.is-filled {
   border-color: var(--color-primary);
   background: var(--color-primary);
+}
+
+.limited-resource.is-read-only .resource-box {
+  border-color: var(--color-muted);
+}
+
+.limited-resource.is-read-only .resource-box.is-filled {
+  border-color: var(--color-muted);
+  background: var(--color-muted);
 }
 
 .limited-resource:not(.is-read-only) .resource-box:disabled {

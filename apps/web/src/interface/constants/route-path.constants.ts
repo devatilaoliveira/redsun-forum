@@ -23,6 +23,7 @@ export const ROUTE_PATHS = {
   letter: "letter",
   contactId: "contactId",
   creation: "creation",
+  edit: "edit",
   letters: "letters",
   letterId: "letterId",
   profileDetails: "profile-details",

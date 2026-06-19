@@ -1,4 +1,4 @@
-import {Component, computed, inject, OnDestroy, OnInit, Signal, signal, ViewChild, WritableSignal} from "@angular/core";
+import {Component, computed, HostListener, inject, OnDestroy, OnInit, Signal, signal, ViewChild, WritableSignal} from "@angular/core";
 import {ActivatedRoute, Router} from "@angular/router";
 import {FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
 import {ITranslateService, TranslatePipe, TranslateService} from "@ngx-translate/core";
@@ -96,6 +96,7 @@ export class ManageCharacterView implements OnInit, OnDestroy {
   protected readonly sheetLoading: WritableSignal<boolean> = signal(true);
   protected readonly saveInProgress: WritableSignal<boolean> = signal(false);
   protected readonly confirmQuitOpen: WritableSignal<boolean> = signal(false);
+  protected readonly confirmExitEditOpen: WritableSignal<boolean> = signal(false);
   protected readonly leavingInProgress: WritableSignal<boolean> = signal(false);
   protected readonly pendingAvatarFile: WritableSignal<File | null> = signal<File | null>(null);
   protected readonly avatarPreviewUrl: WritableSignal<string | null> = signal<string | null>(null);
@@ -140,6 +141,20 @@ export class ManageCharacterView implements OnInit, OnDestroy {
 
   public ngOnDestroy(): void {
     this.revokeAvatarPreviewUrl();
+  }
+
+  @HostListener("document:keydown.escape", ["$event"])
+  protected onEscapePressed(event: Event): void {
+    if (!(event instanceof KeyboardEvent)) {
+      return;
+    }
+
+    if (!this.sheetEditable() || this.avatarCropOpen() || this.confirmQuitOpen() || this.confirmExitEditOpen()) {
+      return;
+    }
+
+    event.preventDefault();
+    this.tryLeaveEditMode();
   }
 
   protected onValueChange(formControl: FormControl<string>, value: string): void {
@@ -226,6 +241,29 @@ export class ManageCharacterView implements OnInit, OnDestroy {
     this.saveSheet();
   }
 
+  protected tryLeaveEditMode(): void {
+    if (!this.sheetEditable() || this.saveInProgress() || this.avatarUploading()) {
+      return;
+    }
+
+    if (!this.hasChanges()) {
+      this.leaveEditMode();
+      return;
+    }
+
+    this.confirmExitEditOpen.set(true);
+  }
+
+  protected closeExitEditConfirm(): void {
+    this.confirmExitEditOpen.set(false);
+  }
+
+  protected confirmExitEditMode(): void {
+    this.confirmExitEditOpen.set(false);
+    this.restoreLastSavedSheet();
+    this.leaveEditMode();
+  }
+
   private saveSheet(): void {
     this.saveInProgress.set(true);
     this._characterSheetService.upsertCharacterSheet(
@@ -242,6 +280,7 @@ export class ManageCharacterView implements OnInit, OnDestroy {
         this.applyLoadedSheet(response);
         this.sheetEditable.set(false);
         this._talesContext.refreshTale();
+        this.openToast("CHARACTER_SHEET_SAVE_SUCCESS", EVariant.SUCCESS);
       },
       error: (err: unknown) => {
         this._printer.error("failed to save character sheet", err);
@@ -356,6 +395,19 @@ export class ManageCharacterView implements OnInit, OnDestroy {
     this.initialState = {...characterSheet};
   }
 
+  private leaveEditMode(): void {
+    this.sheetEditable.set(false);
+  }
+
+  private restoreLastSavedSheet(): void {
+    if (this.initialState) {
+      this.patchForm(this.initialState);
+    }
+
+    this.redSunSheetComponent?.patchValue(this.redSunSheet());
+    this.resetAvatarUpload();
+  }
+
   private resetAvatarUpload(): void {
     this.pendingAvatarFile.set(null);
     this.setAvatarPreviewUrl(null);
@@ -365,11 +417,11 @@ export class ManageCharacterView implements OnInit, OnDestroy {
     this.avatarUploading.set(false);
   }
 
-  private openToast(messageKey: string): void {
+  private openToast(messageKey: string, variant: EVariant = EVariant.DANGER): void {
     this._toastService.show({
-      label: this._translateService.instant("ERROR"),
+      label: this._translateService.instant(variant === EVariant.SUCCESS ? "SUCCESS" : "ERROR"),
       message: this._translateService.instant(messageKey),
-      variant: EVariant.DANGER
+      variant
     });
   }
 

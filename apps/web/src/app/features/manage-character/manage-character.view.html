@@ -64,6 +64,17 @@
   </div>
 
   @if (!sheetLoading()) {
+    @if (sheetEditable()) {
+      <rs-round-icon-button
+        class="sheet-cancel-button"
+        [iconSrc]="'/assets/svgs/close.svg'"
+        [ariaLabel]="'CHARACTER_SHEET_CANCEL_EDIT' | translate"
+        [disabled]="saveInProgress() || avatarUploading()"
+        [variant]="EVariant.PRIMARY"
+        (pressed)="tryLeaveEditMode()"
+      />
+    }
+<p>heihei</p>
     <rs-round-icon-button
       class="sheet-edit-button"
       [iconSrc]="sheetButtonIcon()"
@@ -86,6 +97,21 @@
   >
     <ng-template>
       <p>{{ 'QUIT_TALE_CONFIRM_MESSAGE' | translate }}</p>
+    </ng-template>
+  </rs-dialog-modal>
+}
+
+@if (confirmExitEditOpen()) {
+  <rs-dialog-modal
+    [title]="'CHARACTER_SHEET_DISCARD_TITLE' | translate"
+    [ctaBtnOne]="{ label: ('CHARACTER_SHEET_CONTINUE_EDITING' | translate), variant: EVariant.SECONDARY }"
+    [ctaBtnTwo]="{ label: ('CHARACTER_SHEET_LEAVE_EDIT_MODE' | translate), variant: EVariant.WARNING }"
+    (closePressed)="closeExitEditConfirm()"
+    (ctaBtnOnePressed)="closeExitEditConfirm()"
+    (ctaBtnTwoPressed)="confirmExitEditMode()"
+  >
+    <ng-template>
+      <p>{{ 'CHARACTER_SHEET_DISCARD_MESSAGE' | translate }}</p>
     </ng-template>
   </rs-dialog-modal>
 }

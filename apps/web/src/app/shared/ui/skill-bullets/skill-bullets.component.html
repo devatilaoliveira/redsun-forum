@@ -1,4 +1,4 @@
-<div class="skill-bullets">
+<div class="skill-bullets" [class.is-read-only]="!levelEditable()">
   @if (editable()) {
     <rs-input
       class="skill-name-input"
@@ -12,7 +12,7 @@
     <span class="skill-name">{{ currentSkillName() }}</span>
   }
 
-  <div class="bullets" role="group" [class.is-read-only]="!levelEditable()" [attr.aria-label]="currentSkillName()">
+  <div class="bullets" role="group" [attr.aria-label]="currentSkillName()">
     @for (bullet of bullets; track bullet) {
       <button
         class="bullet"

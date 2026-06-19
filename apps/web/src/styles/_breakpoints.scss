@@ -5,7 +5,7 @@ $bp-lg: 1280px;
 $bp-md: 1024px;
 $bp-sm: 720px;
 $bp-xs: 428px;
-$bp-xs: 360px;
+$bp-xxs: 360px;
 
 @mixin desktop-lg {
   @media (min-width: $bp-xxl) {
@@ -20,13 +20,13 @@ $bp-xs: 360px;
 }
 
 @mixin mobile-md {
-  @media (min-width: $bp-xs) and (max-width: $bp-lg) {
+  @media (min-width: $bp-xxs) and (max-width: $bp-lg) {
     @content;
   }
 }
 
 @mixin mobile-sm {
-  @media (max-width: $bp-xs) {
+  @media (max-width: $bp-xxs) {
     @content;
   }
 }

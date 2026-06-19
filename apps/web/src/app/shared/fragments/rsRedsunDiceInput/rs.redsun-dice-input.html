@@ -1,12 +1,12 @@
-<div class="rs-dice-input">
+<div class="rs-redsun-dice-input">
   <div class="dice-list">
     <div class="dice-header">
       <span class="dice-name">{{ "DICE_ACTION_DESCRIPTION_SHORT" | translate }}</span>
+      <span class="dice-difficulty">{{ "REDSUN_DICE_DIFFICULTY_SHORT" | translate }}</span>
       <span class="dice-count">{{ "DICE_NUMBER_OF_DICE_SHORT" | translate }}</span>
-      <span class="dice-select">{{ "DICE_TYPE_SHORT" | translate }}</span>
     </div>
 
-    @for (entry of entries(); track entry.id; let index = $index) {
+    @for (entry of entries(); track entry.id) {
       <div class="container" [class.is-disabled]="disabled()">
         <div class="dice-name">
           <rs-input
@@ -19,26 +19,25 @@
           >
           </rs-input>
         </div>
+        <div class="dice-difficulty">
+          <rs-number
+            [maxValue]="2"
+            [id]="difficultyId(entry)"
+            [blocked]="disabled()"
+            [value]="difficultyValue(entry)"
+            (valueChanged)="onDifficultyChange(entry.id, $event)"
+          >
+          </rs-number>
+        </div>
         <div class="dice-count">
           <rs-number
-            [maxValue]="1"
+            [maxValue]="2"
             [id]="countId(entry)"
             [blocked]="disabled()"
             [value]="diceCountValue(entry)"
             (valueChanged)="onDiceCountChange(entry.id, $event)"
           >
           </rs-number>
-        </div>
-        <div class="dice-select">
-          <rs-select
-            [id]="typeId(entry)"
-            [optionsEnum]="diceOptions"
-            [value]="entry.value.diceType"
-            [disabled]="disabled()"
-            [allowNull]="false"
-            (valueChanged)="onDiceTypeChange(entry.id, $event)"
-            [localizationPrefix]="'DICE_'">
-          </rs-select>
         </div>
       </div>
     }

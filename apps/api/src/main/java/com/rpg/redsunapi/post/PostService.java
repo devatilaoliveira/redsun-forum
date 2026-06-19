@@ -5,6 +5,9 @@ import com.rpg.redsunapi.location.LocationRepository;
 import com.rpg.redsunapi.post.dto.CreatedPostDTO;
 import com.rpg.redsunapi.post.dto.PostCreateRequestDTO;
 import com.rpg.redsunapi.post.enums.EPostStatus;
+import com.rpg.redsunapi.subscription.Subscription;
+import com.rpg.redsunapi.subscription.SubscriptionRepository;
+import com.rpg.redsunapi.subscription.enums.ESubscriptionPlan;
 import com.rpg.redsunapi.tale.Tale;
 import com.rpg.redsunapi.tale.TaleRepository;
 import com.rpg.redsunapi.tale.enums.ETaleStatus;
@@ -34,6 +37,8 @@ public class PostService {
   private final LocationRepository locationRepository;
   private final TaleRepository taleRepository;
   private final UserRepository userRepository;
+  private final SubscriptionRepository subscriptionRepository;
+  private final GeminiPostTextClient geminiPostTextClient;
 
   public record PostsForLocation(Page<Post> posts, Tale tale) {
   }
@@ -42,12 +47,16 @@ public class PostService {
     PostRepository postRepository,
     LocationRepository locationRepository,
     TaleRepository taleRepository,
-    UserRepository userRepository
+    UserRepository userRepository,
+    SubscriptionRepository subscriptionRepository,
+    GeminiPostTextClient geminiPostTextClient
   ) {
     this.postRepository = postRepository;
     this.locationRepository = locationRepository;
     this.taleRepository = taleRepository;
     this.userRepository = userRepository;
+    this.subscriptionRepository = subscriptionRepository;
+    this.geminiPostTextClient = geminiPostTextClient;
   }
 
   @Transactional
@@ -87,6 +96,17 @@ public class PostService {
     taleRepository.save(tale);
 
     return new CreatedPostDTO(savedPost, tale);
+  }
+
+  public String improvePostText(String content, User requester) {
+    Subscription subscription = subscriptionRepository.findByUserId(requester.getId())
+      .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Premium subscription is required"));
+
+    if (subscription.getPlan() != ESubscriptionPlan.PREMIUM && subscription.getPlan() != ESubscriptionPlan.MAX) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Premium subscription is required");
+    }
+
+    return geminiPostTextClient.improvePostText(content);
   }
 
   @Transactional(readOnly = true)

@@ -58,7 +58,7 @@ public class RedSunSheet extends BasicSheet {
   int legerdemain;
   int survival;
   int stealth;
-  int athletics;
+  int etiquette;
   int performance;
   int history;
   int religion;

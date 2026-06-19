@@ -138,6 +138,7 @@ CREATE TABLE public.basic_sheets (
   character_name varchar(120),
   character_description varchar(4000),
   character_image_url varchar(500),
+  change_history text,
   CONSTRAINT uk_basic_sheets_tale_character UNIQUE (tale_id, character_id)
 );
 CREATE INDEX idx_basic_sheets_tale ON public.basic_sheets(tale_id);
@@ -148,15 +149,15 @@ CREATE TABLE public.redsun_sheets (
   id uuid PRIMARY KEY REFERENCES public.basic_sheets(id) ON DELETE CASCADE,
   nature varchar(120),
   demeanor varchar(120),
-  strength integer NOT NULL DEFAULT 0,
-  dexterity integer NOT NULL DEFAULT 0,
-  stamina integer NOT NULL DEFAULT 0,
-  presence integer NOT NULL DEFAULT 0,
-  empathy integer NOT NULL DEFAULT 0,
-  influence integer NOT NULL DEFAULT 0,
-  perception integer NOT NULL DEFAULT 0,
-  intellect integer NOT NULL DEFAULT 0,
-  determination integer NOT NULL DEFAULT 0,
+  strength integer NOT NULL DEFAULT 1,
+  dexterity integer NOT NULL DEFAULT 1,
+  stamina integer NOT NULL DEFAULT 1,
+  presence integer NOT NULL DEFAULT 1,
+  empathy integer NOT NULL DEFAULT 1,
+  influence integer NOT NULL DEFAULT 1,
+  perception integer NOT NULL DEFAULT 1,
+  intellect integer NOT NULL DEFAULT 1,
+  determination integer NOT NULL DEFAULT 1,
   alertness integer NOT NULL DEFAULT 0,
   sports integer NOT NULL DEFAULT 0,
   intuition integer NOT NULL DEFAULT 0,
@@ -173,7 +174,7 @@ CREATE TABLE public.redsun_sheets (
   legerdemain integer NOT NULL DEFAULT 0,
   survival integer NOT NULL DEFAULT 0,
   stealth integer NOT NULL DEFAULT 0,
-  athletics integer NOT NULL DEFAULT 0,
+  etiquette integer NOT NULL DEFAULT 0,
   performance integer NOT NULL DEFAULT 0,
   history integer NOT NULL DEFAULT 0,
   religion integer NOT NULL DEFAULT 0,
@@ -202,9 +203,9 @@ CREATE TABLE public.redsun_sheets (
   unarmed integer NOT NULL DEFAULT 0,
   throwing integer NOT NULL DEFAULT 0,
   exotic_weapons integer NOT NULL DEFAULT 0,
-  willpower_max integer NOT NULL DEFAULT 0,
-  willpower_current integer NOT NULL DEFAULT 0,
-  impetus_max integer NOT NULL DEFAULT 0,
+  willpower_max integer NOT NULL DEFAULT 3,
+  willpower_current integer NOT NULL DEFAULT 3,
+  impetus_max integer NOT NULL DEFAULT 5,
   impetus_current integer NOT NULL DEFAULT 0,
   vitality_damage integer NOT NULL DEFAULT 0,
   experience text,
@@ -239,7 +240,7 @@ CREATE TABLE public.redsun_sheets (
     AND legerdemain BETWEEN 0 AND 5
     AND survival BETWEEN 0 AND 5
     AND stealth BETWEEN 0 AND 5
-    AND athletics BETWEEN 0 AND 5
+    AND etiquette BETWEEN 0 AND 5
     AND performance BETWEEN 0 AND 5
     AND history BETWEEN 0 AND 5
     AND religion BETWEEN 0 AND 5
