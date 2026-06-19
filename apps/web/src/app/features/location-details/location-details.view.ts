@@ -150,7 +150,7 @@ export class LocationDetailsView implements OnInit, OnDestroy {
       return this.hasRedsunDiceRoll();
     case "post":
     default:
-      return this.postFormGroup.valid && this.postContent().trim().length > 0;
+      return this.postContent().trim().length > 0 && this.postFormGroup.valid;
     }
   });
   private readonly visiblePosts: Signal<PostDTO[]> = computed(() => {
