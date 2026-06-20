@@ -36,21 +36,6 @@
             ]
           },
           "configurations": {
-            "production": {
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "900kb",
-                  "maximumError": "1MB"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kB",
-                  "maximumError": "8kB"
-                }
-              ],
-              "outputHashing": "all"
-            },
             "prod": {
               "fileReplacements": [
                 {
@@ -71,12 +56,6 @@
                 }
               ],
               "outputHashing": "all"
-            },
-            "development": {
-              "optimization": false,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "outputHashing": "none"
             },
             "local": {
               "fileReplacements": [
@@ -106,11 +85,14 @@
                   "with": "src/environments/environment.stage.ts"
                 }
               ],
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "900kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "2700kB",
+                  "maximumError": "3MB"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -118,7 +100,7 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "none"
             }
           },
           "defaultConfiguration": "production"
@@ -130,16 +112,16 @@
               "buildTarget": "redsun-web:build:production,development"
             },
             "prod": {
-              "buildTarget": "redsun-web:build:prod,development"
+              "buildTarget": "redsun-web:build:prod"
             },
             "development": {
               "buildTarget": "redsun-web:build:development"
             },
             "local": {
-              "buildTarget": "redsun-web:build:local,development"
+              "buildTarget": "redsun-web:build:local"
             },
             "stage": {
-              "buildTarget": "redsun-web:build:stage,development"
+              "buildTarget": "redsun-web:build:stage"
             }
           },
           "defaultConfiguration": "development"
