@@ -103,19 +103,13 @@
               "outputHashing": "none"
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "prod"
         },
         "serve": {
           "builder": "@angular/build:dev-server",
           "configurations": {
-            "production": {
-              "buildTarget": "redsun-web:build:production,development"
-            },
             "prod": {
               "buildTarget": "redsun-web:build:prod"
-            },
-            "development": {
-              "buildTarget": "redsun-web:build:development"
             },
             "local": {
               "buildTarget": "redsun-web:build:local"
@@ -124,7 +118,7 @@
               "buildTarget": "redsun-web:build:stage"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "local"
         },
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n"
