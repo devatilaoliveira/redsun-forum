@@ -7,6 +7,7 @@ export class SupabaseProvider {
   private readonly _supabaseClient: SupabaseClient;
 
   constructor() {
+    /* @vite-ignore */
     this._supabaseClient = createClient(
       environment.supabaseUrl,
       environment.supabasePublishableKey, {

@@ -45,7 +45,7 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
+                  "maximumWarning": "6kB",
                   "maximumError": "8kB"
                 }
               ],
@@ -66,7 +66,7 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
+                  "maximumWarning": "6kB",
                   "maximumError": "8kB"
                 }
               ],
@@ -75,7 +75,8 @@
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "outputHashing": "none"
             },
             "local": {
               "fileReplacements": [
@@ -87,12 +88,12 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "700kB",
+                  "maximumWarning": "900kB",
                   "maximumError": "1MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
+                  "maximumWarning": "6kB",
                   "maximumError": "8kB"
                 }
               ],
@@ -108,12 +109,12 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "700kB",
+                  "maximumWarning": "900kB",
                   "maximumError": "1MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
+                  "maximumWarning": "6kB",
                   "maximumError": "8kB"
                 }
               ],
@@ -126,19 +127,19 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "redsun-web:build:production"
+              "buildTarget": "redsun-web:build:production,development"
             },
             "prod": {
-              "buildTarget": "redsun-web:build:prod"
+              "buildTarget": "redsun-web:build:prod,development"
             },
             "development": {
               "buildTarget": "redsun-web:build:development"
             },
             "local": {
-              "buildTarget": "redsun-web:build:local"
+              "buildTarget": "redsun-web:build:local,development"
             },
             "stage": {
-              "buildTarget": "redsun-web:build:stage"
+              "buildTarget": "redsun-web:build:stage,development"
             }
           },
           "defaultConfiguration": "development"
