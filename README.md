@@ -356,8 +356,7 @@ The app reads runtime values from `apps/web/public/env.js` through `window.__env
 - `SUPABASE_URL`
 - `SUPABASE_PUBLISHABLE_KEY`
 
-For local development, placeholder `BASE_URL` and `API_BASE_URL` values in `public/env.js` fall back to defaults in `src/environments/environment.ts`.
-`SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` are required runtime values and do not fall back to a real project.
+Placeholder values in `public/env.js` are invalid for runtime-driven environments. `BASE_URL`, `API_BASE_URL`, `SUPABASE_URL`, and `SUPABASE_PUBLISHABLE_KEY` must all be provided before starting or building a runtime-driven target.
 `npm run build` regenerates `public/env.js` from environment variables before Angular builds.
 
 ### Cloudflare Pages
