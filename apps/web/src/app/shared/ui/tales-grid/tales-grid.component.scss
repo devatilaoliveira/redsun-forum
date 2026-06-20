@@ -2,7 +2,7 @@
 @use "../../../../styles/breakpoints" as bp;
 
 $normal-content: bp.$bp-xs;
-$min-content: bp.$bp-xs;
+$min-content: bp.$bp-xxs;
 
 :host {
   @include mix.main-host();

@@ -15,7 +15,7 @@
     "start:local": "ng serve --configuration local --port 4200",
     "start:stage": "ng serve --configuration stage --port 4200",
     "start:prod": "ng serve --configuration prod --port 4200",
-    "watch": "ng build --watch --configuration development",
+    "watch": "ng build --watch --configuration local",
     "lint": "ng lint",
     "fix": "ng lint --fix",
     "rsAgents": "powershell -ExecutionPolicy Bypass -File ../../scripts/rsAgents.ps1 -App web",
