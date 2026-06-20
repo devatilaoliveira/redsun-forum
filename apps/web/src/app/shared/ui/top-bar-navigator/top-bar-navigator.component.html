@@ -1,4 +1,4 @@
-@if (!hideTopBar) {
+@if (!hideTopBar()) {
   <div class="top-bar-ghost" aria-hidden="true"></div>
   <header class="top-bar" role="banner">
     <div class="content">
@@ -7,7 +7,7 @@
           #menuButton
           [iconSrc]="'/assets/svgs/menu.svg'"
           ariaLabel="Toggle menu"
-          [ariaExpanded]="menuOpen"
+          [ariaExpanded]="menuOpen()"
           [ariaControls]="sideNavId"
           (pressed)="onMenuToggle()"
         />
@@ -44,7 +44,7 @@
             #manageButton
             [iconSrc]="'/assets/svgs/manage.svg'"
             [ariaLabel]="'Manage tale'"
-            [ariaExpanded]="manageMenuOpen"
+            [ariaExpanded]="manageMenuOpen()"
             [ariaControls]="manageSideNavId"
             (pressed)="onManageToggle()"
           />
@@ -54,12 +54,12 @@
             #playerButton
             [iconSrc]="'/assets/svgs/profile.svg'"
             [ariaLabel]="'Player menu'"
-            [ariaExpanded]="playerMenuOpen"
+            [ariaExpanded]="playerMenuOpen()"
             [ariaControls]="playerSideNavId"
             (pressed)="onPlayerToggle()"
           />
         }
-        @if (!hideBackBtn) {
+        @if (!hideBackBtn()) {
           <rs-round-icon-button
             [iconSrc]="'/assets/svgs/arrow.svg'"
             [ariaLabel]="'Go back'"
@@ -71,7 +71,7 @@
   </header>
 
   <rs-side-nav
-    [menuOpen]="menuOpen"
+    [menuOpen]="menuOpen()"
     [navItems]="menuNavItems"
     [showLogoutBtn]="showLogoutBtn"
     [sideNavId]="sideNavId"
@@ -79,8 +79,8 @@
   />
   @if (manageVisible()) {
     <rs-side-nav
-      [menuOpen]="manageMenuOpen"
-      [navItems]="manageNavItems"
+      [menuOpen]="manageMenuOpen()"
+      [navItems]="manageNavItems()"
       [showLogoutBtn]="false"
       [sideNavId]="manageSideNavId"
       (navSelected)="closeManageMenu()"
@@ -88,8 +88,8 @@
   }
   @if (playerVisible() && !manageVisible()) {
     <rs-side-nav
-      [menuOpen]="playerMenuOpen"
-      [navItems]="playerNavItems"
+      [menuOpen]="playerMenuOpen()"
+      [navItems]="playerNavItems()"
       [showLogoutBtn]="false"
       [sideNavId]="playerSideNavId"
       (navSelected)="closePlayerMenu()"

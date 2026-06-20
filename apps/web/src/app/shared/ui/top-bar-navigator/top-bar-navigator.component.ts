@@ -1,5 +1,5 @@
 import {DOCUMENT, Location} from "@angular/common";
-import {Component, DestroyRef, effect, ElementRef, HostListener, inject, OnInit, Signal, ViewChild} from "@angular/core";
+import {Component, DestroyRef, effect, ElementRef, HostListener, inject, OnInit, signal, Signal, ViewChild, WritableSignal} from "@angular/core";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {ActivatedRoute, NavigationEnd, Router, UrlTree} from "@angular/router";
 import {filter} from "rxjs";
@@ -28,12 +28,12 @@ export class RsTopBarNavigatorComponent implements OnInit {
   @ViewChild("playerButton", { read: ElementRef })
   private playerButtonRef?: ElementRef<HTMLElement>;
 
-  protected hideTopBar: boolean = true;
-  protected hideBackBtn: boolean = false;
-  protected backTarget: UrlTree | null = null;
-  protected menuOpen: boolean = false;
-  protected manageMenuOpen: boolean = false;
-  protected playerMenuOpen: boolean = false;
+  protected readonly hideTopBar: WritableSignal<boolean> = signal(true);
+  protected readonly hideBackBtn: WritableSignal<boolean> = signal(false);
+  protected readonly backTarget: WritableSignal<UrlTree | null> = signal(null);
+  protected readonly menuOpen: WritableSignal<boolean> = signal(false);
+  protected readonly manageMenuOpen: WritableSignal<boolean> = signal(false);
+  protected readonly playerMenuOpen: WritableSignal<boolean> = signal(false);
   protected readonly sideNavId: string = "top-bar-sidenav";
   protected readonly manageSideNavId: string = "manage-sidenav";
   protected readonly playerSideNavId: string = "player-sidenav";
@@ -41,8 +41,8 @@ export class RsTopBarNavigatorComponent implements OnInit {
   protected readonly menuNavItems: RsSideNavItem[] = DEFAULT_SIDE_NAV_ITEMS;
   protected readonly manageVisible: Signal<boolean>;
   protected readonly playerVisible: Signal<boolean>;
-  protected manageNavItems: RsSideNavItem[] = [];
-  protected playerNavItems: RsSideNavItem[] = [];
+  protected readonly manageNavItems: WritableSignal<RsSideNavItem[]> = signal([]);
+  protected readonly playerNavItems: WritableSignal<RsSideNavItem[]> = signal([]);
 
 
   private previousBodyOverflow: string | null = null;
@@ -61,7 +61,7 @@ export class RsTopBarNavigatorComponent implements OnInit {
       const manageVisible: boolean = this.manageVisible();
       const playerVisible: boolean = this.playerVisible();
 
-      if (this.hideTopBar) {
+      if (this.hideTopBar()) {
         this.closeAllMenus(false);
         return;
       }
@@ -85,10 +85,10 @@ export class RsTopBarNavigatorComponent implements OnInit {
       )
       .subscribe(() => {
         this.updateRouteState();
-        this.closeAllMenus(!this.hideTopBar);
+        this.closeAllMenus(!this.hideTopBar());
       });
     this._destroyRef.onDestroy(() => {
-      if (this.menuOpen || this.manageMenuOpen || this.playerMenuOpen) {
+      if (this.menuOpen() || this.manageMenuOpen() || this.playerMenuOpen()) {
         this.unlockScroll();
         this.restoreMainInteractivity();
       }
@@ -96,16 +96,16 @@ export class RsTopBarNavigatorComponent implements OnInit {
   }
 
   protected onMenuToggle(): void {
-    if (this.menuOpen) {
+    if (this.menuOpen()) {
       this.closeMenu();
       return;
     }
 
-    if (this.manageMenuOpen) {
+    if (this.manageMenuOpen()) {
       this.closeManageMenu(false);
     }
 
-    if (this.playerMenuOpen) {
+    if (this.playerMenuOpen()) {
       this.closePlayerMenu(false);
     }
 
@@ -113,11 +113,11 @@ export class RsTopBarNavigatorComponent implements OnInit {
   }
 
   protected closeMenu(restoreFocus: boolean = true): void {
-    if (!this.menuOpen) {
+    if (!this.menuOpen()) {
       return;
     }
 
-    this.menuOpen = false;
+    this.menuOpen.set(false);
     this.unlockScroll();
     this.restoreMainInteractivity();
     if (restoreFocus) {
@@ -130,16 +130,16 @@ export class RsTopBarNavigatorComponent implements OnInit {
       return;
     }
 
-    if (this.manageMenuOpen) {
+    if (this.manageMenuOpen()) {
       this.closeManageMenu();
       return;
     }
 
-    if (this.menuOpen) {
+    if (this.menuOpen()) {
       this.closeMenu(false);
     }
 
-    if (this.playerMenuOpen) {
+    if (this.playerMenuOpen()) {
       this.closePlayerMenu(false);
     }
 
@@ -151,16 +151,16 @@ export class RsTopBarNavigatorComponent implements OnInit {
       return;
     }
 
-    if (this.playerMenuOpen) {
+    if (this.playerMenuOpen()) {
       this.closePlayerMenu();
       return;
     }
 
-    if (this.menuOpen) {
+    if (this.menuOpen()) {
       this.closeMenu(false);
     }
 
-    if (this.manageMenuOpen) {
+    if (this.manageMenuOpen()) {
       this.closeManageMenu(false);
     }
 
@@ -168,11 +168,11 @@ export class RsTopBarNavigatorComponent implements OnInit {
   }
 
   protected closeManageMenu(restoreFocus: boolean = true): void {
-    if (!this.manageMenuOpen) {
+    if (!this.manageMenuOpen()) {
       return;
     }
 
-    this.manageMenuOpen = false;
+    this.manageMenuOpen.set(false);
     this.unlockScroll();
     this.restoreMainInteractivity();
     if (restoreFocus) {
@@ -181,11 +181,11 @@ export class RsTopBarNavigatorComponent implements OnInit {
   }
 
   protected closePlayerMenu(restoreFocus: boolean = true): void {
-    if (!this.playerMenuOpen) {
+    if (!this.playerMenuOpen()) {
       return;
     }
 
-    this.playerMenuOpen = false;
+    this.playerMenuOpen.set(false);
     this.unlockScroll();
     this.restoreMainInteractivity();
     if (restoreFocus) {
@@ -195,17 +195,17 @@ export class RsTopBarNavigatorComponent implements OnInit {
 
   @HostListener("document:keydown", ["$event"])
   protected onDocumentKeydown(event: KeyboardEvent): void {
-    if (event.key !== "Escape" || (!this.menuOpen && !this.manageMenuOpen && !this.playerMenuOpen)) {
+    if (event.key !== "Escape" || (!this.menuOpen() && !this.manageMenuOpen() && !this.playerMenuOpen())) {
       return;
     }
 
     event.preventDefault();
-    if (this.manageMenuOpen) {
+    if (this.manageMenuOpen()) {
       this.closeManageMenu();
       return;
     }
 
-    if (this.playerMenuOpen) {
+    if (this.playerMenuOpen()) {
       this.closePlayerMenu();
       return;
     }
@@ -214,12 +214,13 @@ export class RsTopBarNavigatorComponent implements OnInit {
   }
 
   protected onBack(): void {
-    if (this.hideBackBtn) {
+    if (this.hideBackBtn()) {
       return;
     }
 
-    if (this.backTarget) {
-      this.navigateTo(this.backTarget);
+    const backTarget: UrlTree | null = this.backTarget();
+    if (backTarget) {
+      this.navigateTo(backTarget);
       return;
     }
 
@@ -231,31 +232,31 @@ export class RsTopBarNavigatorComponent implements OnInit {
   }
 
   private openMenu(): void {
-    if (this.menuOpen) {
+    if (this.menuOpen()) {
       return;
     }
 
-    this.menuOpen = true;
+    this.menuOpen.set(true);
     this.lockScroll();
     this.disableMainInteractivity();
   }
 
   private openManageMenu(): void {
-    if (this.manageMenuOpen) {
+    if (this.manageMenuOpen()) {
       return;
     }
 
-    this.manageMenuOpen = true;
+    this.manageMenuOpen.set(true);
     this.lockScroll();
     this.disableMainInteractivity();
   }
 
   private openPlayerMenu(): void {
-    if (this.playerMenuOpen) {
+    if (this.playerMenuOpen()) {
       return;
     }
 
-    this.playerMenuOpen = true;
+    this.playerMenuOpen.set(true);
     this.lockScroll();
     this.disableMainInteractivity();
   }
@@ -268,25 +269,25 @@ export class RsTopBarNavigatorComponent implements OnInit {
     const route: ActivatedRoute = this.getDeepestRoute(this._activatedRoute);
     const data: Record<string, unknown> = route.snapshot.data ?? {};
     const { backTo } = data as { backTo?: UrlTree };
-    this.hideBackBtn = data["hideBackBtn"] === true;
-    this.hideTopBar = data["hideTopBar"] === true;
-    this.backTarget = backTo ?? null;
+    this.hideBackBtn.set(data["hideBackBtn"] === true);
+    this.hideTopBar.set(data["hideTopBar"] === true);
+    this.backTarget.set(backTo ?? null);
     this.updateManageItems(route);
     this.updatePlayerItems(route);
 
-    if (this.hideTopBar) {
+    if (this.hideTopBar()) {
       this.closeAllMenus(false);
     }
   }
 
   private closeAllMenus(restoreFocus: boolean = true): void {
-    if (this.menuOpen) {
+    if (this.menuOpen()) {
       this.closeMenu(restoreFocus);
     }
-    if (this.manageMenuOpen) {
+    if (this.manageMenuOpen()) {
       this.closeManageMenu(restoreFocus);
     }
-    if (this.playerMenuOpen) {
+    if (this.playerMenuOpen()) {
       this.closePlayerMenu(restoreFocus);
     }
   }
@@ -304,9 +305,9 @@ export class RsTopBarNavigatorComponent implements OnInit {
   private updateManageItems(route: ActivatedRoute): void {
     const taleId: string | null = route.snapshot.paramMap.get(ROUTE_PATHS.taleId);
     if (!taleId) {
-      this.manageNavItems = this.manageNavItems.filter((item) =>
+      this.manageNavItems.update((items) => items.filter((item) =>
         item.label !== "MANAGE_TALE" && item.label !== "MANAGE_PARTICIPANTS" && item.label !== "MANAGE_PROFILE"
-      );
+      ));
       return;
     }
 
@@ -328,16 +329,16 @@ export class RsTopBarNavigatorComponent implements OnInit {
       routePath: `/${ROUTE_PATHS.tales}/${taleId}/${ROUTE_PATHS.profile}`,
       exact: true
     };
-    const otherItems = this.manageNavItems.filter((item) =>
+    const otherItems = this.manageNavItems().filter((item) =>
       item.label !== "MANAGE_TALE" && item.label !== "MANAGE_PARTICIPANTS" && item.label !== "MANAGE_PROFILE"
     );
-    this.manageNavItems = [manageItem, participantsItem, manageCharacterItem, ...otherItems];
+    this.manageNavItems.set([manageItem, participantsItem, manageCharacterItem, ...otherItems]);
   }
 
   private updatePlayerItems(route: ActivatedRoute): void {
     const taleId: string | null = route.snapshot.paramMap.get(ROUTE_PATHS.taleId);
     if (!taleId) {
-      this.playerNavItems = this.playerNavItems.filter((item) => item.label !== "MANAGE_PROFILE");
+      this.playerNavItems.update((items) => items.filter((item) => item.label !== "MANAGE_PROFILE"));
       return;
     }
 
@@ -347,8 +348,8 @@ export class RsTopBarNavigatorComponent implements OnInit {
       routePath: `/${ROUTE_PATHS.tales}/${taleId}/${ROUTE_PATHS.profile}`,
       exact: true
     };
-    const otherItems = this.playerNavItems.filter((item) => item.label !== "MANAGE_PROFILE");
-    this.playerNavItems = [manageCharacterItem, ...otherItems];
+    const otherItems = this.playerNavItems().filter((item) => item.label !== "MANAGE_PROFILE");
+    this.playerNavItems.set([manageCharacterItem, ...otherItems]);
   }
 
   private restoreMenuButtonFocus(): void {
