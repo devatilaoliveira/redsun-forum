@@ -22,7 +22,10 @@
 
         <div class="identity">
           <h2>{{ displayName() || ('CHARACTER_SHEET_NAME' | translate) }}</h2>
-          <p>{{ description() || ('NO_DESCRIPTION' | translate) }}</p>
+          <rs-expandable-text
+            [text]="description() ?? ('NO_DESCRIPTION' | translate)"
+            [maxLines]="6"
+          />
         </div>
 
         <rs-button
