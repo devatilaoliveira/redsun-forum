@@ -1,13 +1,10 @@
-// Generated during the Cloudflare Pages build.
+// Generated from runtime environment variables.
 (function initEnv() {
   window.__env = {
+    "APP_ENV": "prod",
     "BASE_URL": "__BASE_URL__",
     "API_BASE_URL": "__API_BASE_URL__",
     "SUPABASE_URL": "__SUPABASE_URL__",
-    "SUPABASE_PUBLISHABLE_KEY": "__SUPABASE_PUBLISHABLE_KEY__",
-    "baseUrl": "__BASE_URL__",
-    "apiBaseUrl": "__API_BASE_URL__",
-    "supabaseUrl": "__SUPABASE_URL__",
-    "supabasePublishableKey": "__SUPABASE_PUBLISHABLE_KEY__"
+    "SUPABASE_PUBLISHABLE_KEY": "__SUPABASE_PUBLISHABLE_KEY__"
   };
 })();

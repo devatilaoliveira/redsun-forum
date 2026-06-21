@@ -8,7 +8,7 @@ if (existsSync(e2eEnvPath)) {
   loadEnvFile(e2eEnvPath);
 }
 
-const webServerCommand = process.env?.['CI'] ? 'npm run start:local' : 'npm run start:stage';
+const webServerCommand = process.env?.['CI'] ? 'npm run start:prod' : 'npm run start:stage';
 
 /**
  * See https://playwright.dev/docs/test-configuration.

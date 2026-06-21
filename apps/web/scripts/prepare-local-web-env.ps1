@@ -44,6 +44,7 @@ $env:BASE_URL = $BaseUrl
 $env:API_BASE_URL = $ApiBaseUrl
 $env:SUPABASE_URL = $SupabaseUrl
 $env:SUPABASE_PUBLISHABLE_KEY = Get-LocalSupabasePublishableKey -StatusFile $SupabaseStatusFile -Workdir $SupabaseWorkdir
+$env:APP_ENV = "local"
 
 node scripts/write-env.js
 Write-Host "Wrote local web runtime environment to public/env.js."
