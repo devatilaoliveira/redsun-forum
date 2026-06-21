@@ -19,6 +19,7 @@ import {RsButton} from "../../shared/fragments/rsButton/rs.button";
 import {EVariant} from "../../../interface/enums/EVariant";
 import {RedSunSheetComponent} from "../manage-character/redsun-sheet/redsun-sheet.component";
 import {TaleAccessRole} from "../../../interface/enums/TaleAccessRole";
+import {RsExpandableText} from "../../shared/fragments/rsExpandableText/rs.expandable-text";
 
 @Component({
   selector: "rs-tale-participant-profile",
@@ -29,7 +30,8 @@ import {TaleAccessRole} from "../../../interface/enums/TaleAccessRole";
     RsSpinner,
     RsAvatar,
     RsButton,
-    RedSunSheetComponent
+    RedSunSheetComponent,
+    RsExpandableText
   ],
   templateUrl: "./tale-participant-profile.view.html",
   styleUrl: "./tale-participant-profile.view.scss"

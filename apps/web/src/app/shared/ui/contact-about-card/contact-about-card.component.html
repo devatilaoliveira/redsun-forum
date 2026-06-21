@@ -6,7 +6,10 @@
 
   <rs-divider type="gradient" />
 
-  <p class="text">{{ description() ?? ('NO_DESCRIPTION' | translate) }}</p>
+  <rs-expandable-text
+    [text]="description() ?? ('NO_DESCRIPTION' | translate)"
+    [maxLines]="6"
+  />
 
   @if (hasPreferences()) {
     <rs-divider type="gradient" />

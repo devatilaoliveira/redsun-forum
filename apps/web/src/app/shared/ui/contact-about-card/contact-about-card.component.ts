@@ -7,11 +7,12 @@ import {ERuleSystem} from "../../../../interface/enums/ERuleSystem";
 import {EVariant} from "../../../../interface/enums/EVariant";
 import {RsBadge} from "../../fragments/rsBadge/rs.badge";
 import {RsDivider} from "../../fragments/rsDivider/rs.divider";
+import {RsExpandableText} from "../../fragments/rsExpandableText/rs.expandable-text";
 
 @Component({
   selector: "rs-contact-about-card",
   standalone: true,
-  imports: [TranslatePipe, RsBadge, RsDivider],
+  imports: [TranslatePipe, RsBadge, RsDivider, RsExpandableText],
   templateUrl: "./contact-about-card.component.html",
   styleUrl: "./contact-about-card.component.scss"
 })

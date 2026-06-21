@@ -17,6 +17,8 @@ import java.util.List;
 public class GeminiPostTextClient {
 
   private static final String IMPROVE_POST_PROMPT = """
+    Detect the dominant natural language of the original post text.
+    Return the rewritten post in that same language.
     Rewrite the text as a neutral, descriptive table top RPG narration, similar to a book scene narrated by a DM or the action of a player.
     Preserve the original meaning, intent, actions, and relevant details.
     Do not add new concrete information, actions, objects, locations, lore, or interpretations.
