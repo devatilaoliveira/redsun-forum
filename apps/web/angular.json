@@ -51,17 +51,17 @@
               ],
               "outputHashing": "all"
             },
-            "local": {
+            "local-prod": {
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.local.ts"
+                  "with": "src/environments/environment.prod.ts"
                 }
               ],
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "900kB",
+                  "maximumWarning": "900kb",
                   "maximumError": "1MB"
                 },
                 {
@@ -105,14 +105,14 @@
             "prod": {
               "buildTarget": "redsun-web:build:prod"
             },
-            "local": {
-              "buildTarget": "redsun-web:build:local"
+            "local-prod": {
+              "buildTarget": "redsun-web:build:local-prod"
             },
             "stage": {
               "buildTarget": "redsun-web:build:stage"
             }
           },
-          "defaultConfiguration": "local"
+          "defaultConfiguration": "prod"
         },
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n"

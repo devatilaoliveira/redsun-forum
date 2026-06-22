@@ -355,9 +355,13 @@ The app reads runtime values from `apps/web/public/env.js` through `window.__env
 - `API_BASE_URL`
 - `SUPABASE_URL`
 - `SUPABASE_PUBLISHABLE_KEY`
+- `APP_ENV` (`local`, `stage`, or `prod`; defaults to `prod` when omitted)
 
 Placeholder values in `public/env.js` are invalid for runtime-driven environments. `BASE_URL`, `API_BASE_URL`, `SUPABASE_URL`, and `SUPABASE_PUBLISHABLE_KEY` must all be provided before starting or building a runtime-driven target.
-`npm run build` regenerates `public/env.js` from environment variables before Angular builds.
+`npm run build` regenerates `public/env.js` from environment variables before Angular builds for Cloudflare Pages.
+`npm run start:local` regenerates `public/env.js` from the local Supabase stack before Angular serves.
+`npm run start:prod` regenerates `public/env.js` from environment variables before Angular serves, which is also how GitHub E2E serves the web app after preparing local Supabase values.
+`npm run start:stage` and `npm run start:local-prod` use ignored Angular environment files instead of `public/env.js`.
 
 ### Cloudflare Pages
 
@@ -373,6 +377,7 @@ Set only public frontend values in Cloudflare Pages environment variables:
 - `API_BASE_URL`
 - `SUPABASE_URL`
 - `SUPABASE_PUBLISHABLE_KEY`
+- `APP_ENV`
 
 Direct route refreshes are handled by `not_found_handling = "single-page-application"` in `apps/web/wrangler.toml`.
 
