@@ -72,8 +72,8 @@ export class TaleParticipantProfileView implements OnInit {
   protected readonly avatarSrc: Signal<string | null> = computed(() =>
     this.sheet()?.characterImageUrl ?? this.participant()?.characterImageUrl ?? null
   );
-  protected readonly description: Signal<string> = computed(() =>
-    this.sheet()?.characterDescription?.trim() ?? ""
+  protected readonly description: Signal<string | null> = computed(() =>
+    this.sheet()?.characterDescription?.trim() ?? null
   );
   protected readonly redSunSheet: Signal<RedSunSheetResponseDTO | null> = computed(() => {
     const sheet = this.sheet();
