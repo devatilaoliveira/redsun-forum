@@ -116,7 +116,8 @@ public class UserRepositoryAdapter implements UserRepository {
     if (username != null) {
       predicates.add(criteriaBuilder.like(
           criteriaBuilder.lower(root.get("username")),
-          "%" + username.toLowerCase() + "%"
+          "%" + escapeLikePattern(username.toLowerCase()) + "%",
+          '\\'
       ));
     }
 
@@ -133,6 +134,13 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     return predicates.toArray(Predicate[]::new);
+  }
+
+  private String escapeLikePattern(String value) {
+    return value
+        .replace("\\", "\\\\")
+        .replace("%", "\\%")
+        .replace("_", "\\_");
   }
 
   @Override

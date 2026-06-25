@@ -152,8 +152,10 @@ export class TaleService implements ITaleService {
     taleId: string,
     identifier: string
   ): Observable<TaleDetailDTO> {
+    const encodedIdentifier = encodeURIComponent(identifier);
+
     return this._http.post<TaleDetailDTO>(
-      `${environment.apiBaseUrl}/tales/${taleId}/participants/${identifier}`,
+      `${environment.apiBaseUrl}/tales/${taleId}/participants/${encodedIdentifier}`,
       null
     ).pipe(
       tap((tale) => this.setTaleCache(tale, taleId))
