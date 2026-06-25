@@ -41,7 +41,6 @@
 
 .forgot-cta {
   align-self: flex-end;
-  margin-bottom: var(--space-1-5);
 }
 
 .cta-btn {
@@ -68,4 +67,26 @@
 .legal-footer-wrapper {
   width: 100%;
   margin-top: auto;
+}
+
+.translate-forgot-password-row {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-1);
+  margin-bottom: var(--space-1-5);
+  flex-wrap: wrap;
+  overflow: visible;
+}
+
+.change-language {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+@include bp.mobile {
+  .translate-forgot-password-row {
+    align-items: center;
+  }
 }
