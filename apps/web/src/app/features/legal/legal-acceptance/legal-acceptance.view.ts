@@ -1,22 +1,24 @@
 import {HttpErrorResponse} from "@angular/common/http";
 import {Component, OnInit, inject, signal, WritableSignal} from "@angular/core";
 import {ActivatedRoute, Router, RouterLink} from "@angular/router";
-import {TranslatePipe} from "@ngx-translate/core";
+import {ITranslateService, TranslatePipe, TranslateService} from "@ngx-translate/core";
 import {finalize} from "rxjs";
 import {ROUTE_PATHS} from "../../../../interface/constants/route-path.constants";
 import {MeResponseDTO} from "../../../../interface/dtos/user/MeResponseDTO";
+import {ELanguage} from "../../../../interface/enums/ELanguage";
 import {EVariant} from "../../../../interface/enums/EVariant";
 import {ILocalStoreService, LocalStoreService} from "../../../../services/local-store.service";
 import {IUserProfileService, UserProfileService} from "../../../../services/user-profile.service";
 import {RedsunTitle} from "../../../shared/fragments/redsunTitle/redsun.title";
 import {RsButton} from "../../../shared/fragments/rsButton/rs.button";
 import {RsCheckbox} from "../../../shared/fragments/rsCheckbox/rs.checkbox";
+import {RsOptionsMenu, RsOptionsMenuOption} from "../../../shared/fragments/rsOptionsMenu/rs.options-menu";
 import {PublicLegalFooterComponent} from "../../../shared/ui/public-legal-footer/public-legal-footer.component";
 
 @Component({
   selector: "rs-legal-acceptance",
   standalone: true,
-  imports: [RouterLink, TranslatePipe, RedsunTitle, RsButton, RsCheckbox, PublicLegalFooterComponent],
+  imports: [RouterLink, TranslatePipe, RedsunTitle, RsButton, RsCheckbox, RsOptionsMenu, PublicLegalFooterComponent],
   templateUrl: "./legal-acceptance.view.html",
   styleUrl: "./legal-acceptance.view.scss"
 })
@@ -25,10 +27,13 @@ export class LegalAcceptanceView implements OnInit {
   private readonly _route: ActivatedRoute = inject(ActivatedRoute);
   private readonly _localStoreService: ILocalStoreService = inject(LocalStoreService);
   private readonly _userProfileService: IUserProfileService = inject(UserProfileService);
+  private readonly _translateService: ITranslateService = inject(TranslateService);
 
   protected readonly EVariant = EVariant;
+  protected readonly ELanguage = ELanguage;
   protected readonly termsRoute: string = `/${ROUTE_PATHS.terms}`;
   protected readonly privacyRoute: string = `/${ROUTE_PATHS.privacy}`;
+  protected readonly selectedLanguage: WritableSignal<ELanguage> = signal<ELanguage>(this._localStoreService.getLanguage());
   protected readonly acceptedTerms: WritableSignal<boolean> = signal<boolean>(false);
   protected readonly acknowledgedPrivacy: WritableSignal<boolean> = signal<boolean>(false);
   protected readonly inProgress: WritableSignal<boolean> = signal<boolean>(false);
@@ -90,6 +95,15 @@ export class LegalAcceptanceView implements OnInit {
         this.errorMessage.set(this._resolveAcceptanceError(error));
       }
     });
+  }
+
+  protected onLangChange(option: RsOptionsMenuOption): void {
+    if (!Object.values(ELanguage).includes(option.value as ELanguage)) return;
+
+    const nextLang = option.value as ELanguage;
+    this.selectedLanguage.set(nextLang);
+    this._localStoreService.setLanguage(nextLang);
+    this._translateService.use(nextLang).subscribe();
   }
 
   private _setUser(user: MeResponseDTO): void {

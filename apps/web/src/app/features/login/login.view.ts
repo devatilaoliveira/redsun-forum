@@ -20,11 +20,13 @@ import {PublicLegalFooterComponent} from "../../shared/ui/public-legal-footer/pu
 import {ISupabaseAuthClient, SupabaseAuthClientAdapter} from "../../../services/supabase-auth-client.adapter";
 import {GoogleButton} from "../../shared/fragments/googleButton/google.button";
 import {UtilFunctions} from "../../../infra/miscellaneous/util.functions";
+import {ELanguage} from "../../../interface/enums/ELanguage";
+import {RsOptionsMenu, RsOptionsMenuOption} from "../../shared/fragments/rsOptionsMenu/rs.options-menu";
 
 @Component({
   selector: "rs-login",
   standalone: true,
-  imports: [RedsunTitle, NgOptimizedImage, TranslatePipe, RsInput, RsButton, RsButtonText, PublicLegalFooterComponent, GoogleButton],
+  imports: [RedsunTitle, NgOptimizedImage, TranslatePipe, RsInput, RsButton, RsButtonText, PublicLegalFooterComponent, GoogleButton, RsOptionsMenu],
   templateUrl: "./login.view.html",
   styleUrl: "./login.view.scss"
 })
@@ -38,9 +40,11 @@ export class LoginView implements OnInit {
   private readonly _supabaseAuthClient: ISupabaseAuthClient = inject(SupabaseAuthClientAdapter);
   protected errorMessage: WritableSignal<string | null> = signal<string | null>(null);
   protected inProgress: WritableSignal<boolean> = signal<boolean>(false);
+  protected readonly selectedLanguage: WritableSignal<ELanguage> = signal<ELanguage>(this._localStoreService.getLanguage());
   protected email: string = "";
   protected password: string = "";
   protected readonly EVariant = EVariant;
+  protected readonly ELanguage = ELanguage;
   protected readonly forgotPasswordRoute: string = `/${ROUTE_PATHS.forgotPassword}`;
   protected readonly registerRoute: string = `/${ROUTE_PATHS.register}`;
   private readonly _targetOrigin: string = UtilFunctions.getAppOrigin(environment.baseUrl);
@@ -102,6 +106,15 @@ export class LoginView implements OnInit {
 
   protected onPasswordChange(value: string): void {
     this.password = value;
+  }
+
+  protected onLangChange(option: RsOptionsMenuOption): void {
+    if (!Object.values(ELanguage).includes(option.value as ELanguage)) return;
+
+    const nextLang = option.value as ELanguage;
+    this.selectedLanguage.set(nextLang);
+    this._localStoreService.setLanguage(nextLang);
+    this._translateService.use(nextLang).subscribe();
   }
 
   private _resolveLoginError(error: unknown): string {

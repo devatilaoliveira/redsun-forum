@@ -2,6 +2,19 @@
   <rs-title />
 
   <div class="acceptance-content">
+    <rs-options-menu
+      class="language-menu"
+      [label]="'LANGUAGE' | translate"
+      [iconSrc]="'/assets/svgs/language.svg'"
+      [selectedValue]="selectedLanguage()"
+      [options]="[
+        { value: ELanguage.EN, label: ('LANGUAGE_EN' | translate) },
+        { value: ELanguage.DE, label: ('LANGUAGE_DE' | translate) },
+        { value: ELanguage.PT, label: ('LANGUAGE_PT' | translate) }
+      ]"
+      (optionSelected)="onLangChange($event)"
+    />
+
     <header class="header">
       <p class="eyebrow">{{ "LEGAL_ACCEPTANCE_EYEBROW" | translate }}</p>
       <h1>{{ "LEGAL_ACCEPTANCE_TITLE" | translate }}</h1>

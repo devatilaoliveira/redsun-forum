@@ -17,6 +17,11 @@
   flex-direction: column;
   width: min(620px, 100%);
   gap: var(--space-1-5);
+  overflow: visible;
+}
+
+.language-menu {
+  align-self: flex-start;
 }
 
 .header {

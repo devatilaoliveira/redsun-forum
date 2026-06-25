@@ -80,7 +80,6 @@ export class ManageCharacterView implements OnInit, OnDestroy {
   private readonly isSelfProfile: boolean = this.characterSheetId === this.authenticatedUserId;
   private initialState: CharacterSheetFormValue | null = null;
   private avatarPreviewObjectUrl: string | null = null;
-  private currentRuleSystem: ERuleSystem | null = null;
 
   protected readonly characterNameMaxLength: number = UTIL_CONSTANTS.USERNAME_MAX_LENGTH;
   protected readonly characterDescriptionMaxLength: number = UTIL_CONSTANTS.EXTRA_LONG_TEXT_LENGTH;
@@ -107,8 +106,15 @@ export class ManageCharacterView implements OnInit, OnDestroy {
   protected readonly avatarCropBlob: WritableSignal<Blob | null> = signal<Blob | null>(null);
   protected readonly avatarUploading: WritableSignal<boolean> = signal<boolean>(false);
   protected readonly sheetEditable: WritableSignal<boolean> = signal<boolean>(false);
+  protected readonly currentRuleSystem: WritableSignal<ERuleSystem | null> = signal<ERuleSystem | null>(null);
   protected readonly isTargetTaleOwner: Signal<boolean> = computed(() => this._talesContext.owner()?.id === this.characterSheetId);
   protected readonly canQuitTale: Signal<boolean> = computed(() => this.isSelfProfile && !this.isTargetTaleOwner());
+  protected readonly isRedSunSheet: Signal<boolean> = computed(() =>
+    this.currentRuleSystem() === ERuleSystem.REDSUN && !this.isTargetTaleOwner()
+  );
+  protected readonly avatarImageSrc: Signal<string | null> = computed(() =>
+    this.avatarPreviewUrl() ?? this.characterImageUrl()
+  );
   protected readonly headerTitleKey: Signal<string> = computed(() =>
     this.isSelfProfile ? "MANAGE_PROFILE" : "TALE_PARTICIPANT_PROFILE"
   );
@@ -135,10 +141,6 @@ export class ManageCharacterView implements OnInit, OnDestroy {
     });
   }
 
-  protected isRedSunSheet(): boolean {
-    return this.currentRuleSystem === ERuleSystem.REDSUN && !this.isTargetTaleOwner();
-  }
-
   public ngOnDestroy(): void {
     this.revokeAvatarPreviewUrl();
   }
@@ -160,10 +162,6 @@ export class ManageCharacterView implements OnInit, OnDestroy {
   protected onValueChange(formControl: FormControl<string>, value: string): void {
     formControl.setValue(value);
     formControl.markAsDirty();
-  }
-
-  protected avatarImageSrc(): string | null {
-    return this.avatarPreviewUrl() ?? this.characterImageUrl();
   }
 
   protected onAvatarFileSelected(file: File): void {
@@ -341,7 +339,7 @@ export class ManageCharacterView implements OnInit, OnDestroy {
 
   private applyLoadedSheet(response: CharacterSheetResponseDTO): void {
     this.resetAvatarUpload();
-    this.currentRuleSystem = response.ruleSystem;
+    this.currentRuleSystem.set(response.ruleSystem);
     this.characterImageUrl.set(response.sheet.characterImageUrl);
     this.patchForm(this.toFormValue(response.sheet));
     if (this.isRedSunSheet()) {
@@ -376,11 +374,12 @@ export class ManageCharacterView implements OnInit, OnDestroy {
   }
 
   private requireRuleSystem(): ERuleSystem {
-    if (this.currentRuleSystem === null) {
+    const ruleSystem: ERuleSystem | null = this.currentRuleSystem();
+    if (ruleSystem === null) {
       throw new Error("Character sheet rule system is not loaded.");
     }
 
-    return this.currentRuleSystem;
+    return ruleSystem;
   }
 
   private toNullableText(value: string): string | null {

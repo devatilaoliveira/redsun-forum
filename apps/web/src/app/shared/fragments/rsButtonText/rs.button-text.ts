@@ -1,5 +1,5 @@
 import {NgStyle, NgTemplateOutlet} from "@angular/common";
-import {Component, input, InputSignal, output, OutputEmitterRef} from "@angular/core";
+import {Component, computed, input, InputSignal, output, OutputEmitterRef, Signal} from "@angular/core";
 import {RouterLink} from "@angular/router";
 import type {UrlTree} from "@angular/router";
 import {EVariant} from "../../../../interface/enums/EVariant";
@@ -27,8 +27,17 @@ export class RsButtonText {
   public readonly inProgress: InputSignal<boolean> = input<boolean>(false);
   public readonly variant: InputSignal<RsButtonTextVariant> = input<RsButtonTextVariant>(EVariant.PRIMARY);
   public readonly size: InputSignal<ESize> = input<ESize>(ESize.M);
+  public readonly ariaHasPopup: InputSignal<string | null> = input<string | null>(null);
+  public readonly ariaExpanded: InputSignal<boolean | null> = input<boolean | null>(null);
   public readonly pressed: OutputEmitterRef<void> = output<void>();
   public readonly customStyle: InputSignal<IStyleMap | null> = input<IStyleMap | null>(null);
+  protected readonly interactiveRoutePath: Signal<RsButtonTextRoute> = computed<RsButtonTextRoute>(() => {
+    if (this.disabled() || this.inProgress()) {
+      return null;
+    }
+
+    return this.routePath();
+  });
 
   protected onClick(event: MouseEvent): void {
     if (this.disabled() || this.inProgress()) {
@@ -38,14 +47,6 @@ export class RsButtonText {
     }
 
     this.pressed.emit();
-  }
-
-  protected interactiveRoutePath(): RsButtonTextRoute {
-    if (this.disabled() || this.inProgress()) {
-      return null;
-    }
-
-    return this.routePath();
   }
 
   protected readonly EVariant = EVariant;

@@ -39,7 +39,13 @@ type PostFormGroup = FormGroup<{
   content: FormControl<string>;
 }>;
 
-type PostInputMode = "post" | "dice" | "redsunDice";
+const POST_INPUT_MODE = {
+  post: "post",
+  dice: "dice",
+  redsunDice: "redsunDice",
+} as const;
+
+type PostInputMode = typeof POST_INPUT_MODE[keyof typeof POST_INPUT_MODE];
 
 type LocationDetailsViewModel = LocationDetailsDTO & {
   posts: PostDTO[];
@@ -118,7 +124,7 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   protected readonly postContent: WritableSignal<string> = signal("");
   protected readonly diceValues: WritableSignal<RsDiceListValue> = signal<RsDiceListValue>([]);
   protected readonly redsunDiceValues: WritableSignal<RsRedsunDiceListValue> = signal<RsRedsunDiceListValue>([]);
-  protected readonly postInputMode: WritableSignal<PostInputMode> = signal<PostInputMode>("post");
+  protected readonly postInputMode: WritableSignal<PostInputMode> = signal<PostInputMode>(POST_INPUT_MODE.post);
   protected readonly totalPosts: WritableSignal<number | null> = signal<number | null>(null);
   protected readonly nextPage: WritableSignal<number> = signal(0);
   protected readonly isCurrentUserTaleOwner: Signal<boolean> = computed(() => {
@@ -139,16 +145,19 @@ export class LocationDetailsView implements OnInit, OnDestroy {
     this.user()?.subscription?.plan === ESubscriptionPlan.PREMIUM
     || this.user()?.subscription?.plan === ESubscriptionPlan.MAX
   ));
-  protected readonly showDiceInput: Signal<boolean> = computed(() => this.postInputMode() === "dice");
-  protected readonly showRedsunDiceInput: Signal<boolean> = computed(() => this.postInputMode() === "redsunDice");
-  protected readonly isDiceInputMode: Signal<boolean> = computed(() => this.postInputMode() !== "post");
+  protected readonly showDiceInput: Signal<boolean> = computed(() => this.postInputMode() === POST_INPUT_MODE.dice);
+  protected readonly showRedsunDiceInput: Signal<boolean> = computed(() => this.postInputMode() === POST_INPUT_MODE.redsunDice);
+  protected readonly isDiceInputMode: Signal<boolean> = computed(() => this.postInputMode() !== POST_INPUT_MODE.post);
+  protected readonly canImprovePostText: Signal<boolean> = computed(() =>
+    this.postInputMode() === POST_INPUT_MODE.post && this.postContent().trim().length > 0
+  );
   protected readonly canSubmitCurrentInput: Signal<boolean> = computed(() => {
     switch (this.postInputMode()) {
-    case "dice":
+    case POST_INPUT_MODE.dice:
       return this.hasDiceCount();
-    case "redsunDice":
+    case POST_INPUT_MODE.redsunDice:
       return this.hasRedsunDiceRoll();
-    case "post":
+    case POST_INPUT_MODE.post:
     default:
       return this.postContent().trim().length > 0 && this.postFormGroup.valid;
     }
@@ -240,21 +249,21 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   }
 
   protected onShowPostInput(): void {
-    if (this.postInputMode() === "post") return;
-    this.postInputMode.set("post");
+    if (this.postInputMode() === POST_INPUT_MODE.post) return;
+    this.postInputMode.set(POST_INPUT_MODE.post);
     this.resetDiceInputs();
   }
 
   protected onShowDiceInput(): void {
-    if (this.postInputMode() === "dice") return;
-    this.postInputMode.set("dice");
+    if (this.postInputMode() === POST_INPUT_MODE.dice) return;
+    this.postInputMode.set(POST_INPUT_MODE.dice);
     this.resetRedsunDiceInput();
     this.resetPostContent();
   }
 
   protected onShowRedsunDiceInput(): void {
-    if (!this.isRedsunTale() || this.postInputMode() === "redsunDice") return;
-    this.postInputMode.set("redsunDice");
+    if (!this.isRedsunTale() || this.postInputMode() === POST_INPUT_MODE.redsunDice) return;
+    this.postInputMode.set(POST_INPUT_MODE.redsunDice);
     this.resetDiceInput();
     this.resetPostContent();
   }
@@ -540,12 +549,8 @@ export class LocationDetailsView implements OnInit, OnDestroy {
     };
   }
 
-  protected canImprovePostText(): boolean {
-    return this.postInputMode() === "post" && this.postContent().trim().length > 0;
-  }
-
   protected improvePostTextWithAI(): void {
-    if (this.postInputMode() !== "post" || this.postInProgress() || this.improvePostInProgress()) {
+    if (this.postInputMode() !== POST_INPUT_MODE.post || this.postInProgress() || this.improvePostInProgress()) {
       return;
     }
 

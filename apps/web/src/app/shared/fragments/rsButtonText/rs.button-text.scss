@@ -59,11 +59,16 @@
 }
 
 .rs-button-text[data-variant="black"] {
-  --rs-text-fc: var(--color-black);
+  --rs-text-fc: var(--color-muted);
 }
 
 .rs-button-text[data-variant="muted"] {
   --rs-text-fc: var(--color-muted);
+}
+
+.rs-button-text[data-variant="black"]:not(:disabled):not(.is-disabled):hover,
+.rs-button-text[data-variant="black"]:not(:disabled):not(.is-disabled):focus-visible {
+  --rs-text-fc: var(--color-text);
 }
 
 .rs-button-text[data-variant="muted"]:not(:disabled):not(.is-disabled):hover,

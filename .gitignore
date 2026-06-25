@@ -86,7 +86,8 @@ apps/api/HELP.md
 **/exports/
 **/backups/
 **/todos/
-TODOS.txt
+Notes.txt
+TODO.txt
 __screenshots__/
 
 ### Agent and temporary files ###

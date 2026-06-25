@@ -26,14 +26,29 @@
         autocomplete="current-password"
         (valueChanged)="onPasswordChange($event)"
       />
-      <rs-button-text
-        class="forgot-cta"
-        kind="link"
-        [routePath]="forgotPasswordRoute"
-        [variant]="EVariant.PRIMARY"
-      >
-        {{ "FORGOT_PASSWORD" | translate }}
-      </rs-button-text>
+      <div class="translate-forgot-password-row">
+        <rs-options-menu
+          class="change-language"
+          [label]="'LANGUAGE' | translate"
+          [iconSrc]="'/assets/svgs/language.svg'"
+          [selectedValue]="selectedLanguage()"
+          [options]="[
+            { value: ELanguage.EN, label: ('LANGUAGE_EN' | translate) },
+            { value: ELanguage.DE, label: ('LANGUAGE_DE' | translate) },
+            { value: ELanguage.PT, label: ('LANGUAGE_PT' | translate) }
+          ]"
+          (optionSelected)="onLangChange($event)"
+        />
+
+        <rs-button-text
+          class="forgot-cta"
+          kind="link"
+          [routePath]="forgotPasswordRoute"
+          [variant]="EVariant.PRIMARY"
+        >
+          {{ "FORGOT_PASSWORD" | translate }}
+        </rs-button-text>
+      </div>
   </form>
 
   @if (errorMessage(); as errorMessage) {
