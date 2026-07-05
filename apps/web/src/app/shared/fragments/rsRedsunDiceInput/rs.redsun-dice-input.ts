@@ -14,6 +14,7 @@ import {
 import {TranslatePipe, TranslateService} from "@ngx-translate/core";
 import {RsInput} from "../rsInput/rs.input";
 import {RsNumber} from "../rsNumber/rs.number";
+import {UTIL_CONSTANTS} from "../../../../interface/constants/util.constants";
 
 export interface RsRedsunDiceValue {
   action: string;
@@ -28,6 +29,7 @@ const DEFAULT_DIFFICULTY: number = 0;
 const DEFAULT_DICE_COUNT: number = 0;
 const DEFAULT_DICE_ENTRIES: number = 4;
 const D10_FACES: number = 10;
+const MAX_ACTION_LENGTH: number = UTIL_CONSTANTS.EXTRA_SHORT_TEXT_LENGTH;
 const MAX_DICE_COUNT: number = 10;
 
 interface RedsunDicePostLabels {
@@ -47,7 +49,7 @@ interface RedsunRollResult {
 
 const normalizeAction = (action: string | null): string => {
   if (action == null) return DEFAULT_ACTION;
-  return action;
+  return action.slice(0, MAX_ACTION_LENGTH);
 };
 
 const clampDifficulty = (value: number): number => {
@@ -156,6 +158,7 @@ export class RsRedsunDiceInput {
 
   public readonly valueChanged: OutputEmitterRef<RsRedsunDiceListValue> = output<RsRedsunDiceListValue>();
 
+  protected readonly UTIL_CONSTANTS = UTIL_CONSTANTS;
   protected readonly entries: WritableSignal<RedsunDiceEntry[]> = signal<RedsunDiceEntry[]>([]);
   protected readonly baseId: Signal<string> = computed<string>(() => this.id() ?? this.uniqueId);
 

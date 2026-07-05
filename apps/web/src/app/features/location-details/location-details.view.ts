@@ -242,7 +242,7 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   }
 
   protected readonly postFormGroup: PostFormGroup = this._formBuilder.group({
-    content: this._formBuilder.control<string>("", {validators: [Validators.required, Validators.maxLength(UTIL_CONSTANTS.MEDIUM_TEXT_LENGTH)]})
+    content: this._formBuilder.control<string>("", {validators: [Validators.required, Validators.maxLength(UTIL_CONSTANTS.LONG_TEXT_LENGTH)]})
   });
   protected readonly postControls: { content: FormControl<string> } = this.postFormGroup.controls;
 

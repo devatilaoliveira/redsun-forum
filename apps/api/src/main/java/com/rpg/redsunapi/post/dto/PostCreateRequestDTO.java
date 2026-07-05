@@ -11,7 +11,7 @@ public record PostCreateRequestDTO(
   @NotNull
   UUID locationId,
   @NotBlank
-  @Size(max = 1000)
+  @Size(max = 2000)
   String content,
   @NotNull
   EPostType type

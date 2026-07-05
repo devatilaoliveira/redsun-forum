@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 
 public record PostImproveTextRequestDTO(
   @NotBlank
-  @Size(max = 1000)
+  @Size(max = 2000)
   String content
 ) {
 }

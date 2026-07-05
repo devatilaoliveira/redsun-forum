@@ -26,7 +26,7 @@ public class Post {
   @Column(name = "location", nullable = false)
   private UUID locationId;
 
-  @Column(length = 1000)
+  @Column(length = 2000)
   private String content;
 
   @Column(name = "creation_date", nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
