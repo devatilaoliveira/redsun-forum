@@ -14,6 +14,7 @@
               [iconSrc]="'/assets/svgs/post.svg'"
               [ariaLabel]="'SHOW_POST_INPUT' | translate"
               [disabled]="postInProgress()"
+              [variant]="postInputMode() === POST_INPUT_MODE.post ? EVariant.PRIMARY : 'default'"
               (pressed)="onShowPostInput()"
             />
           </rs-tooltip>
@@ -22,6 +23,7 @@
               [iconSrc]="'/assets/svgs/dice.svg'"
               [ariaLabel]="'SHOW_DICE_INPUT' | translate"
               [disabled]="postInProgress()"
+              [variant]="postInputMode() === POST_INPUT_MODE.dice ? EVariant.PRIMARY : 'default'"
               (pressed)="onShowDiceInput()"
             />
           </rs-tooltip>
@@ -32,12 +34,24 @@
                 [iconSrc]="'/assets/svgs/rs-white.svg'"
                 [ariaLabel]="'SHOW_REDSUN_DICE_INPUT' | translate"
                 [disabled]="postInProgress()"
+                [variant]="postInputMode() === POST_INPUT_MODE.redsunDice ? EVariant.PRIMARY : 'default'"
                 (pressed)="onShowRedsunDiceInput()"
               />
             </rs-tooltip>
+            @if (canUseCharacterSheetInput()) {
+              <rs-tooltip [text]="'SHOW_CHARACTER_SHEET_INPUT' | translate" align="end">
+                <rs-round-icon-button
+                  [iconSrc]="'/assets/svgs/profile.svg'"
+                  [ariaLabel]="'SHOW_CHARACTER_SHEET_INPUT' | translate"
+                  [disabled]="postInProgress()"
+                  [variant]="postInputMode() === POST_INPUT_MODE.characterSheet ? EVariant.PRIMARY : 'default'"
+                  (pressed)="onShowCharacterSheetInput()"
+                />
+              </rs-tooltip>
+            }
           }
         </div>
-        @if (postInputMode() === "post") {
+        @if (postInputMode() === POST_INPUT_MODE.post) {
           <div class="input-row">
             <rs-avatar
               [src]="currentTaleParticipant()?.characterImageUrl || ''"
@@ -62,13 +76,25 @@
               (valueChanged)="onDiceValueChange($event)"
             ></rs-dice-input>
           </div>
-        } @else {
+        } @else if (showRedsunDiceInput()) {
           <div class="dice-row">
             <rs-redsun-dice-input
               [disabled]="postInProgress()"
               (valueChanged)="onRedsunDiceValueChange($event)"
             ></rs-redsun-dice-input>
           </div>
+        } @else if (showCharacterSheetInput()) {
+          @if (characterSheetLoading()) {
+            <div class="status sheet-loading">
+              <rs-spinner [variant]="EVariant.PRIMARY" />
+            </div>
+          } @else if (characterSheetLoadFailed()) {
+            <p class="empty">{{ 'COMPACT_CHARACTER_SHEET_LOAD_ERROR' | translate }}</p>
+          } @else if (characterSheet(); as sheet) {
+            <rs-compact-redsun-sheet [sheet]="sheet" />
+          } @else {
+            <p class="empty">{{ 'COMPACT_CHARACTER_SHEET_EMPTY' | translate }}</p>
+          }
         }
 
         <div class="post-actions">
@@ -77,7 +103,7 @@
               <rs-round-icon-button
                 [iconSrc]="'/assets/svgs/ai_assistant.svg'"
                 [ariaLabel]="'IMPROVE_POST_TEXT_WITH_AI' | translate"
-                [disabled]="postInProgress() || improvePostInProgress() || postInputMode() !== 'post' || !canImprovePostText()"
+                [disabled]="postInProgress() || improvePostInProgress() || postInputMode() !== POST_INPUT_MODE.post || !canImprovePostText()"
                 [variant]="EVariant.PREMIUM"
                 (pressed)="improvePostTextWithAI()"
               />

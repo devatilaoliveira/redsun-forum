@@ -35,6 +35,12 @@ import {RsTooltip} from "../../shared/fragments/rsTooltip/rs.tooltip";
 import {ERuleSystem} from "../../../interface/enums/ERuleSystem";
 import {ESubscriptionPlan} from "../../../interface/enums/ESubscriptionPlan";
 import {IToastService, ToastService} from "../../../services/toast.service";
+import {CharacterSheetService, ICharacterSheetService} from "../../../services/character-sheet.service";
+import {
+  CharacterSheetResponseDTO
+} from "../../../interface/dtos/characterSheet/CharacterSheetDTO";
+import {RedSunSheetResponseDTO} from "../../../interface/dtos/characterSheet/RedSunSheetResponseDTO";
+import {CompactRedSunSheetComponent} from "./compact-redsun-sheet/compact-redsun-sheet.component";
 
 type PostFormGroup = FormGroup<{
   content: FormControl<string>;
@@ -44,6 +50,7 @@ const POST_INPUT_MODE = {
   post: "post",
   dice: "dice",
   redsunDice: "redsunDice",
+  characterSheet: "characterSheet",
 } as const;
 
 type PostInputMode = typeof POST_INPUT_MODE[keyof typeof POST_INPUT_MODE];
@@ -79,7 +86,8 @@ interface VisiblePostViewModel {
     RsRoundIconButton,
     RsTooltip,
     RsDialogModalComponent,
-    PostDetailsCardComponent
+    PostDetailsCardComponent,
+    CompactRedSunSheetComponent
   ],
   templateUrl: "./location-details.view.html",
   styleUrl: "./location-details.view.scss"
@@ -111,9 +119,11 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   private readonly _talesContext: TalesContextService = inject(TalesContextService);
   private readonly _translateService: ITranslateService = inject(TranslateService);
   private readonly _toastService: IToastService = inject(ToastService);
+  private readonly _characterSheetService: ICharacterSheetService = inject(CharacterSheetService);
 
   protected user: Signal<MeResponseDTO | null> = this._LocalStoreService.user;
   protected readonly currentUserId: Signal<string | null> = computed(() => this.user()?.id ?? null);
+  protected readonly POST_INPUT_MODE = POST_INPUT_MODE;
   protected readonly EVariant = EVariant;
   protected readonly locationId: string | null = this._activatedRoute.snapshot.paramMap.get(ROUTE_PATHS.locationId);
   protected readonly postInProgress: WritableSignal<boolean> = signal(false);
@@ -121,7 +131,10 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   protected readonly isLoading: WritableSignal<boolean> = signal(false);
   protected readonly isLoadingPosts: WritableSignal<boolean> = signal(false);
   protected readonly isLoadingMore: WritableSignal<boolean> = signal(false);
+  protected readonly characterSheetLoading: WritableSignal<boolean> = signal(false);
+  protected readonly characterSheetLoadFailed: WritableSignal<boolean> = signal(false);
   protected readonly locationDetails: WritableSignal<LocationDetailsViewModel | null> = signal(null);
+  protected readonly characterSheet: WritableSignal<RedSunSheetResponseDTO | null> = signal<RedSunSheetResponseDTO | null>(null);
   protected readonly postContent: WritableSignal<string> = signal("");
   protected readonly diceValues: WritableSignal<RsDiceListValue> = signal<RsDiceListValue>([]);
   protected readonly redsunDiceValues: WritableSignal<RsRedsunDiceListValue> = signal<RsRedsunDiceListValue>([]);
@@ -142,13 +155,21 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   protected readonly isRedsunTale: Signal<boolean> = computed(() => (
     this._talesContext.tale()?.rules === ERuleSystem.REDSUN
   ));
+  protected readonly canUseCharacterSheetInput: Signal<boolean> = computed(() => (
+    this.isRedsunTale() && !this.isCurrentUserTaleOwner()
+  ));
   protected readonly isPremium: Signal<boolean> = computed(() => (
     this.user()?.subscription?.plan === ESubscriptionPlan.PREMIUM
     || this.user()?.subscription?.plan === ESubscriptionPlan.MAX
   ));
   protected readonly showDiceInput: Signal<boolean> = computed(() => this.postInputMode() === POST_INPUT_MODE.dice);
   protected readonly showRedsunDiceInput: Signal<boolean> = computed(() => this.postInputMode() === POST_INPUT_MODE.redsunDice);
-  protected readonly isDiceInputMode: Signal<boolean> = computed(() => this.postInputMode() !== POST_INPUT_MODE.post);
+  protected readonly showCharacterSheetInput: Signal<boolean> = computed(() => (
+    this.postInputMode() === POST_INPUT_MODE.characterSheet && this.canUseCharacterSheetInput()
+  ));
+  protected readonly isDiceInputMode: Signal<boolean> = computed(() =>
+    this.postInputMode() === POST_INPUT_MODE.dice || this.postInputMode() === POST_INPUT_MODE.redsunDice
+  );
   protected readonly canImprovePostText: Signal<boolean> = computed(() =>
     this.postInputMode() === POST_INPUT_MODE.post && this.postContent().trim().length > 0
   );
@@ -158,6 +179,8 @@ export class LocationDetailsView implements OnInit, OnDestroy {
       return this.hasDiceCount();
     case POST_INPUT_MODE.redsunDice:
       return this.hasRedsunDiceRoll();
+    case POST_INPUT_MODE.characterSheet:
+      return false;
     case POST_INPUT_MODE.post:
     default:
       return this.postContent().trim().length > 0 && this.postFormGroup.valid;
@@ -269,6 +292,12 @@ export class LocationDetailsView implements OnInit, OnDestroy {
     this.resetPostContent();
   }
 
+  protected onShowCharacterSheetInput(): void {
+    if (!this.canUseCharacterSheetInput() || this.postInputMode() === POST_INPUT_MODE.characterSheet) return;
+    this.postInputMode.set(POST_INPUT_MODE.characterSheet);
+    this.loadCharacterSheetIfNeeded();
+  }
+
   protected onSubmitPost(locationId: string): void {
     this.postFormGroup.markAllAsTouched();
 
@@ -334,6 +363,8 @@ export class LocationDetailsView implements OnInit, OnDestroy {
       return EPostType.GENERALDICEROLL;
     case POST_INPUT_MODE.redsunDice:
       return EPostType.RSDICEROLL;
+    case POST_INPUT_MODE.characterSheet:
+      return EPostType.TEXT;
     case POST_INPUT_MODE.post:
     default:
       return EPostType.TEXT;
@@ -560,6 +591,44 @@ export class LocationDetailsView implements OnInit, OnDestroy {
       cancel: this._translateService.instant("CANCEL_ACTION"),
       delete: this._translateService.instant("DELETE")
     };
+  }
+
+  private loadCharacterSheetIfNeeded(): void {
+    if (!this.canUseCharacterSheetInput()) {
+      return;
+    }
+
+    if (this.characterSheet() || this.characterSheetLoading()) {
+      return;
+    }
+
+    const taleId = this._talesContext.taleId();
+    const currentUserId = this.currentUserId();
+    if (!taleId || !currentUserId) {
+      this.characterSheetLoadFailed.set(true);
+      return;
+    }
+
+    this.characterSheetLoading.set(true);
+    this.characterSheetLoadFailed.set(false);
+    this._characterSheetService.getCharacterSheet(taleId, currentUserId).pipe(
+      finalize(() => this.characterSheetLoading.set(false))
+    ).subscribe({
+      next: (response: CharacterSheetResponseDTO) => {
+        if (response.ruleSystem !== ERuleSystem.REDSUN) {
+          this.characterSheet.set(null);
+          this.characterSheetLoadFailed.set(true);
+          return;
+        }
+
+        this.characterSheet.set(response.sheet as RedSunSheetResponseDTO);
+      },
+      error: (err: unknown) => {
+        this._printer.error("failed to load compact character sheet", err);
+        this.characterSheet.set(null);
+        this.characterSheetLoadFailed.set(true);
+      }
+    });
   }
 
   protected improvePostTextWithAI(): void {
