@@ -8,6 +8,7 @@ import {LocationDetailsDTO} from "../../../interface/dtos/location/LocationDetai
 import {PostDTO} from "../../../interface/dtos/post/PostDTO";
 import {EAction} from "../../../interface/enums/EAction";
 import {EPostStatus} from "../../../interface/enums/EPostStatus";
+import {EPostType} from "../../../interface/enums/EPostType";
 import {EVariant} from "../../../interface/enums/EVariant";
 import {IPrinter, Printer} from "../../../infra/miscellaneous/printer.handler";
 import {ILocationService, LocationService} from "../../../services/location.service";
@@ -294,7 +295,7 @@ export class LocationDetailsView implements OnInit, OnDestroy {
 
     this.postInProgress.set(true);
 
-    this._postService.createPost({locationId, content}).pipe(
+    this._postService.createPost({locationId, content, type: this.currentPostType()}).pipe(
       finalize(() => {
         this.postInProgress.set(false);
         this.postFormGroup.reset({content: ""});
@@ -325,6 +326,18 @@ export class LocationDetailsView implements OnInit, OnDestroy {
 
   protected onRedsunDiceValueChange(values: RsRedsunDiceListValue): void {
     this.redsunDiceValues.set(values);
+  }
+
+  private currentPostType(): EPostType {
+    switch (this.postInputMode()) {
+    case POST_INPUT_MODE.dice:
+      return EPostType.GENERALDICEROLL;
+    case POST_INPUT_MODE.redsunDice:
+      return EPostType.RSDICEROLL;
+    case POST_INPUT_MODE.post:
+    default:
+      return EPostType.TEXT;
+    }
   }
 
   private canDeactivatePost(post: PostDTO): boolean {

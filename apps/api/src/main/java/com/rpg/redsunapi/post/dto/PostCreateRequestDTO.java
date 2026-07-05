@@ -1,5 +1,6 @@
 package com.rpg.redsunapi.post.dto;
 
+import com.rpg.redsunapi.post.enums.EPostType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -11,6 +12,8 @@ public record PostCreateRequestDTO(
   UUID locationId,
   @NotBlank
   @Size(max = 1000)
-  String content
+  String content,
+  @NotNull
+  EPostType type
 ) {
 }

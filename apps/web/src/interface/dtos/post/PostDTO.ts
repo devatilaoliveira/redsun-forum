@@ -1,4 +1,5 @@
 import {EPostStatus} from "../../enums/EPostStatus";
+import {EPostType} from "../../enums/EPostType";
 import {TaleParticipantProfileDTO} from "../tale/TaleParticipantProfileDTO";
 
 export interface PostDTO {
@@ -9,4 +10,5 @@ export interface PostDTO {
   content: string;
   creationDate: string;
   status: EPostStatus;
+  type: EPostType;
 }

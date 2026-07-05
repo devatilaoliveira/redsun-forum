@@ -2,6 +2,7 @@ package com.rpg.redsunapi.post.dto;
 
 import com.rpg.redsunapi.post.Post;
 import com.rpg.redsunapi.post.enums.EPostStatus;
+import com.rpg.redsunapi.post.enums.EPostType;
 import com.rpg.redsunapi.tale.Tale;
 import com.rpg.redsunapi.tale.dto.TaleParticipantProfileDTO;
 
@@ -14,6 +15,7 @@ public record PostDTO(
   String taleId,
   String content,
   EPostStatus status,
+  EPostType type,
   OffsetDateTime creationDate
 ) {
   public static PostDTO from(Post post, Tale tale) {
@@ -24,6 +26,7 @@ public record PostDTO(
       : null;
     String taleId = tale != null && tale.getId() != null ? tale.getId().toString() : null;
     EPostStatus status = post.getStatus() != null ? post.getStatus() : EPostStatus.ACTIVE;
+    EPostType type = post.getType();
     return new PostDTO(
       id,
       author,
@@ -31,6 +34,7 @@ public record PostDTO(
       taleId,
       post.getContent(),
       status,
+      type,
       post.getCreationDate()
     );
   }

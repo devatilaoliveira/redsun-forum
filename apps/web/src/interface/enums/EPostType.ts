@@ -1,0 +1,5 @@
+export enum EPostType {
+  TEXT = "TEXT",
+  RSDICEROLL = "RSDICEROLL",
+  GENERALDICEROLL = "GENERALDICEROLL",
+}
