@@ -3,13 +3,9 @@
     <rs-avatar [src]="post().author.characterImageUrl || ''" [userName]="post().author.characterName" [size]="40" />
     <div class="post-meta">
       <h2 class="author-name">{{ authorName() }}</h2>
-      <p class="post-date muted">
-        @if (post().creationDate) {
-          {{ post().creationDate | date:'y MMM d' }}
-        } @else {
-          -
-        }
-      </p>
+      <time class="post-date muted" [dateTime]="post().creationDate">
+        {{ creationDateDisplay() }}
+      </time>
       @if (isInactive()) {
         <div class="inactive-controls">
           <rs-badge
