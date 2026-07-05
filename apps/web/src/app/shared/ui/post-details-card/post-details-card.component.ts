@@ -1,5 +1,7 @@
 import {Component, computed, effect, inject, input, InputSignal, output, OutputEmitterRef, signal} from "@angular/core";
+import {RouterLink} from "@angular/router";
 import {TranslatePipe} from "@ngx-translate/core";
+import {ROUTE_PATHS} from "../../../../interface/constants/route-path.constants";
 import {PostDTO} from "../../../../interface/dtos/post/PostDTO";
 import {EPostStatus} from "../../../../interface/enums/EPostStatus";
 import {EVariant} from "../../../../interface/enums/EVariant";
@@ -12,7 +14,7 @@ import {RsRoundIconButton} from "../../fragments/rsRoundIconButton/rs.round-icon
 @Component({
   selector: "rs-post-details-card",
   standalone: true,
-  imports: [TranslatePipe, RsAvatar, RsBadge, RsMoreOptions, RsRoundIconButton],
+  imports: [RouterLink, TranslatePipe, RsAvatar, RsBadge, RsMoreOptions, RsRoundIconButton],
   templateUrl: "./post-details-card.component.html",
   styleUrl: "./post-details-card.component.scss"
 })
@@ -62,6 +64,18 @@ export class PostDetailsCardComponent {
 
   protected readonly creationDateDisplay = computed<string>(() => {
     return this._timeDisplayHandler.display(this.post().creationDate, "relative");
+  });
+
+  protected readonly authorProfileLink = computed<string[] | null>(() => {
+    const post = this.post();
+    const taleId = post.taleId;
+    const participantId = post.author?.id;
+
+    if (!taleId || !participantId) {
+      return null;
+    }
+
+    return ["/", ROUTE_PATHS.tales, taleId, ROUTE_PATHS.participants, participantId];
   });
 
   protected toggleContentVisibility(): void {

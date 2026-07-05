@@ -27,7 +27,7 @@ export class HomeView {
   // TODO: Create endpoint to retrieve patch notes.
   protected readonly patchNoteGroups: readonly PatchNoteGroup[] = [
     {
-      title: "Patch 2",
+      title: "Patch 2.0",
       date: "Julho de 2026",
       summary: "Este patch melhora o jogo nas localizações, deixa os dados das postagens mais claros e ajusta pequenos pontos de acesso.",
       items: [
@@ -42,6 +42,10 @@ export class HomeView {
         {
           title: "Horários de postagem mais claros",
           description: "Datas de postagens agora usam rótulos relativos localizados, como há menos de 1 h, horas, dias e há mais de uma semana."
+        },
+        {
+          title: "Acesso ao perfil pelo avatar",
+          description: "Ao clicar no avatar do autor em uma postagem, o jogador agora abre o perfil do personagem daquela história."
         }
       ]
     }
