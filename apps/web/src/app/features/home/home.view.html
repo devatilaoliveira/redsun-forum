@@ -3,6 +3,7 @@
     <div class="content">
       <rs-view-header [title]="'WELCOME' | translate:{name: user.username}" />
       <rs-avatar [src]="user?.imageURL || null" [userName]="user?.username || null" [size]="200"/>
+      <rs-patch-notes [title]="patchNotesTitle" [groups]="patchNoteGroups" />
     </div>
   </section>
 }

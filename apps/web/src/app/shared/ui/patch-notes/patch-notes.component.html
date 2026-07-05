@@ -1,0 +1,30 @@
+<section class="patch-notes" aria-labelledby="patch-notes-title">
+  <header class="patch-notes-header">
+    <h2 id="patch-notes-title" class="eyebrow">{{ title() }}</h2>
+  </header>
+
+  @for (group of groups(); track group.date + group.title) {
+    <article class="patch-group">
+      <div class="heading-row">
+        <h3>{{ group.title }}</h3>
+        <span class="version">{{ group.date }}</span>
+      </div>
+
+      <p class="summary">{{ group.summary }}</p>
+
+      <rs-divider type="gradient" />
+
+      <ul class="notes-list">
+        @for (item of group.items; track item.title) {
+          <li class="note-item">
+            <span class="marker" aria-hidden="true"></span>
+            <div class="note-copy">
+              <h4>{{ item.title }}</h4>
+              <p>{{ item.description }}</p>
+            </div>
+          </li>
+        }
+      </ul>
+    </article>
+  }
+</section>
