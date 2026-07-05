@@ -84,6 +84,7 @@ public class PostService {
     post.setLocationId(location.getId());
     post.setContent(content);
     post.setStatus(EPostStatus.ACTIVE);
+    post.setType(request.type());
 
     OffsetDateTime now = OffsetDateTime.now();
     post.setCreationDate(now);

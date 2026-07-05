@@ -1,9 +1,11 @@
-import {Component, computed, effect, input, InputSignal, output, OutputEmitterRef, signal} from "@angular/core";
-import {DatePipe} from "@angular/common";
+import {Component, computed, effect, inject, input, InputSignal, output, OutputEmitterRef, signal} from "@angular/core";
+import {RouterLink} from "@angular/router";
 import {TranslatePipe} from "@ngx-translate/core";
+import {ROUTE_PATHS} from "../../../../interface/constants/route-path.constants";
 import {PostDTO} from "../../../../interface/dtos/post/PostDTO";
 import {EPostStatus} from "../../../../interface/enums/EPostStatus";
 import {EVariant} from "../../../../interface/enums/EVariant";
+import {ITimeDisplayHandler, TimeDisplayHandler} from "../../../../infra/miscellaneous/time-display.handler";
 import {RsAvatar} from "../../fragments/rsAvatar/rs.avatar";
 import {RsBadge} from "../../fragments/rsBadge/rs.badge";
 import {RsMoreOption, RsMoreOptions} from "../../fragments/rsMoreOptions/rs.more-options";
@@ -12,11 +14,13 @@ import {RsRoundIconButton} from "../../fragments/rsRoundIconButton/rs.round-icon
 @Component({
   selector: "rs-post-details-card",
   standalone: true,
-  imports: [DatePipe, TranslatePipe, RsAvatar, RsBadge, RsMoreOptions, RsRoundIconButton],
+  imports: [RouterLink, TranslatePipe, RsAvatar, RsBadge, RsMoreOptions, RsRoundIconButton],
   templateUrl: "./post-details-card.component.html",
   styleUrl: "./post-details-card.component.scss"
 })
 export class PostDetailsCardComponent {
+  private readonly _timeDisplayHandler: ITimeDisplayHandler = inject(TimeDisplayHandler);
+
   public readonly post: InputSignal<PostDTO> = input.required<PostDTO>();
   public readonly options: InputSignal<RsMoreOption[]> = input<RsMoreOption[]>([]);
   public readonly actionSelected: OutputEmitterRef<RsMoreOption> = output<RsMoreOption>();
@@ -56,6 +60,22 @@ export class PostDetailsCardComponent {
 
   protected readonly contentVisible = computed<boolean>(() => {
     return !this.isInactive() || this.isContentVisible();
+  });
+
+  protected readonly creationDateDisplay = computed<string>(() => {
+    return this._timeDisplayHandler.display(this.post().creationDate, "relative");
+  });
+
+  protected readonly authorProfileLink = computed<string[] | null>(() => {
+    const post = this.post();
+    const taleId = post.taleId;
+    const participantId = post.author?.id;
+
+    if (!taleId || !participantId) {
+      return null;
+    }
+
+    return ["/", ROUTE_PATHS.tales, taleId, ROUTE_PATHS.participants, participantId];
   });
 
   protected toggleContentVisibility(): void {

@@ -24,8 +24,10 @@ export class ContactService implements IContactService {
   }
 
   public addContactByIdentifier(identifier: string): Observable<UserAsContactDTO> {
+    const encodedIdentifier = encodeURIComponent(identifier);
+
     return this._httpClient.post<UserAsContactDTO>(
-      `${environment.apiBaseUrl}/user/contacts/by-identifier/${identifier}`,
+      `${environment.apiBaseUrl}/user/contacts/by-identifier/${encodedIdentifier}`,
       null
     );
   }

@@ -1,0 +1,91 @@
+@use "../../../../styles/breakpoints" as bp;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.compact-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+
+  .sheet-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-0-5);
+  }
+
+  .section-title,
+  .group-title {
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .section-title {
+    font-size: var(--text-base);
+    color: var(--color-text);
+  }
+
+  .group-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--space-0-5);
+    width: 100%;
+  }
+
+  .sheet-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-0-5);
+    min-width: 0;
+  }
+
+  .group-title {
+    font-size: var(--text-small);
+    color: var(--color-muted);
+  }
+
+  .value-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(126px, 1fr));
+    gap: var(--space-0-25, 0.25rem);
+  }
+
+  .sheet-value {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-0-25, 0.25rem);
+    min-width: 0;
+  }
+
+  .value-label {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--color-text);
+    font-size: var(--text-small);
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .value-number {
+    flex: 0 0 auto;
+    color: var(--color-text);
+    font-size: var(--text-small);
+    line-height: 1.2;
+  }
+}
+
+@media (max-width: bp.$bp-xs) {
+  .compact-sheet {
+    .group-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .value-grid {
+      grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+    }
+  }
+}

@@ -295,9 +295,10 @@ CREATE TABLE public.posts (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   location uuid NOT NULL,
   author uuid NOT NULL REFERENCES public.users(id),
-  content varchar(1000),
+  content varchar(2000),
   creation_date timestamptz NOT NULL DEFAULT now(),
-  status varchar(15) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE','INACTIVE'))
+  status varchar(15) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE','INACTIVE')),
+  type varchar(15) NOT NULL DEFAULT 'TEXT' CHECK (type IN ('TEXT','RSDICEROLL','GENERALDICEROLL'))
 );
 CREATE INDEX idx_posts_location ON public.posts(location);
 CREATE INDEX idx_posts_author ON public.posts(author);

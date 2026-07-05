@@ -66,6 +66,10 @@ $min-content: bp.$bp-xs;
       gap: var(--space-0-5, 1rem);
     }
 
+    .sheet-loading {
+      height: 96px;
+    }
+
     .post-actions {
       display: flex;
       justify-content: flex-end;

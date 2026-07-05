@@ -1,6 +1,7 @@
 package com.rpg.redsunapi.post;
 
 import com.rpg.redsunapi.post.enums.EPostStatus;
+import com.rpg.redsunapi.post.enums.EPostType;
 import com.rpg.redsunapi.user.User;
 import jakarta.persistence.*;
 import org.hibernate.annotations.UuidGenerator;
@@ -25,7 +26,7 @@ public class Post {
   @Column(name = "location", nullable = false)
   private UUID locationId;
 
-  @Column(length = 1000)
+  @Column(length = 2000)
   private String content;
 
   @Column(name = "creation_date", nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
@@ -34,6 +35,10 @@ public class Post {
   @Enumerated(EnumType.STRING)
   @Column(length = 15)
   private EPostStatus status;
+
+  @Enumerated(EnumType.STRING)
+  @Column(length = 15, nullable = false)
+  private EPostType type;
 
   public Post() {
   }
@@ -44,7 +49,8 @@ public class Post {
     String content,
     OffsetDateTime creationDate,
     UUID locationId,
-    EPostStatus status
+    EPostStatus status,
+    EPostType type
   ) {
     this.id = id;
     this.author = author;
@@ -52,6 +58,7 @@ public class Post {
     this.creationDate = creationDate;
     this.locationId = locationId;
     this.status = status;
+    this.type = type;
   }
 
   @PrePersist
@@ -110,5 +117,13 @@ public class Post {
 
   public void setStatus(EPostStatus status) {
     this.status = status;
+  }
+
+  public EPostType getType() {
+    return type;
+  }
+
+  public void setType(EPostType type) {
+    this.type = type;
   }
 }

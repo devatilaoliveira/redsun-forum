@@ -1,0 +1,30 @@
+<section class="compact-sheet" [attr.aria-label]="'COMPACT_CHARACTER_SHEET' | translate">
+  @for (section of sections(); track section.titleKey) {
+    <section class="sheet-section">
+      <h3 class="section-title">{{ section.titleKey | translate }}</h3>
+      <div class="group-grid">
+        @for (group of section.groups; track group.titleKey) {
+          @if (group.items.length) {
+            <article class="sheet-group">
+              <h4 class="group-title">{{ group.titleKey | translate }}</h4>
+              <div class="value-grid">
+                @for (item of group.items; track (item.labelKey || item.label)) {
+                  <div class="sheet-value">
+                    <span class="value-label">
+                      @if (item.labelKey) {
+                        {{ item.labelKey | translate }}
+                      } @else {
+                        {{ item.label }}
+                      }
+                    </span>
+                    <span class="value-number">{{ item.value }}</span>
+                  </div>
+                }
+              </div>
+            </article>
+          }
+        }
+      </div>
+    </section>
+  }
+</section>

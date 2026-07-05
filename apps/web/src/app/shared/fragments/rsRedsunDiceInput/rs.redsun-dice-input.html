@@ -10,7 +10,7 @@
       <div class="container" [class.is-disabled]="disabled()">
         <div class="dice-name">
           <rs-input
-            [maxLength]="60"
+            [maxLength]="UTIL_CONSTANTS.EXTRA_SHORT_TEXT_LENGTH"
             [id]="actionId(entry)"
             [blocked]="disabled()"
             [value]="entry.value.action"

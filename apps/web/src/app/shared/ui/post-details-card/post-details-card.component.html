@@ -1,15 +1,13 @@
 <article class="post-details" [class.inactive]="isInactive()">
   <div class="header">
-    <rs-avatar [src]="post().author.characterImageUrl || ''" [userName]="post().author.characterName" [size]="40" />
+    <a class="author-avatar-link" [routerLink]="authorProfileLink()" [attr.aria-label]="authorName()">
+      <rs-avatar [src]="post().author.characterImageUrl || ''" [userName]="post().author.characterName" [size]="40" />
+    </a>
     <div class="post-meta">
       <h2 class="author-name">{{ authorName() }}</h2>
-      <p class="post-date muted">
-        @if (post().creationDate) {
-          {{ post().creationDate | date:'y MMM d' }}
-        } @else {
-          -
-        }
-      </p>
+      <time class="post-date muted" [dateTime]="post().creationDate">
+        {{ creationDateDisplay() }}
+      </time>
       @if (isInactive()) {
         <div class="inactive-controls">
           <rs-badge
