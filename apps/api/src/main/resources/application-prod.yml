@@ -7,4 +7,10 @@ spring:
 supabase:
   url: ${SUPABASE_URL}
   secret-key: ${SUPABASE_SECRET_KEY}
-  storage-url: ${SUPABASE_STORAGE_URL}
+  storage-url: ${}
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
