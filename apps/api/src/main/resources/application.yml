@@ -6,7 +6,8 @@ spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:local}
   jpa:
-    open-in-view: false
+    # TODO: Disable open-in-view again after tale detail DTO mapping fetches all lazy associations inside service transactions.
+    open-in-view: true
     hibernate:
       ddl-auto: validate
     properties:
