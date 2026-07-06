@@ -83,10 +83,12 @@ export class ManageParticipantsView {
   }
 
   protected onParticipantPressed(contact: TaleParticipantProfileDTO): void {
-    if (!contact?.id) {
+    const taleId = this.taleId;
+    if (!taleId || !contact?.id) {
       return;
     }
-    void this._router.navigate(["/", ROUTE_PATHS.contacts, ROUTE_PATHS.details, contact.id]);
+
+    void this._router.navigate(["/", ROUTE_PATHS.tales, taleId, ROUTE_PATHS.participants, contact.id]);
   }
 
   protected onOptionSelected(contact: TaleParticipantProfileDTO, option: RsMoreOption): void {
