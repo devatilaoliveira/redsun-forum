@@ -9,7 +9,6 @@ import {AuthSessionService, IAuthSessionService} from "./session.service";
 import {IPrinter, Printer} from "../infra/miscellaneous/printer.handler";
 import {UTIL_CONSTANTS} from "../interface/constants/util.constants";
 import {ELoginProvider} from "../interface/enums/ELoginProvider";
-import {IOAuthPopupHandler, OAuthPopupHandler} from "../infra/miscellaneous/oauth-popup.handler";
 import {IOAuthOptions} from "../interface/models/ioauth-options";
 import {ISupabaseAuthClient, SupabaseAuthClientAdapter} from "./supabase-auth-client.adapter";
 import {IUserProfileService, UserProfileService} from "./user-profile.service";
@@ -37,25 +36,16 @@ export class AuthService implements IAuthService {
   private readonly _localStoreService: ILocalStoreService = inject(LocalStoreService);
   private readonly _userProfileService: IUserProfileService = inject(UserProfileService);
   private readonly _printer: IPrinter = inject(Printer);
-  private readonly _oauthPopupHandler: IOAuthPopupHandler = inject(OAuthPopupHandler);
   private readonly _taleContextState: TaleContextStateService = inject(TaleContextStateService);
 
   public async loginWithProvider(provider: ELoginProvider): Promise<void> {
     const options: IOAuthOptions = this._getOAuthOptions(provider);
 
-    let url: string;
     try {
-      const result = await this._supabaseAuthClient.signInWithOAuth({provider, options});
-      url = result.url;
+      await this._supabaseAuthClient.signInWithOAuth({provider, options});
     } catch (error) {
       this._printer.error(`OAuth error (${provider})`, error as Error);
-    }
-
-    try {
-      this._oauthPopupHandler.openPopup(url!);
-    } catch (popupError) {
-      this._printer.error(`login with ${provider} error`, popupError as Error);
-      throw popupError;
+      throw error;
     }
   }
 
@@ -78,7 +68,6 @@ export class AuthService implements IAuthService {
   }
 
   public async logout(): Promise<void> {
-    this._oauthPopupHandler.reset();
     this._authSessionService.clearCachedSession();
     this._localStoreService.removeUser();
     this._taleContextState.clear();
@@ -101,13 +90,14 @@ export class AuthService implements IAuthService {
     case ELoginProvider.GOOGLE:
       return {
         redirectTo,
-        skipBrowserRedirect: true,
-        scopes: "openid profile email"
+        scopes: "openid profile email",
+        queryParams: {
+          prompt: "select_account"
+        }
       };
     default:
       return {
-        redirectTo,
-        skipBrowserRedirect: true
+        redirectTo
       };
     }
   }
