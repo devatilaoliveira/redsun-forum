@@ -4,5 +4,4 @@ export interface AuthCallbackResult {
   status: EStatus;
   redirectUrl?: string;
   redirectState?: unknown;
-  sentToOpener?: boolean;
 }

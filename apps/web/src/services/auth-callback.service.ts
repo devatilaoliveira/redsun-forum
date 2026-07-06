@@ -1,19 +1,15 @@
 import {HttpErrorResponse} from "@angular/common/http";
 import {Injectable, inject} from "@angular/core";
 import {ITranslateService, TranslateService} from "@ngx-translate/core";
-import {from, Observable} from "rxjs";
+import {from, Observable, of} from "rxjs";
 import {catchError, switchMap} from "rxjs/operators";
 import {AuthService, IAuthService} from "./auth.service";
 import {ISupabaseAuthClient, SupabaseAuthClientAdapter} from "./supabase-auth-client.adapter";
 import {IPrinter, Printer} from "../infra/miscellaneous/printer.handler";
-import {environment} from "../environments/environment";
 import {ROUTE_PATHS} from "../interface/constants/route-path.constants";
-import {MeResponseDTO} from "../interface/dtos/user/MeResponseDTO";
-import {IOAuthResult} from "../interface/models/ioauth-result-message";
 import {EStatus} from "../interface/enums/EStatus";
 import {IAuthCallbackState} from "../interface/models/iauth-callback-state";
 import {AuthCallbackResult} from "../interface/models/iauth-callback-result";
-import {UtilFunctions} from "../infra/miscellaneous/util.functions";
 
 @Injectable({providedIn: "root"})
 export class AuthCallbackService {
@@ -21,7 +17,6 @@ export class AuthCallbackService {
   private readonly _supabaseAuthClient: ISupabaseAuthClient = inject(SupabaseAuthClientAdapter);
   private readonly _printer: IPrinter = inject(Printer);
   private readonly _translate: ITranslateService = inject(TranslateService);
-  private readonly _parentOrigin: string = UtilFunctions.getAppOrigin(environment.baseUrl);
 
   handle(urlString: string): Observable<AuthCallbackResult> {
     const url: URL = new URL(urlString);
@@ -46,24 +41,7 @@ export class AuthCallbackService {
     return from(this._supabaseAuthClient.exchangeCodeForSession(code)).pipe(
       switchMap((): Observable<AuthCallbackResult> => {
         return this._authService.completeSignIn().pipe(
-          switchMap((me: MeResponseDTO): Observable<AuthCallbackResult> => {
-            const sent = this._notifyOpener(undefined, me);
-            if (sent) {
-              return from([
-                {
-                  status: EStatus.SUCCESS,
-                  sentToOpener: true
-                } as AuthCallbackResult
-              ]);
-            }
-
-            return from([
-              {
-                status: EStatus.SUCCESS,
-                redirectUrl: `/${ROUTE_PATHS.home}`
-              } as AuthCallbackResult
-            ]);
-          }),
+          switchMap((): Observable<AuthCallbackResult> => this._redirectHome()),
           catchError(httpError => {
             this._printer.error("Backend could not complete OAuth sign-in", httpError);
 
@@ -79,39 +57,32 @@ export class AuthCallbackService {
       }),
       catchError((error: unknown): Observable<AuthCallbackResult> => {
         this._printer.error("Supabase error while exchanging code for session", error);
-        return this._handleLoginFailure({
-          authError: this._translate.instant("UNEXPECTED_ERROR")
-        });
+        return from(this._authService.logout()).pipe(
+          switchMap((): Observable<AuthCallbackResult> =>
+            this._handleLoginFailure({
+              authError: this._translate.instant("UNEXPECTED_ERROR")
+            })
+          )
+        );
       })
     );
   }
 
   private _handleLoginFailure(state: IAuthCallbackState): Observable<AuthCallbackResult> {
-    const messageParts: string[] = [state.authError, state.authErrorCode].filter((value: string | undefined): value is string => Boolean(value));
-    const message: string | undefined = messageParts.length ? messageParts.join(" ") : undefined;
-
-    this._notifyOpener(message);
-    return from([
+    return of(
       {
         status: EStatus.ERROR,
         redirectUrl: `/${ROUTE_PATHS.login}`,
-        sentToOpener: true,
         redirectState: state
       } as AuthCallbackResult
-    ]);
+    );
   }
 
-  private _notifyOpener(message?: string, user?: MeResponseDTO): boolean {
-    if (!window.opener) {
-      return false;
-    }
-
-    const oAuthResult: IOAuthResult = {message, user};
-
-    window.opener.postMessage(oAuthResult, this._parentOrigin);
-    window.close();
-
-    return true;
+  private _redirectHome(): Observable<AuthCallbackResult> {
+    return of({
+      status: EStatus.SUCCESS,
+      redirectUrl: "/"
+    });
   }
 
   private _resolveBackendLoginError(error: unknown): string {

@@ -2,7 +2,6 @@ import {Component, inject, OnInit} from "@angular/core";
 import {Router} from "@angular/router";
 import {TranslatePipe} from "@ngx-translate/core";
 import {IAuthCallbackState} from "../../../interface/models/iauth-callback-state";
-import {EStatus} from "../../../interface/enums/EStatus";
 import {EVariant} from "../../../interface/enums/EVariant";
 import {AuthCallbackResult} from "../../../interface/models/iauth-callback-result";
 import {AuthCallbackService} from "../../../services/auth-callback.service";
@@ -23,16 +22,10 @@ export class AuthCallbackView implements OnInit {
   ngOnInit(): void {
     this._authCallbackService.handle(window.location.href).subscribe(
       (result: AuthCallbackResult) => {
-        if (result.sentToOpener) {
-          return;
-        }
-
-        if (result.status === EStatus.ERROR) {
-          void this._router.navigate([result.redirectUrl], {
-            replaceUrl: true,
-            state: result.redirectState as IAuthCallbackState
-          });
-        }
+        void this._router.navigate([result.redirectUrl ?? "/"], {
+          replaceUrl: true,
+          state: result.redirectState as IAuthCallbackState | undefined
+        });
       }
     );
   }

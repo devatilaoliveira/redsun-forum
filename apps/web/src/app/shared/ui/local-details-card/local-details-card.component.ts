@@ -1,6 +1,8 @@
 import {Component, computed, input, InputSignal} from "@angular/core";
 import {DatePipe} from "@angular/common";
+import {RouterLink} from "@angular/router";
 import {TranslatePipe} from "@ngx-translate/core";
+import {ROUTE_PATHS} from "../../../../interface/constants/route-path.constants";
 import {RsBox} from "../../fragments/rsBox/rs.box";
 import {LocationDetailsDTO} from "../../../../interface/dtos/location/LocationDetailsDTO";
 import {RsAvatar} from "../../fragments/rsAvatar/rs.avatar";
@@ -10,7 +12,7 @@ import {RsExpandableText} from "../../fragments/rsExpandableText/rs.expandable-t
 @Component({
   selector: "rs-local-details-card",
   standalone: true,
-  imports: [DatePipe, TranslatePipe, RsBox, RsAvatar, RsImg, RsExpandableText],
+  imports: [DatePipe, RouterLink, TranslatePipe, RsBox, RsAvatar, RsImg, RsExpandableText],
   templateUrl: "./local-details-card.component.html",
   styleUrl: "./local-details-card.component.scss"
 })
@@ -26,5 +28,16 @@ export class LocalDetailsCardComponent {
     const authorName = this.location().author?.characterName ?? "";
     const trimmed = authorName.trim();
     return trimmed.length > 0 ? trimmed : "-";
+  });
+  protected readonly authorProfileLink = computed<string[] | null>(() => {
+    const location = this.location();
+    const taleId = location.taleId;
+    const participantId = location.author?.id;
+
+    if (!taleId || !participantId) {
+      return null;
+    }
+
+    return ["/", ROUTE_PATHS.tales, taleId, ROUTE_PATHS.participants, participantId];
   });
 }

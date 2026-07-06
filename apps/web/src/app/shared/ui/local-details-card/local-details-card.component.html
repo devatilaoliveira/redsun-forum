@@ -14,10 +14,14 @@
   }
 
   <div class="body">
-    <rs-avatar [src]="location().author.characterImageUrl" [userName]="location().author.characterName" [size]="40"/>
     <div class="content">
       <div class="info">
-        <h2>{{ authorName() }}</h2>
+        <div class="author">
+          <a class="author-avatar-link" [routerLink]="authorProfileLink()" [attr.aria-label]="authorName()">
+            <rs-avatar [src]="location().author.characterImageUrl" [userName]="location().author.characterName" [size]="40"/>
+          </a>
+          <h2>{{ authorName() }}</h2>
+        </div>
         <p class="muted">
           @if (location().lastTimeActive) {
             {{ location().lastTimeActive | date:'y MMMM d' }}

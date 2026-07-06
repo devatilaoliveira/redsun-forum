@@ -54,6 +54,7 @@ const POST_INPUT_MODE = {
 } as const;
 
 type PostInputMode = typeof POST_INPUT_MODE[keyof typeof POST_INPUT_MODE];
+type ComposerInputMode = Exclude<PostInputMode, typeof POST_INPUT_MODE.characterSheet>;
 
 type LocationDetailsViewModel = LocationDetailsDTO & {
   posts: PostDTO[];
@@ -229,6 +230,7 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   });
 
   private readonly pageSize = 10;
+  private composerInputModeBeforeCharacterSheet: ComposerInputMode | null = null;
 
   @ViewChild("loadMoreTrigger")
   set loadMoreTrigger(element: ElementRef<HTMLElement> | undefined) {
@@ -273,29 +275,23 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   }
 
   protected onShowPostInput(): void {
-    if (this.postInputMode() === POST_INPUT_MODE.post) return;
-    this.postInputMode.set(POST_INPUT_MODE.post);
-    this.resetDiceInputs();
+    this.switchPostInputMode(POST_INPUT_MODE.post);
   }
 
   protected onShowDiceInput(): void {
-    if (this.postInputMode() === POST_INPUT_MODE.dice) return;
-    this.postInputMode.set(POST_INPUT_MODE.dice);
-    this.resetRedsunDiceInput();
-    this.resetPostContent();
+    this.switchPostInputMode(POST_INPUT_MODE.dice);
   }
 
   protected onShowRedsunDiceInput(): void {
-    if (!this.isRedsunTale() || this.postInputMode() === POST_INPUT_MODE.redsunDice) return;
-    this.postInputMode.set(POST_INPUT_MODE.redsunDice);
-    this.resetDiceInput();
-    this.resetPostContent();
+    if (!this.isRedsunTale()) return;
+    this.switchPostInputMode(POST_INPUT_MODE.redsunDice);
   }
 
   protected onShowCharacterSheetInput(): void {
-    if (!this.canUseCharacterSheetInput() || this.postInputMode() === POST_INPUT_MODE.characterSheet) return;
-    this.postInputMode.set(POST_INPUT_MODE.characterSheet);
-    this.loadCharacterSheetIfNeeded();
+    if (!this.canUseCharacterSheetInput()) return;
+    if (this.switchPostInputMode(POST_INPUT_MODE.characterSheet)) {
+      this.loadCharacterSheetIfNeeded();
+    }
   }
 
   protected onSubmitPost(locationId: string): void {
@@ -579,6 +575,42 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   private resetDiceInputs(): void {
     this.resetDiceInput();
     this.resetRedsunDiceInput();
+  }
+
+  private resetComposerInputs(): void {
+    this.resetPostContent();
+    this.resetDiceInputs();
+  }
+
+  private switchPostInputMode(nextMode: PostInputMode): boolean {
+    const currentMode: PostInputMode = this.postInputMode();
+    if (currentMode === nextMode) {
+      return false;
+    }
+
+    if (nextMode === POST_INPUT_MODE.characterSheet) {
+      if (this.isComposerInputMode(currentMode)) {
+        this.composerInputModeBeforeCharacterSheet = currentMode;
+      }
+      this.postInputMode.set(nextMode);
+      return true;
+    }
+
+    const shouldPreserveInputs: boolean = currentMode === POST_INPUT_MODE.characterSheet
+      && this.composerInputModeBeforeCharacterSheet === nextMode;
+
+    this.postInputMode.set(nextMode);
+    this.composerInputModeBeforeCharacterSheet = null;
+
+    if (!shouldPreserveInputs) {
+      this.resetComposerInputs();
+    }
+
+    return true;
+  }
+
+  private isComposerInputMode(mode: PostInputMode): mode is ComposerInputMode {
+    return mode !== POST_INPUT_MODE.characterSheet;
   }
 
   private canDeactivatePostForUser(post: PostDTO, currentUserId: string | null, isTaleOwner: boolean): boolean {

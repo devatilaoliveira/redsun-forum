@@ -73,6 +73,7 @@
           <div class="dice-row">
             <rs-dice-input
               [disabled]="postInProgress()"
+              [value]="diceValues()"
               (valueChanged)="onDiceValueChange($event)"
             ></rs-dice-input>
           </div>
@@ -80,6 +81,7 @@
           <div class="dice-row">
             <rs-redsun-dice-input
               [disabled]="postInProgress()"
+              [value]="redsunDiceValues()"
               (valueChanged)="onRedsunDiceValueChange($event)"
             ></rs-redsun-dice-input>
           </div>

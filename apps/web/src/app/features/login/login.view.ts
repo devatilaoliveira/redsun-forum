@@ -1,10 +1,8 @@
-import {Component, DestroyRef, OnInit, inject, WritableSignal, signal} from "@angular/core";
-import {from, fromEvent, finalize, switchMap} from "rxjs";
-import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {Component, OnInit, inject, WritableSignal, signal} from "@angular/core";
+import {from, finalize, switchMap} from "rxjs";
 import {Router} from "@angular/router";
 import {ROUTE_PATHS} from "../../../interface/constants/route-path.constants";
-import {environment} from "../../../environments/environment";
-import {IOAuthResult} from "../../../interface/models/ioauth-result-message";
+import {IAuthCallbackState} from "../../../interface/models/iauth-callback-state";
 import {ILocalStoreService, LocalStoreService} from "../../../services/local-store.service";
 import {RedsunTitle} from "../../shared/fragments/redsunTitle/redsun.title";
 import {NgOptimizedImage} from "@angular/common";
@@ -19,7 +17,6 @@ import {EMAIL_PATTERN} from "../../../interface/constants/pattern-validators";
 import {PublicLegalFooterComponent} from "../../shared/ui/public-legal-footer/public-legal-footer.component";
 import {ISupabaseAuthClient, SupabaseAuthClientAdapter} from "../../../services/supabase-auth-client.adapter";
 import {GoogleButton} from "../../shared/fragments/googleButton/google.button";
-import {UtilFunctions} from "../../../infra/miscellaneous/util.functions";
 import {ELanguage} from "../../../interface/enums/ELanguage";
 import {RsOptionsMenu, RsOptionsMenuOption} from "../../shared/fragments/rsOptionsMenu/rs.options-menu";
 
@@ -34,7 +31,6 @@ export class LoginView implements OnInit {
   protected readonly emailPattern: RegExp = EMAIL_PATTERN;
   private readonly _router: Router = inject(Router);
   private readonly _localStoreService: ILocalStoreService = inject(LocalStoreService);
-  private readonly _destroyRef: DestroyRef = inject(DestroyRef);
   private readonly _translateService: ITranslateService = inject(TranslateService);
   private readonly _authService: IAuthService = inject(AuthService);
   private readonly _supabaseAuthClient: ISupabaseAuthClient = inject(SupabaseAuthClientAdapter);
@@ -47,26 +43,13 @@ export class LoginView implements OnInit {
   protected readonly ELanguage = ELanguage;
   protected readonly forgotPasswordRoute: string = `/${ROUTE_PATHS.forgotPassword}`;
   protected readonly registerRoute: string = `/${ROUTE_PATHS.register}`;
-  private readonly _targetOrigin: string = UtilFunctions.getAppOrigin(environment.baseUrl);
-  private readonly _onOAuthMessage = (event: MessageEvent<IOAuthResult>): void => {
-    if (event.origin !== this._targetOrigin) return;
-
-    if (event.data.user) {
-      this._localStoreService.storeUser(event.data.user);
-      this.errorMessage.set(null);
-      void this._router.navigate(["/"], {replaceUrl: true});
-      return;
-    }
-
-    this._localStoreService.removeUser();
-    this.errorMessage.set(event.data.message!);
-  };
 
   ngOnInit(): void {
-    if (typeof window !== "undefined") {
-      fromEvent<MessageEvent<IOAuthResult>>(window, "message")
-        .pipe(takeUntilDestroyed(this._destroyRef))
-        .subscribe(this._onOAuthMessage);
+    const state = history.state as Partial<IAuthCallbackState> | undefined;
+    const messageParts: string[] = [state?.authError, state?.authErrorCode].filter((value: string | undefined): value is string => Boolean(value));
+
+    if (messageParts.length) {
+      this.errorMessage.set(messageParts.join(" "));
     }
   }
 
