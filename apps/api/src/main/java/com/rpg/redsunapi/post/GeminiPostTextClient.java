@@ -21,6 +21,7 @@ public class GeminiPostTextClient {
     Return the rewritten post in that same language.
     Rewrite the text as a neutral, descriptive table top RPG narration, similar to a book scene narrated by a DM or the action of a player.
     Preserve the original meaning, intent, actions, and relevant details.
+    Preserve the original narrative perspective and grammatical person. First-person narration may be correct when the post is written by a player as their own character action; third-person narration may be correct when the post is written as DM narration or already describes characters from outside. Do not convert first person to third person, or third person to first person, unless the original text is inconsistent and the minimal correction is required for clarity.
     Do not add new concrete information, actions, objects, locations, lore, or interpretations.
     You may improve the atmosphere slightly through pacing, sentence rhythm, and narrative framing, but do not invent details.
     Remove filler words, speech disfluencies, repetitions, and conversational noise,that do not affect meaning.

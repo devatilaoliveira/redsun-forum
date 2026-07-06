@@ -1,4 +1,5 @@
-import {Component, input, InputSignal} from "@angular/core";
+import {Component, inject, input, InputSignal} from "@angular/core";
+import {ITimeDisplayHandler, TimeDisplayHandler} from "../../../../infra/miscellaneous/time-display.handler";
 import {RsDivider} from "../../fragments/rsDivider/rs.divider";
 
 export interface PatchNoteItem {
@@ -21,6 +22,12 @@ export interface PatchNoteGroup {
   styleUrl: "./patch-notes.component.scss"
 })
 export class PatchNotesComponent {
+  private readonly _timeDisplayHandler: ITimeDisplayHandler = inject(TimeDisplayHandler);
+
   public readonly title: InputSignal<string> = input.required<string>();
   public readonly groups: InputSignal<readonly PatchNoteGroup[]> = input.required<readonly PatchNoteGroup[]>();
+
+  protected patchDateDisplay(date: string): string {
+    return this._timeDisplayHandler.display(date, "date");
+  }
 }

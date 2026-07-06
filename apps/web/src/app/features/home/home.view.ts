@@ -27,8 +27,43 @@ export class HomeView {
   // TODO: Create endpoint to retrieve patch notes.
   protected readonly patchNoteGroups: readonly PatchNoteGroup[] = [
     {
+      title: "Patch 2.1",
+      date: "2026-07-06",
+      summary: "Este patch melhora a navegação entre personagens, ajusta a apresentação dos locais e deixa os deploys do frontend mais estáveis.",
+      items: [
+        {
+          title: "Autenticação mais estável",
+          description: "O fluxo de autenticação do frontend foi simplificado para usar redirecionamento direto, tratar melhor erros de callback e limpar a sessão quando o login não é concluído corretamente."
+        },
+        {
+          title: "Modos de postagem preservam melhor o conteúdo",
+          description: "Ao alternar entre texto, dados e ficha de personagem em um local, o compositor agora mantém ou limpa os campos de forma mais previsível, evitando perda desnecessária do que estava sendo escrito."
+        },
+        {
+          title: "Participantes levam ao perfil do personagem",
+          description: "A lista de participantes no gerenciamento da história agora abre o perfil do personagem, seguindo o mesmo comportamento do carrossel da história."
+        },
+        {
+          title: "Cartão de local mais compacto",
+          description: "O avatar do autor agora aparece na mesma linha do nome, liberando espaço em telas pequenas e mantendo o layout consistente em todos os tamanhos."
+        },
+        {
+          title: "Acesso ao personagem pelo local",
+          description: "Ao clicar no avatar do autor em um local, o jogador agora abre a ficha do personagem daquela história."
+        },
+        {
+          title: "Deploys mais seguros",
+          description: "O frontend ganhou regras de cache para Workers Static Assets e recupera automaticamente uma vez quando uma aba antiga tenta carregar arquivos de uma versão anterior."
+        },
+        {
+          title: "Melhoria de texto mais fiel ao narrador",
+          description: "A melhoria automática de postagens agora preserva melhor se o texto foi narrado em primeira pessoa pelo jogador ou em terceira pessoa pelo narrador."
+        }
+      ]
+    },
+    {
       title: "Patch 2.0",
-      date: "Julho de 2026",
+      date: "2026-07-05",
       summary: "Este patch melhora o jogo nas localizações, deixa os dados das postagens mais claros e ajusta pequenos pontos de acesso.",
       items: [
         {
