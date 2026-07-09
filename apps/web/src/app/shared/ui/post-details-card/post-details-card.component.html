@@ -34,9 +34,7 @@
     </div>
   <div class="content" [class.is-visible]="contentVisible()">
     <div class="content-inner">
-      <p class="post-content" [attr.aria-hidden]="!contentVisible()">
-        {{ post().content }}
-      </p>
+      <p class="post-content" [attr.aria-hidden]="!contentVisible()">{{ post().content }}</p>
     </div>
   </div>
 </article>
