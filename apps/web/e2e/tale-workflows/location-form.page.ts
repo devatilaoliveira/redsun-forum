@@ -42,4 +42,14 @@ export class LocationFormPage {
     );
     await expect(this.page.getByRole("heading", { name: locationName })).toBeVisible();
   }
+
+  async expectCreatedLocationVisibleByUrl(taleId: string, locationName: string): Promise<string> {
+    await expect(this.page).toHaveURL((url) => {
+      const pathPattern = new RegExp(`^/${ROUTE_PATHS.tales}/${taleId}/${ROUTE_PATHS.locations}/[^/]+$`);
+      return pathPattern.test(url.pathname);
+    });
+    await expect(this.page.getByRole("heading", { name: locationName })).toBeVisible();
+
+    return new URL(this.page.url()).pathname.split("/").at(-1)!;
+  }
 }

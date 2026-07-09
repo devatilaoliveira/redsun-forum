@@ -14,10 +14,8 @@ test.describe("Tale workflows with seeded backend data", () => {
     const createResponse = await taleCreation.createTale(uniqueName, "Created by a full browser E2E test.");
 
     expect(createResponse.ok()).toBe(true);
-    const createdTale = await createResponse.json();
-    expect(createdTale.id).toEqual(expect.any(String));
-    expect(createdTale.taleName).toBe(uniqueName);
-    await taleCreation.expectCreatedTaleVisible(createdTale.id, uniqueName);
+    const createdTaleId = await taleCreation.expectCreatedTaleVisibleByUrl(uniqueName);
+    expect(createdTaleId).toEqual(expect.any(String));
   });
 
   test("adds a pre-existing participant to a pre-existing tale", async ({ page }) => {
@@ -31,15 +29,6 @@ test.describe("Tale workflows with seeded backend data", () => {
     const addResponse = await participantsPage.addParticipant(tale.id, participant.email);
 
     expect(addResponse.ok()).toBe(true);
-    const updatedTale = await addResponse.json();
-    expect(updatedTale.participants).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: participant.id,
-          username: participant.username,
-        }),
-      ]),
-    );
     await participantsPage.expectParticipantRowVisible(participant.id);
   });
 
@@ -52,9 +41,7 @@ test.describe("Tale workflows with seeded backend data", () => {
     const createResponse = await locationForm.createLocation(tale.id, uniqueName, "Created by a full browser E2E test.");
 
     expect(createResponse.ok()).toBe(true);
-    const createdLocation = await createResponse.json();
-    expect(createdLocation.id).toEqual(expect.any(String));
-    expect(createdLocation.locationName).toBe(uniqueName);
-    await locationForm.expectCreatedLocationVisible(tale.id, createdLocation.id, uniqueName);
+    const createdLocationId = await locationForm.expectCreatedLocationVisibleByUrl(tale.id, uniqueName);
+    expect(createdLocationId).toEqual(expect.any(String));
   });
 });

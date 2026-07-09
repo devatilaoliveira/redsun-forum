@@ -39,4 +39,14 @@ export class TaleCreationPage {
     await expect(this.page).toHaveURL((url) => url.pathname === `/${ROUTE_PATHS.tales}/${taleId}`);
     await expect(this.page.getByText(taleName, { exact: true })).toBeVisible();
   }
+
+  async expectCreatedTaleVisibleByUrl(taleName: string): Promise<string> {
+    await expect(this.page).toHaveURL((url) => {
+      const pathPattern = new RegExp(`^/${ROUTE_PATHS.tales}/[^/]+$`);
+      return pathPattern.test(url.pathname);
+    });
+    await expect(this.page.getByText(taleName, { exact: true })).toBeVisible();
+
+    return new URL(this.page.url()).pathname.split("/").at(-1)!;
+  }
 }
