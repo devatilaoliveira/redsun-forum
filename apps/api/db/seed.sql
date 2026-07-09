@@ -208,3 +208,61 @@ VALUES
     false
   )
 ON CONFLICT (user_id) DO NOTHING;
+
+INSERT INTO public.tales (
+  id,
+  tale_name,
+  owner_id,
+  is_public,
+  image_url,
+  description,
+  language,
+  rules,
+  creation_date,
+  last_time_active,
+  status
+)
+VALUES (
+  '00000000-0000-0000-0000-000000000301',
+  'Seeded RedSun Tale',
+  '00000000-0000-0000-0000-000000000101',
+  true,
+  null,
+  'Seeded tale for full browser E2E workflows.',
+  'EN',
+  'REDSUN',
+  '2026-01-01T00:00:00Z',
+  '2026-01-01T00:00:00Z',
+  'ACTIVE'
+)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public.tale_participants (
+  tale_id,
+  participant_id
+)
+VALUES (
+  '00000000-0000-0000-0000-000000000301',
+  '00000000-0000-0000-0000-000000000101'
+)
+ON CONFLICT (tale_id, participant_id) DO NOTHING;
+
+INSERT INTO public.basic_sheets (
+  id,
+  tale_id,
+  character_id,
+  character_name,
+  character_description,
+  character_image_url,
+  change_history
+)
+VALUES (
+  '00000000-0000-0000-0000-000000000401',
+  '00000000-0000-0000-0000-000000000301',
+  '00000000-0000-0000-0000-000000000101',
+  'no_given_name_yet',
+  null,
+  null,
+  null
+)
+ON CONFLICT (tale_id, character_id) DO NOTHING;

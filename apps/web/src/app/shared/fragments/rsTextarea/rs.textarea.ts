@@ -32,6 +32,7 @@ export class RsTextarea {
   public readonly required: InputSignal<boolean> = input<boolean>(false);
   public readonly blocked: InputSignal<boolean> = input<boolean>(false);
   public readonly id: InputSignal<string | null> = input<string | null>(null);
+  public readonly testId: InputSignal<string | null> = input<string | null>(null);
   public readonly rows: InputSignal<number> = input<number>(5);
   public readonly errorMessage: InputSignal<string | null> = input<string | null>(null);
 

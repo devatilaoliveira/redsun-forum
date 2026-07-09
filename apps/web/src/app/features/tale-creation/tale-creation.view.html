@@ -7,6 +7,7 @@
   <div class="content">
     <form class="form" [formGroup]="createNewTaleFormGroup" (submit)="$event.preventDefault(); onSubmit()">
       <rs-input
+        testId="tale-create-name-input"
         [label]="'TALE_NAME' | translate"
         [placeholder]="'TALE_NAME_PLACEHOLDER' | translate"
         [required]="true"
@@ -17,6 +18,7 @@
       />
 
       <rs-textarea
+        testId="tale-create-description-input"
         [label]="'TALE_DESCRIPTION' | translate"
         [placeholder]="'DESCRIPTION_YOUR_WORLD' | translate"
         [maxLength]="UTIL_CONSTANTS.EXTRA_LONG_TEXT_LENGTH"
@@ -71,6 +73,7 @@
 
       <div class="cta-btn">
         <rs-button
+          testId="tale-create-submit"
           [inProgress]="inProgress()"
           (pressed)="onSubmit()"
           [disabled]="!createNewTaleFormGroup.valid || inProgress()"
