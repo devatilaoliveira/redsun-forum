@@ -274,6 +274,12 @@ export class LocationDetailsView implements OnInit, OnDestroy {
     this.setPostContent(value);
   }
 
+  protected onClearPostInputs(): void {
+    this.resetComposerInputs();
+    this.diceInput?.resetFields();
+    this.redsunDiceInput?.resetFields();
+  }
+
   protected onShowPostInput(): void {
     this.switchPostInputMode(POST_INPUT_MODE.post);
   }

@@ -29,6 +29,13 @@
   --rs-button-border: var(--color-primary);
 }
 
+.rs-round-icon-button[data-variant="secondary"] {
+  --rs-icon-color: var(--color-black);
+  --rs-hover-bg: color-mix(in srgb, var(--color-secondary) 88%, var(--color-black));
+  --rs-button-bg: var(--color-secondary);
+  --rs-button-border: var(--color-secondary);
+}
+
 .rs-round-icon-button[data-variant="premium"] {
   --rs-icon-color: var(--color-black);
   --rs-hover-bg: color-mix(in srgb, var(--color-yellow) 88%, var(--color-black));

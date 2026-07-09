@@ -100,6 +100,15 @@
         }
 
         <div class="post-actions">
+          <rs-tooltip [text]="'POST_CLEAR_INPUTS' | translate" align="end" class="clear-inputs-btn">
+            <rs-round-icon-button
+              [iconSrc]="'/assets/svgs/close.svg'"
+              [ariaLabel]="'POST_CLEAR_INPUTS' | translate"
+              [disabled]="postInProgress() || improvePostInProgress()"
+              [variant]="EVariant.SECONDARY"
+              (pressed)="onClearPostInputs()"
+            />
+          </rs-tooltip>
           @if (isPremium()) {
             <rs-tooltip [text]="'IMPROVE_POST_TEXT_WITH_AI' | translate" align="end">
               <rs-round-icon-button

@@ -424,6 +424,7 @@
   "IMPROVE_POST_TEXT_WITH_AI": "Beitrag mit KI verbessern",
   "IMPROVE_POST_TEXT_WITH_AI_FAILED": "Beitrag konnte nicht mit KI verbessert werden. Bitte versuche es erneut.",
   "POST_PLACEHOLDER": "Teile ein neues Update...",
+  "POST_CLEAR_INPUTS": "Leeren",
   "POST_SUBMIT": "Senden",
   "NO_POSTS": "Noch keine Beiträge.",
   "MY_TALES_EMPTY": "Du hast noch keine Geschichten erstellt.",

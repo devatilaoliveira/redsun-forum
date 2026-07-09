@@ -413,6 +413,7 @@
   "IMPROVE_POST_TEXT_WITH_AI": "Improve post text with AI",
   "IMPROVE_POST_TEXT_WITH_AI_FAILED": "Could not improve post text. Please try again.",
   "POST_PLACEHOLDER": "Share a new post...",
+  "POST_CLEAR_INPUTS": "Clear",
   "POST_SUBMIT": "Send",
   "NO_POSTS": "No posts yet.",
   "MY_TALES_EMPTY": "You have not created any tales yet.",
