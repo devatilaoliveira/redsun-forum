@@ -16,6 +16,7 @@ DROP TABLE IF EXISTS public.user_contacts CASCADE;
 DROP TABLE IF EXISTS public.user_favorite_roles CASCADE;
 DROP TABLE IF EXISTS public.user_favorite_rules CASCADE;
 DROP TABLE IF EXISTS public.user_favorite_languages CASCADE;
+DROP TABLE IF EXISTS public.user_settings CASCADE;
 DROP TABLE IF EXISTS public.subscriptions CASCADE;
 DROP TABLE IF EXISTS public.users CASCADE;
 
@@ -37,6 +38,12 @@ CREATE TABLE public.users (
 );
 
 -- User preferences
+CREATE TABLE public.user_settings (
+  user_id uuid PRIMARY KEY REFERENCES public.users(id) ON DELETE CASCADE,
+  app_language varchar(20) CHECK (app_language IS NULL OR app_language IN ('EN','DE','PT')),
+  app_theme varchar(20) CHECK (app_theme IS NULL OR app_theme IN ('DARK','LIGHT'))
+);
+
 CREATE TABLE public.user_favorite_languages (
   user_id uuid NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
   preference_order integer NOT NULL CHECK (preference_order BETWEEN 0 AND 9),

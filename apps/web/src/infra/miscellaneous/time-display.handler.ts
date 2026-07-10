@@ -1,7 +1,7 @@
 import {inject, Injectable} from "@angular/core";
 import {TranslateService} from "@ngx-translate/core";
 import {ELanguage} from "../../interface/enums/ELanguage";
-import {ILocalStoreService, LocalStoreService} from "../../services/local-store.service";
+import {AppSettingsService, IAppSettingsService} from "../../services/app-settings.service";
 
 export type TimeDisplayMode = "date" | "relative" | "dateTime";
 
@@ -20,7 +20,7 @@ interface TimeDisplayLocaleConfig {
 
 @Injectable({providedIn: "root"})
 export class TimeDisplayHandler implements ITimeDisplayHandler {
-  private readonly _localStoreService: ILocalStoreService = inject(LocalStoreService);
+  private readonly _appSettingsService: IAppSettingsService = inject(AppSettingsService);
   private readonly _translateService: TranslateService = inject(TranslateService);
 
   private readonly _hourMs: number = 60 * 60 * 1000;
@@ -109,7 +109,7 @@ export class TimeDisplayHandler implements ITimeDisplayHandler {
   }
 
   private _getLocaleConfig(): TimeDisplayLocaleConfig {
-    const language: ELanguage = this._localStoreService.getLanguage();
+    const language: ELanguage = this._appSettingsService.getLanguage();
 
     if (language === ELanguage.EN) {
       return {

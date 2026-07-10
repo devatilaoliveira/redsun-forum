@@ -1,16 +1,13 @@
 import {Injectable, computed, signal, WritableSignal, Signal} from "@angular/core";
 import {MeResponseDTO} from "../interface/dtos/user/MeResponseDTO";
 import {UserAsContactDTO} from "../interface/dtos/user/UserAsContactDTO";
-import {ELanguage} from "../interface/enums/ELanguage";
-import {LANG_STORE_KEY, USER_STORE_KEY} from "../interface/constants/store.constants";
+import {USER_STORE_KEY} from "../interface/constants/store.constants";
 
 export interface ILocalStoreService {
   getAuthenticatedUser(): MeResponseDTO;
   storeUser(user: MeResponseDTO | null): void;
   removeUser(): void;
   updateContacts(contacts: UserAsContactDTO[]): void;
-  getLanguage(): ELanguage;
-  setLanguage(lang: ELanguage): void;
 }
 
 @Injectable({providedIn: "root"})
@@ -57,16 +54,4 @@ export class LocalStoreService implements ILocalStoreService {
     });
   }
 
-  public getLanguage(): ELanguage {
-    const saved = localStorage.getItem(LANG_STORE_KEY) as ELanguage | null;
-    if (!saved) {
-      this.setLanguage(ELanguage.PT);
-      return ELanguage.PT;
-    }
-    return saved;
-  }
-
-  public setLanguage(lang: ELanguage): void {
-    localStorage.setItem(LANG_STORE_KEY, lang);
-  }
 }

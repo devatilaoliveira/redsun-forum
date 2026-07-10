@@ -86,6 +86,7 @@ WHERE schemaname = 'public'
   AND tablename IN (
     'users',
     'client_error_reports',
+    'user_settings',
     'subscriptions',
     'user_contacts',
     'user_favorite_languages',
@@ -114,6 +115,7 @@ WHERE schemaname = 'public'
   AND tablename IN (
     'users',
     'client_error_reports',
+    'user_settings',
     'subscriptions',
     'user_contacts',
     'user_favorite_languages',

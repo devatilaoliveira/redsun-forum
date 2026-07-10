@@ -21,6 +21,7 @@ public record MeResponseDto(
   List<ELanguage> favoriteLanguage,
   List<ERuleSystem> favoriteRules,
   List<ERole> favoriteRole,
+  UserSettingsDto userSettings,
   SubscriptionDTO subscription,
   List<UserAsContactDTO> contacts,
   LegalAcknowledgementDto legalAcknowledgement
@@ -28,6 +29,7 @@ public record MeResponseDto(
 
   public static MeResponseDto from(
       User user,
+      UserSettingsDto userSettings,
       List<UserAsContactDTO> contacts,
       Subscription subscription,
       String requiredTermsVersion,
@@ -46,6 +48,7 @@ public record MeResponseDto(
       isDeleted ? null : List.copyOf(user.getFavoriteLanguage()),
       isDeleted ? null : List.copyOf(user.getFavoriteRules()),
       isDeleted ? null : List.copyOf(user.getFavoriteRole()),
+      isDeleted ? null : userSettings,
       isDeleted ? null : SubscriptionDTO.from(Objects.requireNonNull(subscription, "subscription")),
       usersAsContacts,
       isDeleted ? null : LegalAcknowledgementDto.from(user, requiredTermsVersion, requiredPrivacyVersion)
