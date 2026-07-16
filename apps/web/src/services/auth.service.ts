@@ -15,6 +15,7 @@ import {IUserProfileService, UserProfileService} from "./user-profile.service";
 import {MeResponseDTO} from "../interface/dtos/user/MeResponseDTO";
 import {UtilFunctions} from "../infra/miscellaneous/util.functions";
 import {TaleContextStateService} from "../stateServices/tale-context-state.service";
+import {AppSettingsService, IAppSettingsService} from "./app-settings.service";
 
 export interface IAuthService {
   loginWithProvider(provider: ELoginProvider): Promise<void>;
@@ -39,6 +40,7 @@ export class AuthService implements IAuthService {
   private readonly _userProfileService: IUserProfileService = inject(UserProfileService);
   private readonly _printer: IPrinter = inject(Printer);
   private readonly _taleContextState: TaleContextStateService = inject(TaleContextStateService);
+  private readonly _appSettingsService: IAppSettingsService = inject(AppSettingsService);
   private readonly _destroyRef: DestroyRef = inject(DestroyRef);
 
   private _logoutPromise: Promise<void> | null = null;
@@ -78,6 +80,7 @@ export class AuthService implements IAuthService {
       switchMap((me: MeResponseDTO) => this.recordSessionEstablished().pipe(
         map((): MeResponseDTO => {
           this._localStoreService.storeUser(me);
+          this._appSettingsService.applyUserSettings(me.userSettings);
           return me;
         })
       ))
@@ -126,6 +129,7 @@ export class AuthService implements IAuthService {
   private _clearLocalAuthState(): void {
     this._localStoreService.removeUser();
     this._taleContextState.clear();
+    this._appSettingsService.resetToDetectedDefaults();
   }
 
   private _getOAuthOptions(provider: ELoginProvider): IOAuthOptions {

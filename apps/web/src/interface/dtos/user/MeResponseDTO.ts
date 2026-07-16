@@ -4,6 +4,7 @@ import {EProfileLanguage} from "../../enums/EProfileLanguage";
 import {ERuleSystem} from "../../enums/ERuleSystem";
 import {EFavoriteRole} from "../../enums/EFavoriteRole";
 import {EProvider} from "../../enums/EProvider";
+import {UserSettingsDTO} from "./UserSettingsDTO";
 
 export interface MeResponseDTO {
   id: string;
@@ -14,6 +15,7 @@ export interface MeResponseDTO {
   description?: string;
   favoriteLanguage: EProfileLanguage[] | null;
   favoriteRules: ERuleSystem[] | null;
+  userSettings: UserSettingsDTO | null;
   favoriteRole: EFavoriteRole[] | null;
   subscription?: SubscriptionDTO | null;
   contacts: UserAsContactDTO[];

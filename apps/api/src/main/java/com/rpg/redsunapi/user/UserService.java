@@ -12,9 +12,12 @@ import com.rpg.redsunapi.tale.enums.ELanguage;
 import com.rpg.redsunapi.tale.enums.ERuleSystem;
 import com.rpg.redsunapi.user.dto.MeRequestDto;
 import com.rpg.redsunapi.user.dto.MeResponseDto;
+import com.rpg.redsunapi.user.dto.UserSettingsDto;
+import com.rpg.redsunapi.user.dto.UserSettingsRequestDto;
 import com.rpg.redsunapi.user.dto.UserAsContactDTO;
 import com.rpg.redsunapi.user.dto.UserAsContactProfileDTO;
 import com.rpg.redsunapi.utils.GeneralUtil;
+import com.rpg.redsunapi.user.persistence.JpaUserSettingsRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -48,17 +51,20 @@ public class UserService {
   private final AvatarStorageService avatarStorageService;
   private final UserRepository userRepository;
   private final SubscriptionRepository subscriptionRepository;
+  private final JpaUserSettingsRepository userSettingsRepository;
   private final SupabaseAuthAdminClient supabaseAuthAdminClient;
   private final LegalDocumentService legalDocumentService;
 
   public UserService(
       UserRepository userRepository,
       SubscriptionRepository subscriptionRepository,
+      JpaUserSettingsRepository userSettingsRepository,
       AvatarStorageService avatarStorageService,
       SupabaseAuthAdminClient supabaseAuthAdminClient,
       LegalDocumentService legalDocumentService) {
     this.userRepository = userRepository;
     this.subscriptionRepository = subscriptionRepository;
+    this.userSettingsRepository = userSettingsRepository;
     this.avatarStorageService = avatarStorageService;
     this.supabaseAuthAdminClient = supabaseAuthAdminClient;
     this.legalDocumentService = legalDocumentService;
@@ -103,9 +109,13 @@ public class UserService {
   @Transactional(readOnly = true)
   public MeResponseDto toMeResponse(User user, List<UserAsContactDTO> contacts) {
     User responseUser = userRepository.findById(user.getId()).orElse(user);
+    UserSettingsDto userSettings = userSettingsRepository.findById(responseUser.getId())
+        .map(UserSettingsDto::from)
+        .orElseGet(() -> UserSettingsDto.from(null));
     Subscription subscription = getSubscriptionForUser(responseUser.getId());
     return MeResponseDto.from(
         responseUser,
+        userSettings,
         contacts,
         subscription,
         legalDocumentService.currentTermsVersion(),
@@ -127,6 +137,43 @@ public class UserService {
     User savedUser = userRepository.save(user);
     List<UserAsContactDTO> contacts = getContactsForUser(savedUser.getId());
     return toMeResponse(savedUser, contacts);
+  }
+
+  @Transactional
+  public MeResponseDto updateMySettings(UUID userId, UserSettingsRequestDto request) {
+    if (request == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request body is required");
+    }
+
+    User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    ensureActiveUser(user);
+
+    boolean hasUpdate = false;
+    UserSettings settings = userSettingsRepository.findById(user.getId()).orElseGet(() -> new UserSettings(user));
+
+    if (request.appLanguage() != null) {
+      ELanguage language = request.appLanguage();
+      if (settings.getAppLanguage() != language) {
+        settings.setAppLanguage(language);
+      }
+      hasUpdate = true;
+    }
+
+    if (request.appTheme() != null) {
+      EThemeApplication theme = request.appTheme();
+      if (settings.getAppTheme() != theme) {
+        settings.setAppTheme(theme);
+      }
+      hasUpdate = true;
+    }
+
+    if (!hasUpdate) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No settings updates provided");
+    }
+
+    userSettingsRepository.save(settings);
+    List<UserAsContactDTO> contacts = getContactsForUser(user.getId());
+    return toMeResponse(user, contacts);
   }
 
   private Subscription getSubscriptionForUser(UUID userId) {

@@ -2,6 +2,7 @@ import {inject, Injectable} from "@angular/core";
 import {Observable} from "rxjs";
 import {MeResponseDTO} from "../interface/dtos/user/MeResponseDTO";
 import {MeRequestDTO} from "../interface/dtos/user/MeRequestDTO";
+import {UserSettingsRequestDTO} from "../interface/dtos/user/UserSettingsRequestDTO";
 import {environment} from "../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {LegalAcknowledgementRequestDTO} from "../interface/dtos/user/LegalAcknowledgementRequestDTO";
@@ -14,6 +15,8 @@ export interface IUserProfileService {
   deleteAvatar(): Observable<MeResponseDTO>;
 
   updateMe(request: MeRequestDTO): Observable<MeResponseDTO>;
+
+  updateMySettings(request: UserSettingsRequestDTO): Observable<MeResponseDTO>;
 
   acknowledgeLegalDocuments(request: LegalAcknowledgementRequestDTO): Observable<MeResponseDTO>;
 
@@ -42,6 +45,13 @@ export class UserProfileService {
   public updateMe(request: MeRequestDTO): Observable<MeResponseDTO> {
     return this._httpClient.patch<MeResponseDTO>(
       `${environment.apiBaseUrl}/user/me`,
+      request
+    );
+  }
+
+  public updateMySettings(request: UserSettingsRequestDTO): Observable<MeResponseDTO> {
+    return this._httpClient.patch<MeResponseDTO>(
+      `${environment.apiBaseUrl}/user/me/settings`,
       request
     );
   }

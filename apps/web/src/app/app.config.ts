@@ -11,15 +11,16 @@ import {provideHttpClient, withInterceptors} from "@angular/common/http";
 import {routes} from "./app.routes";
 import {GlobalErrorHandler} from "../infra/miscellaneous/global-error.handler";
 
-import {InterpolatableTranslation, provideTranslateService, TranslateService} from "@ngx-translate/core";
+import {InterpolatableTranslation, provideTranslateService} from "@ngx-translate/core";
 import {provideTranslateHttpLoader} from "@ngx-translate/http-loader";
 import {TitleI18nHandler} from "../infra/miscellaneous/title-I18n.handler";
 import {authInterceptor} from "../infra/interceptor/auth.interceptor";
 import {apiErrorInterceptor} from "../infra/interceptor/api-error.interceptor";
 import {ELanguage} from "../interface/enums/ELanguage";
 import {UTIL_CONSTANTS} from "../interface/constants/util.constants";
-import {ILocalStoreService, LocalStoreService} from "../services/local-store.service";
 import {firstValueFrom} from "rxjs";
+import {AppSettingsService, IAppSettingsService} from "../services/app-settings.service";
+import {LocalStoreService} from "../services/local-store.service";
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -34,8 +35,8 @@ export const appConfig: ApplicationConfig = {
       useClass: GlobalErrorHandler
     },
     provideTranslateService({
-      lang: ELanguage.PT,
-      fallbackLang: ELanguage.PT,
+      lang: AppSettingsService.toTranslateLang(ELanguage.PT),
+      fallbackLang: AppSettingsService.toTranslateLang(ELanguage.PT),
       loader: provideTranslateHttpLoader({
         prefix: UTIL_CONSTANTS.I18N_PREFIX,
         suffix: UTIL_CONSTANTS.JSON_EXTENSION,
@@ -43,9 +44,9 @@ export const appConfig: ApplicationConfig = {
       })
     }),
     provideAppInitializer((): Promise<InterpolatableTranslation> => {
-      const translate: TranslateService = inject(TranslateService);
-      const localStoreService: ILocalStoreService = inject(LocalStoreService);
-      return firstValueFrom(translate.use(localStoreService.getLanguage() || ELanguage.PT));
+      const appSettingsService: IAppSettingsService = inject(AppSettingsService);
+      const localStoreService: LocalStoreService = inject(LocalStoreService);
+      return firstValueFrom(appSettingsService.initDefaults(localStoreService.user()?.userSettings ?? null));
     }),
     {
       provide: TitleStrategy,

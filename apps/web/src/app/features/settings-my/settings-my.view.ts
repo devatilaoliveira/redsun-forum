@@ -1,11 +1,16 @@
-import {Component, inject, signal, WritableSignal} from "@angular/core";
-import {ILocalStoreService, LocalStoreService} from "../../../services/local-store.service";
+import {Component, Signal, WritableSignal, inject, signal} from "@angular/core";
 import {ELanguage} from "../../../interface/enums/ELanguage";
 import {ITranslateService, TranslatePipe, TranslateService} from "@ngx-translate/core";
 import {FormsModule} from "@angular/forms";
+import {finalize} from "rxjs";
 import {RsSelect} from "../../shared/fragments/rsSelect/rs.select";
 import {EThemeApplication} from "../../../interface/enums/EThemeApplication";
-import {IThemeHandler, ThemeHandler} from "../../../infra/miscellaneous/theme.handler";
+import {AppSettingsService, IAppSettingsService} from "../../../services/app-settings.service";
+import {IUserProfileService, UserProfileService} from "../../../services/user-profile.service";
+import {ILocalStoreService, LocalStoreService} from "../../../services/local-store.service";
+import {MeResponseDTO} from "../../../interface/dtos/user/MeResponseDTO";
+import {IToastService, ToastService} from "../../../services/toast.service";
+import {EVariant} from "../../../interface/enums/EVariant";
 
 @Component({
   selector: "rs-settings-my",
@@ -16,27 +21,52 @@ import {IThemeHandler, ThemeHandler} from "../../../infra/miscellaneous/theme.ha
 })
 export class SettingsMyView {
   private readonly _localStoreService: ILocalStoreService = inject(LocalStoreService);
+  private readonly _userProfileService: IUserProfileService = inject(UserProfileService);
+  private readonly _appSettingsService: IAppSettingsService = inject(AppSettingsService);
+  private readonly _toastService: IToastService = inject(ToastService);
   private readonly _translateService: ITranslateService = inject(TranslateService);
-  private readonly _themeHandler: IThemeHandler = inject(ThemeHandler);
-  protected readonly selectedLanguage: WritableSignal<ELanguage> = signal<ELanguage>(this._localStoreService.getLanguage());
-  protected readonly selectedTheme: WritableSignal<EThemeApplication> = signal<EThemeApplication>(this._themeHandler.getTheme());
+  protected readonly selectedLanguage: Signal<ELanguage> = this._appSettingsService.language;
+  protected readonly selectedTheme: Signal<EThemeApplication> = this._appSettingsService.theme;
+  protected readonly saveInProgress: WritableSignal<boolean> = signal<boolean>(false);
   protected readonly ELanguage = ELanguage;
   protected readonly EThemeApplication = EThemeApplication;
 
   onLangChange(lang: string | null): void {
-    if (!lang || !Object.values(ELanguage).includes(lang as ELanguage)) return;
+    if (!lang || !Object.values(ELanguage).includes(lang as ELanguage) || this.saveInProgress()) return;
 
     const nextLang = lang as ELanguage;
-    this.selectedLanguage.set(nextLang);
-    this._localStoreService.setLanguage(nextLang);
-    this._translateService.use(nextLang).subscribe();
+    this.saveInProgress.set(true);
+    this._userProfileService.updateMySettings({appLanguage: nextLang}).pipe(
+      finalize(() => this.saveInProgress.set(false))
+    ).subscribe({
+      next: (user: MeResponseDTO) => this._applyUpdatedUser(user),
+      error: () => this._showSaveFailedToast()
+    });
   }
 
   onThemeChange(theme: string | null): void {
-    if (!theme || !Object.values(EThemeApplication).includes(theme as EThemeApplication)) return;
+    if (!theme || !Object.values(EThemeApplication).includes(theme as EThemeApplication) || this.saveInProgress()) return;
 
     const nextTheme = theme as EThemeApplication;
-    this.selectedTheme.set(nextTheme);
-    this._themeHandler.setTheme(nextTheme);
+    this.saveInProgress.set(true);
+    this._userProfileService.updateMySettings({appTheme: nextTheme}).pipe(
+      finalize(() => this.saveInProgress.set(false))
+    ).subscribe({
+      next: (user: MeResponseDTO) => this._applyUpdatedUser(user),
+      error: () => this._showSaveFailedToast()
+    });
+  }
+
+  private _applyUpdatedUser(user: MeResponseDTO): void {
+    this._localStoreService.storeUser(user);
+    this._appSettingsService.applyUserSettings(user.userSettings);
+  }
+
+  private _showSaveFailedToast(): void {
+    this._toastService.show({
+      label: this._translateService.instant("ERROR"),
+      message: this._translateService.instant("SETTINGS_SAVE_FAILED"),
+      variant: EVariant.DANGER
+    });
   }
 }

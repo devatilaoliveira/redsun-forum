@@ -1,6 +1,8 @@
 import { Page, Route } from "@playwright/test";
 import { MeResponseDTO } from "../../../src/interface/dtos/user/MeResponseDTO";
 import { EProvider } from "../../../src/interface/enums/EProvider";
+import { ELanguage } from "../../../src/interface/enums/ELanguage";
+import { EThemeApplication } from "../../../src/interface/enums/EThemeApplication";
 
 const CORS_HEADERS = {
   "access-control-allow-origin": "*",
@@ -17,6 +19,10 @@ export const buildUser = (email: string, currentLegalAcknowledgement: boolean): 
   favoriteLanguage: [],
   favoriteRules: [],
   favoriteRole: [],
+  userSettings: {
+    appLanguage: ELanguage.EN,
+    appTheme: EThemeApplication.DARK,
+  },
   contacts: [],
   legalAcknowledgement: {
     termsAccepted: currentLegalAcknowledgement,

@@ -1,10 +1,7 @@
 import {Injectable} from "@angular/core";
 import {EThemeApplication} from "../../interface/enums/EThemeApplication";
-import {THEME_KEY} from "../../interface/constants/store.constants";
 
 export interface IThemeHandler {
-  init(): void;
-
   setTheme(theme: EThemeApplication): void;
 
   getTheme(): EThemeApplication;
@@ -13,22 +10,18 @@ export interface IThemeHandler {
 @Injectable({providedIn: "root"})
 export class ThemeHandler {
   private readonly defaultTheme: EThemeApplication = EThemeApplication.DARK;
-
-  public init(): void {
-    const saved: EThemeApplication = (localStorage.getItem(THEME_KEY) as EThemeApplication) || this.defaultTheme;
-    this._apply(saved);
-  }
+  private _theme: EThemeApplication = this.defaultTheme;
 
   public setTheme(theme: EThemeApplication): void {
     this._apply(theme);
   }
 
   public getTheme(): EThemeApplication {
-    return (localStorage.getItem(THEME_KEY) as EThemeApplication) || this.defaultTheme;
+    return this._theme;
   }
 
   private _apply(theme: EThemeApplication): void {
+    this._theme = theme;
     document.documentElement.dataset["theme"] = theme;
-    localStorage.setItem(THEME_KEY, theme);
   }
 }
