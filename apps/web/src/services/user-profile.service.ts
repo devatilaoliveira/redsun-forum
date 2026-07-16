@@ -6,6 +6,8 @@ import {UserSettingsRequestDTO} from "../interface/dtos/user/UserSettingsRequest
 import {environment} from "../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {LegalAcknowledgementRequestDTO} from "../interface/dtos/user/LegalAcknowledgementRequestDTO";
+import {AppSettingsService, IAppSettingsService} from "./app-settings.service";
+import {UserSettingsInitializationRequestDTO} from "../interface/dtos/user/UserSettingsInitializationRequestDTO";
 
 export interface IUserProfileService {
   upsertCurrentUser(): Observable<MeResponseDTO>;
@@ -26,11 +28,17 @@ export interface IUserProfileService {
 @Injectable({providedIn: "root"})
 export class UserProfileService {
   private readonly _httpClient: HttpClient = inject(HttpClient);
+  private readonly _appSettingsService: IAppSettingsService = inject(AppSettingsService);
 
   public upsertCurrentUser(): Observable<MeResponseDTO> {
+    const request: UserSettingsInitializationRequestDTO = {
+      appLanguage: this._appSettingsService.language(),
+      appTheme: this._appSettingsService.theme()
+    };
+
     return this._httpClient.post<MeResponseDTO>(
       `${environment.apiBaseUrl}/user/me`,
-      {}
+      request
     );
   }
 

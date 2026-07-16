@@ -22,6 +22,7 @@ export const buildUser = (email: string, currentLegalAcknowledgement: boolean): 
   userSettings: {
     appLanguage: ELanguage.EN,
     appTheme: EThemeApplication.DARK,
+    redirectToFavorite: false,
   },
   contacts: [],
   legalAcknowledgement: {

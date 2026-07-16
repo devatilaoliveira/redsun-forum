@@ -11,11 +11,12 @@ import {ILocalStoreService, LocalStoreService} from "../../../services/local-sto
 import {MeResponseDTO} from "../../../interface/dtos/user/MeResponseDTO";
 import {IToastService, ToastService} from "../../../services/toast.service";
 import {EVariant} from "../../../interface/enums/EVariant";
+import {RsCheckbox} from "../../shared/fragments/rsCheckbox/rs.checkbox";
 
 @Component({
   selector: "rs-settings-my",
   standalone: true,
-  imports: [FormsModule, RsSelect, TranslatePipe],
+  imports: [FormsModule, RsSelect, RsCheckbox, TranslatePipe],
   templateUrl: "./settings-my.view.html",
   styleUrl: "./settings-my.view.scss"
 })
@@ -27,6 +28,7 @@ export class SettingsMyView {
   private readonly _translateService: ITranslateService = inject(TranslateService);
   protected readonly selectedLanguage: Signal<ELanguage> = this._appSettingsService.language;
   protected readonly selectedTheme: Signal<EThemeApplication> = this._appSettingsService.theme;
+  protected readonly redirectToFavorite: Signal<boolean> = this._appSettingsService.redirectToFavorite;
   protected readonly saveInProgress: WritableSignal<boolean> = signal<boolean>(false);
   protected readonly ELanguage = ELanguage;
   protected readonly EThemeApplication = EThemeApplication;
@@ -50,6 +52,17 @@ export class SettingsMyView {
     const nextTheme = theme as EThemeApplication;
     this.saveInProgress.set(true);
     this._userProfileService.updateMySettings({appTheme: nextTheme}).pipe(
+      finalize(() => this.saveInProgress.set(false))
+    ).subscribe({
+      next: (user: MeResponseDTO) => this._applyUpdatedUser(user),
+      error: () => this._showSaveFailedToast()
+    });
+  }
+
+  onRedirectToFavoriteChange(redirectToFavorite: boolean): void {
+    if (this.saveInProgress()) return;
+    this.saveInProgress.set(true);
+    this._userProfileService.updateMySettings({redirectToFavorite}).pipe(
       finalize(() => this.saveInProgress.set(false))
     ).subscribe({
       next: (user: MeResponseDTO) => this._applyUpdatedUser(user),

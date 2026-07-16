@@ -48,7 +48,7 @@ public record MeResponseDto(
       isDeleted ? null : List.copyOf(user.getFavoriteLanguage()),
       isDeleted ? null : List.copyOf(user.getFavoriteRules()),
       isDeleted ? null : List.copyOf(user.getFavoriteRole()),
-      isDeleted ? null : userSettings,
+      userSettings,
       isDeleted ? null : SubscriptionDTO.from(Objects.requireNonNull(subscription, "subscription")),
       usersAsContacts,
       isDeleted ? null : LegalAcknowledgementDto.from(user, requiredTermsVersion, requiredPrivacyVersion)

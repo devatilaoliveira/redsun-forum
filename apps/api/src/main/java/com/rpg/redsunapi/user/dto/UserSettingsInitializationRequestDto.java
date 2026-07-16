@@ -4,9 +4,8 @@ import com.rpg.redsunapi.tale.enums.ELanguage;
 import com.rpg.redsunapi.user.EThemeApplication;
 import org.springframework.lang.Nullable;
 
-public record UserSettingsRequestDto(
+public record UserSettingsInitializationRequestDto(
   @Nullable ELanguage appLanguage,
-  @Nullable EThemeApplication appTheme,
-  @Nullable Boolean redirectToFavorite
+  @Nullable EThemeApplication appTheme
 ) {
 }

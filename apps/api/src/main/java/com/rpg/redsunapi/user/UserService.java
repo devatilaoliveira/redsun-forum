@@ -13,6 +13,7 @@ import com.rpg.redsunapi.tale.enums.ERuleSystem;
 import com.rpg.redsunapi.user.dto.MeRequestDto;
 import com.rpg.redsunapi.user.dto.MeResponseDto;
 import com.rpg.redsunapi.user.dto.UserSettingsDto;
+import com.rpg.redsunapi.user.dto.UserSettingsInitializationRequestDto;
 import com.rpg.redsunapi.user.dto.UserSettingsRequestDto;
 import com.rpg.redsunapi.user.dto.UserAsContactDTO;
 import com.rpg.redsunapi.user.dto.UserAsContactProfileDTO;
@@ -71,7 +72,7 @@ public class UserService {
   }
 
   @Transactional
-  public User upsertUser(UUID userId, String email, Provider provider) {
+  public UserUpsertResult upsertUser(UUID userId, String email, Provider provider) {
     Objects.requireNonNull(provider, "provider");
     String normalizedEmail = GeneralUtil.normalizeEmail(email);
     if (normalizedEmail == null || normalizedEmail.isBlank()) {
@@ -85,11 +86,11 @@ public class UserService {
       }
       if (user.getProvider() != provider) {
         user.setProvider(provider);
-        return userRepository.save(user);
+        return new UserUpsertResult(userRepository.save(user), false);
       }
-      return user;
+      return new UserUpsertResult(user, false);
     }
-    return createUser(userId, normalizedEmail, provider);
+    return new UserUpsertResult(createUser(userId, normalizedEmail, provider), true);
   }
 
   private User createUser(UUID userId, String email, Provider provider) {
@@ -103,7 +104,23 @@ public class UserService {
 
     User savedUser = userRepository.save(user);
     subscriptionRepository.save(new Subscription(savedUser));
+    userSettingsRepository.save(new UserSettings(savedUser));
     return savedUser;
+  }
+
+  @Transactional
+  public void initializeUserSettings(UUID userId, UserSettingsInitializationRequestDto request) {
+    UserSettings settings = userSettingsRepository.findById(userId)
+        .orElseThrow(() -> new IllegalStateException("Missing settings for user " + userId));
+
+    if (request.appLanguage() != null) {
+      settings.setAppLanguage(request.appLanguage());
+    }
+    if (request.appTheme() != null) {
+      settings.setAppTheme(request.appTheme());
+    }
+
+    userSettingsRepository.save(settings);
   }
 
   @Transactional(readOnly = true)
@@ -111,7 +128,7 @@ public class UserService {
     User responseUser = userRepository.findById(user.getId()).orElse(user);
     UserSettingsDto userSettings = userSettingsRepository.findById(responseUser.getId())
         .map(UserSettingsDto::from)
-        .orElseGet(() -> UserSettingsDto.from(null));
+        .orElseThrow(() -> new IllegalStateException("Missing settings for user " + responseUser.getId()));
     Subscription subscription = getSubscriptionForUser(responseUser.getId());
     return MeResponseDto.from(
         responseUser,
@@ -149,7 +166,8 @@ public class UserService {
     ensureActiveUser(user);
 
     boolean hasUpdate = false;
-    UserSettings settings = userSettingsRepository.findById(user.getId()).orElseGet(() -> new UserSettings(user));
+    UserSettings settings = userSettingsRepository.findById(user.getId())
+        .orElseThrow(() -> new IllegalStateException("Missing settings for user " + user.getId()));
 
     if (request.appLanguage() != null) {
       ELanguage language = request.appLanguage();
@@ -163,6 +181,14 @@ public class UserService {
       EThemeApplication theme = request.appTheme();
       if (settings.getAppTheme() != theme) {
         settings.setAppTheme(theme);
+      }
+      hasUpdate = true;
+    }
+
+    if (request.redirectToFavorite() != null) {
+      boolean redirectToFavorite = request.redirectToFavorite();
+      if (settings.isRedirectToFavorite() != redirectToFavorite) {
+        settings.setRedirectToFavorite(redirectToFavorite);
       }
       hasUpdate = true;
     }

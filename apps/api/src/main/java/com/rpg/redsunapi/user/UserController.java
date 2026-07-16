@@ -5,6 +5,7 @@ import com.rpg.redsunapi.user.dto.AddContactByEmailRequestDTO;
 import com.rpg.redsunapi.user.dto.LegalAcknowledgementRequestDto;
 import com.rpg.redsunapi.user.dto.MeRequestDto;
 import com.rpg.redsunapi.user.dto.MeResponseDto;
+import com.rpg.redsunapi.user.dto.UserSettingsInitializationRequestDto;
 import com.rpg.redsunapi.user.dto.UserSettingsRequestDto;
 import com.rpg.redsunapi.user.dto.UserAsContactDTO;
 import com.rpg.redsunapi.user.dto.UserAsContactProfileDTO;
@@ -42,8 +43,12 @@ public class UserController {
 
   @PostMapping("/me")
   public ResponseEntity<MeResponseDto> upsertUser(
-    @AuthenticationPrincipal AuthenticatedUser principal
+    @AuthenticationPrincipal AuthenticatedUser principal,
+    @Valid @RequestBody UserSettingsInitializationRequestDto request
   ) {
+    if (principal.newlyCreated()) {
+      userService.initializeUserSettings(principal.user().getId(), request);
+    }
     List<UserAsContactDTO> contacts = userService.getContactsForUser(principal.user().getId());
     return ResponseEntity.ok(userService.toMeResponse(principal.user(), contacts));
   }

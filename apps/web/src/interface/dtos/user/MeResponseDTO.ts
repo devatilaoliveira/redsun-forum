@@ -15,7 +15,7 @@ export interface MeResponseDTO {
   description?: string;
   favoriteLanguage: EProfileLanguage[] | null;
   favoriteRules: ERuleSystem[] | null;
-  userSettings: UserSettingsDTO | null;
+  userSettings: UserSettingsDTO;
   favoriteRole: EFavoriteRole[] | null;
   subscription?: SubscriptionDTO | null;
   contacts: UserAsContactDTO[];

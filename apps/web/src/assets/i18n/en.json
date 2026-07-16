@@ -23,6 +23,7 @@
   "USER_CANNOT_BE_AUTHENTICATED_TO_NAVIGATE_TO_LOGIN": "Authenticated users cannot navigate to the /login page.",
   "SETTINGS": "Settings",
   "SETTINGS_SAVE_FAILED": "Settings could not be saved. Please try again.",
+  "REDIRECT_TO_FAVORITE": "Redirect to your favorite campaign after logging in or when clicking the RS logo?",
   "SUPPORT": "Support",
   "SUPPORT_SUBTITLE": "Share improvements, suggestions, bug reports, and content reports.",
   "SUPPORT_IMPROVEMENTS_TITLE": "Improvements",

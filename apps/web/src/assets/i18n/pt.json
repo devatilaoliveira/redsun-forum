@@ -23,6 +23,7 @@
   "USER_CANNOT_BE_AUTHENTICATED_TO_NAVIGATE_TO_LOGIN": "Usuários autenticados não podem navegar para a página /login.",
   "SETTINGS": "Configurações",
   "SETTINGS_SAVE_FAILED": "Nao foi possivel salvar as configuracoes. Tente novamente.",
+  "REDIRECT_TO_FAVORITE": "Redirecionar para sua campanha favorita após entrar ou ao clicar no logotipo do RS?",
   "SUPPORT": "Suporte",
   "SUPPORT_SUBTITLE": "Compartilhe melhorias, sugestões, relatos de bug e denúncias de conteúdo.",
   "SUPPORT_IMPROVEMENTS_TITLE": "Melhorias",

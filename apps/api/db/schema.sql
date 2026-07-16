@@ -40,8 +40,9 @@ CREATE TABLE public.users (
 -- User preferences
 CREATE TABLE public.user_settings (
   user_id uuid PRIMARY KEY REFERENCES public.users(id) ON DELETE CASCADE,
-  app_language varchar(20) CHECK (app_language IS NULL OR app_language IN ('EN','DE','PT')),
-  app_theme varchar(20) CHECK (app_theme IS NULL OR app_theme IN ('DARK','LIGHT'))
+  app_language varchar(20) NOT NULL DEFAULT 'PT' CHECK (app_language IN ('EN','DE','PT')),
+  app_theme varchar(20) NOT NULL DEFAULT 'DARK' CHECK (app_theme IN ('DARK','LIGHT')),
+  redirect_to_favorite boolean NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE public.user_favorite_languages (

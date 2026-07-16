@@ -9,9 +9,10 @@ import {EThemeApplication} from "../interface/enums/EThemeApplication";
 export interface IAppSettingsService {
   readonly language: Signal<ELanguage>;
   readonly theme: Signal<EThemeApplication>;
+  readonly redirectToFavorite: Signal<boolean>;
 
-  initDefaults(settings?: UserSettingsDTO | null): Observable<InterpolatableTranslation>;
-  applyUserSettings(settings: UserSettingsDTO | null): void;
+  initDefaults(settings?: UserSettingsDTO): Observable<InterpolatableTranslation>;
+  applyUserSettings(settings: UserSettingsDTO): void;
   resetToDetectedDefaults(): void;
   setTransientLanguage(language: ELanguage): Observable<InterpolatableTranslation>;
   getLanguage(): ELanguage;
@@ -23,32 +24,34 @@ export class AppSettingsService implements IAppSettingsService {
   private readonly _themeHandler: IThemeHandler = inject(ThemeHandler);
   private readonly _language: WritableSignal<ELanguage> = signal<ELanguage>(this._detectLanguage());
   private readonly _theme: WritableSignal<EThemeApplication> = signal<EThemeApplication>(this._detectTheme());
+  private readonly _redirectToFavorite: WritableSignal<boolean> = signal<boolean>(false);
 
   readonly language: Signal<ELanguage> = this._language.asReadonly();
   readonly theme: Signal<EThemeApplication> = this._theme.asReadonly();
+  readonly redirectToFavorite: Signal<boolean> = this._redirectToFavorite.asReadonly();
 
   public static toTranslateLang(language: ELanguage): string {
     return language.toLowerCase();
   }
 
-  public initDefaults(settings?: UserSettingsDTO | null): Observable<InterpolatableTranslation> {
+  public initDefaults(settings?: UserSettingsDTO): Observable<InterpolatableTranslation> {
     const language: ELanguage = this._toLanguage(settings?.appLanguage) ?? this._language();
     const theme: EThemeApplication = this._toTheme(settings?.appTheme) ?? this._theme();
+    const redirectToFavorite: boolean = settings?.redirectToFavorite ?? false;
 
     this._language.set(language);
     this._theme.set(theme);
+    this._redirectToFavorite.set(redirectToFavorite);
     this._themeHandler.setTheme(this._theme());
     return this._translate.use(AppSettingsService.toTranslateLang(this._language()));
   }
 
-  public applyUserSettings(settings: UserSettingsDTO | null): void {
-    const language: ELanguage = this._toLanguage(settings?.appLanguage) ?? this._language();
-    const theme: EThemeApplication = this._toTheme(settings?.appTheme) ?? this._theme();
-
-    this._language.set(language);
-    this._theme.set(theme);
-    this._themeHandler.setTheme(theme);
-    this._translate.use(AppSettingsService.toTranslateLang(language)).subscribe();
+  public applyUserSettings(settings: UserSettingsDTO): void {
+    this._language.set(settings.appLanguage);
+    this._theme.set(settings.appTheme);
+    this._redirectToFavorite.set(settings.redirectToFavorite);
+    this._themeHandler.setTheme(settings.appTheme);
+    this._translate.use(AppSettingsService.toTranslateLang(settings.appLanguage)).subscribe();
   }
 
   public resetToDetectedDefaults(): void {
@@ -57,6 +60,7 @@ export class AppSettingsService implements IAppSettingsService {
 
     this._language.set(language);
     this._theme.set(theme);
+    this._redirectToFavorite.set(false);
     this._themeHandler.setTheme(theme);
     this._translate.use(AppSettingsService.toTranslateLang(language)).subscribe();
   }

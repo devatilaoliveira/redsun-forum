@@ -29,19 +29,28 @@ public class UserSettings {
   private User user;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "app_language", length = 20)
-  private ELanguage appLanguage;
+  @Column(name = "app_language", nullable = false, length = 20)
+  private ELanguage appLanguage = ELanguage.PT;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "app_theme", length = 20)
-  private EThemeApplication appTheme;
+  @Column(name = "app_theme", nullable = false, length = 20)
+  private EThemeApplication appTheme = EThemeApplication.DARK;
+
+  @Column(name = "redirect_to_favorite", nullable = false)
+  private boolean redirectToFavorite;
 
   public UserSettings() {
   }
 
   public UserSettings(User user) {
+    this(user, ELanguage.PT, EThemeApplication.DARK);
+  }
+
+  public UserSettings(User user, ELanguage appLanguage, EThemeApplication appTheme) {
     this.user = Objects.requireNonNull(user, "user");
     this.userId = user.getId();
+    this.appLanguage = appLanguage;
+    this.appTheme = appTheme;
   }
 
   public UUID getUserId() {
@@ -71,5 +80,13 @@ public class UserSettings {
 
   public void setAppTheme(EThemeApplication appTheme) {
     this.appTheme = appTheme;
+  }
+
+  public boolean isRedirectToFavorite() {
+    return redirectToFavorite;
+  }
+
+  public void setRedirectToFavorite(boolean redirectToFavorite) {
+    this.redirectToFavorite = redirectToFavorite;
   }
 }

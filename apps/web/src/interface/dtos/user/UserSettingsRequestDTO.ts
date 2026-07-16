@@ -4,4 +4,5 @@ import {EThemeApplication} from "../../enums/EThemeApplication";
 export interface UserSettingsRequestDTO {
   appLanguage?: ELanguage;
   appTheme?: EThemeApplication;
+  redirectToFavorite?: boolean;
 }

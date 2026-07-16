@@ -46,7 +46,7 @@ export const appConfig: ApplicationConfig = {
     provideAppInitializer((): Promise<InterpolatableTranslation> => {
       const appSettingsService: IAppSettingsService = inject(AppSettingsService);
       const localStoreService: LocalStoreService = inject(LocalStoreService);
-      return firstValueFrom(appSettingsService.initDefaults(localStoreService.user()?.userSettings ?? null));
+      return firstValueFrom(appSettingsService.initDefaults(localStoreService.user()?.userSettings));
     }),
     {
       provide: TitleStrategy,

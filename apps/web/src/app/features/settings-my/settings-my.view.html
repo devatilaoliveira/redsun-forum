@@ -22,4 +22,11 @@
       [localizationPrefix]="'THEME_'"
     />
   }
+
+  <rs-checkbox
+    [label]="'REDIRECT_TO_FAVORITE' | translate"
+    [checked]="redirectToFavorite()"
+    [disabled]="saveInProgress()"
+    (checkedChange)="onRedirectToFavoriteChange($event)"
+  />
 </section>
