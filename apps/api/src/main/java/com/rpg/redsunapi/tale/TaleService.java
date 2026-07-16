@@ -47,6 +47,7 @@ public class TaleService {
   private final LocationStorageService locationStorageService;
   private final UserRepository userRepository;
   private final CharacterSheetService characterSheetService;
+  private final TaleAccessPolicy taleAccessPolicy;
 
   public TaleService(
       TaleRepository taleRepository,
@@ -54,13 +55,15 @@ public class TaleService {
       LocationRepository locationRepository,
       LocationStorageService locationStorageService,
       UserRepository userRepository,
-      CharacterSheetService characterSheetService) {
+      CharacterSheetService characterSheetService,
+      TaleAccessPolicy taleAccessPolicy) {
     this.taleRepository = taleRepository;
     this.taleStorageService = taleStorageService;
     this.locationRepository = locationRepository;
     this.locationStorageService = locationStorageService;
     this.userRepository = userRepository;
     this.characterSheetService = characterSheetService;
+    this.taleAccessPolicy = taleAccessPolicy;
   }
 
   @Transactional
@@ -69,7 +72,7 @@ public class TaleService {
     List<String> ids = taleDTO.participantsIds();
     if (ids != null && !ids.isEmpty()) {
       for (String id : ids) {
-        if (id == null || id.isBlank()) continue;
+        if (id.isBlank()) continue;
         UUID participantId = UUID.fromString(id);
         userRepository.findById(participantId).ifPresent(participants::add);
       }
@@ -77,25 +80,17 @@ public class TaleService {
     User ownerEntity = userRepository.findById(owner.getId()).orElse(owner);
     participants.add(ownerEntity);
 
-    OffsetDateTime dateNow = OffsetDateTime.now();
     ERuleSystem ruleSystem = ERuleSystem.from(taleDTO.rules());
 
-    Tale tale = new Tale();
-    tale.setTaleName(taleDTO.taleName());
-    tale.setOwnerId(ownerEntity.getId());
-    tale.setParticipants(participants);
-    tale.setPublic(taleDTO.isPublic() != null ? taleDTO.isPublic() : Boolean.FALSE);
-    tale.setImageURL(null);
-    tale.setDescription(taleDTO.description());
-    tale.setLanguage(taleDTO.language() == null ? null : parseLanguage(taleDTO.language()));
-    tale.setRules(ruleSystem);
-    tale.setCreationDate(dateNow);
-    tale.setLastTimeActive(dateNow);
-    ETaleStatus status = taleDTO.status().orElse(ETaleStatus.ACTIVE);
-    if (status == ETaleStatus.SLEEP) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot create a tale with status SLEEP");
-    }
-    tale.setStatus(status);
+    Tale tale = new Tale(
+      taleDTO.taleName(),
+      ownerEntity.getId(),
+      participants,
+      taleDTO.isPublic(),
+      taleDTO.description(),
+      taleDTO.language() == null ? null : parseLanguage(taleDTO.language()),
+      ruleSystem
+    );
     boolean hasImage = taleDTO.image() != null && taleDTO.image().isPresent() && !taleDTO.image().get().isEmpty();
 
     Tale savedTale = taleRepository.save(tale);
@@ -119,11 +114,8 @@ public class TaleService {
     Tale tale = taleRepository.findById(taleId)
       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tale not found"));
 
-    ensureNotSleeping(tale);
-
-    if (tale.getOwnerId() == null || !tale.getOwnerId().equals(requester.getId())) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the owner of this tale");
-    }
+    taleAccessPolicy.ensureNotSleeping(tale);
+    taleAccessPolicy.ensureCanManageTale(tale, requester);
 
     boolean hasUpdate = false;
 
@@ -191,7 +183,7 @@ public class TaleService {
       }
 
       if (removeImage) {
-        tale.setImageURL(null);
+        tale.clearImageURL();
         hasUpdate = true;
       }
 
@@ -238,11 +230,8 @@ public class TaleService {
     Tale tale = taleRepository.findById(taleId)
       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tale not found"));
 
-    ensureNotSleeping(tale);
-
-    if (tale.getOwnerId() == null || !tale.getOwnerId().equals(requester.getId())) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the owner of this tale");
-    }
+    taleAccessPolicy.ensureNotSleeping(tale);
+    taleAccessPolicy.ensureCanManageTale(tale, requester);
 
     OffsetDateTime now = OffsetDateTime.now();
     tale.setStatus(ETaleStatus.SLEEP);
@@ -254,21 +243,8 @@ public class TaleService {
   public Tale findTaleById(UUID taleId, User requester) {
     Tale tale = taleRepository.findById(taleId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tale not found"));
 
-    ensureNotSleeping(tale);
-
-    if (Boolean.TRUE.equals(tale.getPublic())) {
-      return tale;
-    }
-
-    if (tale.getOwnerId() != null && tale.getOwnerId().equals(requester.getId())) {
-      return tale;
-    }
-
-    boolean isParticipant = tale.getParticipants() != null && tale.getParticipants().stream()
-      .anyMatch(user -> requester.getId().equals(user.getId()));
-    if (!isParticipant) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not a participant of this tale");
-    }
+    taleAccessPolicy.ensureNotSleeping(tale);
+    taleAccessPolicy.ensureCanViewTale(tale, requester);
 
     return tale;
   }
@@ -329,11 +305,8 @@ public class TaleService {
     Tale tale = taleRepository.findById(taleId)
       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tale not found"));
 
-    ensureNotSleeping(tale);
-
-    if (!tale.getOwnerId().equals(requester.getId())) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the owner of this tale");
-    }
+    taleAccessPolicy.ensureNotSleeping(tale);
+    taleAccessPolicy.ensureCanManageTale(tale, requester);
 
     User participant = normalizedIdentifier.contains("@")
       ? userRepository.findByEmail(normalizedIdentifier)
@@ -344,13 +317,7 @@ public class TaleService {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
     }
 
-    Set<User> participants = tale.getParticipants();
-    if (participants == null) {
-      participants = new HashSet<>();
-      tale.setParticipants(participants);
-    }
-
-    participants.add(participant);
+    tale.addParticipant(participant);
     characterSheetService.ensureCharacterSheetForParticipant(tale, participant);
     return taleRepository.save(tale);
   }
@@ -360,23 +327,18 @@ public class TaleService {
     Tale tale = taleRepository.findById(taleId)
       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tale not found"));
 
-    ensureNotSleeping(tale);
+    taleAccessPolicy.ensureNotSleeping(tale);
+    taleAccessPolicy.ensureCanManageTale(tale, requester);
 
-    if (!tale.getOwnerId().equals(requester.getId())) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the owner of this tale");
-    }
-
-    if (tale.getOwnerId() != null && tale.getOwnerId().equals(participantId)) {
+    if (tale.isOwnedBy(participantId)) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Owner cannot be removed");
     }
 
-    Set<User> participants = tale.getParticipants();
-    if (participants == null || participants.isEmpty()) {
+    if (tale.getParticipants() == null || tale.getParticipants().isEmpty()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Participant not found in tale");
     }
 
-    boolean removed = participants.removeIf(participant -> participantId.equals(participant.getId()));
-    if (!removed) {
+    if (!tale.removeParticipant(participantId)) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Participant not found in tale");
     }
 
@@ -389,19 +351,17 @@ public class TaleService {
     Tale tale = taleRepository.findById(taleId)
       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tale not found"));
 
-    ensureNotSleeping(tale);
+    taleAccessPolicy.ensureNotSleeping(tale);
 
-    if (tale.getOwnerId() != null && tale.getOwnerId().equals(requester.getId())) {
+    if (tale.isOwnedBy(requester.getId())) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Owner cannot leave the tale");
     }
 
-    Set<User> participants = tale.getParticipants();
-    if (participants == null || participants.isEmpty()) {
+    if (tale.getParticipants() == null || tale.getParticipants().isEmpty()) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not a participant of this tale");
     }
 
-    boolean removed = participants.removeIf(participant -> requester.getId().equals(participant.getId()));
-    if (!removed) {
+    if (!tale.removeParticipant(requester.getId())) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not a participant of this tale");
     }
 
@@ -414,11 +374,8 @@ public class TaleService {
     Tale tale = taleRepository.findById(taleId)
       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tale not found"));
 
-    ensureNotSleeping(tale);
-
-    if (!tale.getOwnerId().equals(requester.getId())) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the owner of this tale");
-    }
+    taleAccessPolicy.ensureNotSleeping(tale);
+    taleAccessPolicy.ensureCanManageTale(tale, requester);
 
     if (newOwnerId.equals(requester.getId())) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "New owner must be different from current owner");
@@ -429,10 +386,7 @@ public class TaleService {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Participant not found in tale");
     }
 
-    User newOwner = participants.stream()
-      .filter(Objects::nonNull)
-      .filter(user -> newOwnerId.equals(user.getId()))
-      .findFirst()
+    User newOwner = tale.findParticipant(newOwnerId)
       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Participant not found in tale"));
 
     if (newOwner.isDeleted()) {
@@ -444,12 +398,6 @@ public class TaleService {
     characterSheetService.handleOwnershipTransfer(tale, previousOwnerId, newOwnerId);
 
     return taleRepository.save(tale);
-  }
-
-  private void ensureNotSleeping(Tale tale) {
-    if (tale.getStatus() == ETaleStatus.SLEEP) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tale not found");
-    }
   }
 
   private ELanguage parseLanguage(String language) {

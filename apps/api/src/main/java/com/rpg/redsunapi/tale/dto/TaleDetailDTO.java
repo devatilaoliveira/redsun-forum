@@ -61,7 +61,7 @@ public record TaleDetailDTO(
     TaleParticipantProfileDTO author = null;
     if (tale.getOwnerId() != null && !taleParticipants.isEmpty()) {
       author = taleParticipants.stream()
-        .filter(user -> tale.getOwnerId().equals(user.getId()))
+        .filter(user -> tale.isOwnedBy(user.getId()))
         .findFirst()
         .map(user -> TaleParticipantProfileDTO.from(user, tale))
         .orElse(null);

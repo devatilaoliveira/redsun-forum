@@ -21,7 +21,7 @@ This repository uses layered instruction files stored under the root `.agents/` 
 
 ## App Selection
 
-Use `scripts/rsAgents.ps1` from the repository root to start a layered Codex session.
+Use `scripts/codexLaucher.ps1` from the repository root to start a layered Codex session.
 
 - `-App web` activates the shared core, `redsun-web`, and `angular` layers.
 - `-App api` activates the shared core, `redsun-api`, `domain-map`, `spring-boot`, and `persistence-storage` layers.

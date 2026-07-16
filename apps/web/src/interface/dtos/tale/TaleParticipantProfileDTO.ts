@@ -1,9 +1,10 @@
-import {ERole} from "../../enums/ERole";
+import {ETaleRole} from "../../enums/ETaleRole";
 
 export interface TaleParticipantProfileDTO {
   id: string;
   username: string;
   characterName: string | null;
   characterImageUrl: string | null;
-  role: ERole;
+  isDeleted: boolean;
+  role: ETaleRole;
 }

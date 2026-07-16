@@ -13,7 +13,7 @@
     "start:local-prod": "ng serve --configuration local-prod --port 4200",
     "lint": "ng lint",
     "fix": "ng lint --fix",
-    "rsAgents": "powershell -ExecutionPolicy Bypass -File ../../scripts/rsAgents.ps1 -App web",
+    "codexLaucher": "powershell -ExecutionPolicy Bypass -File ../../scripts/codexLaucher.ps1 -App web",
     "e2e": "npx playwright test",
     "e2e:ui": "npx playwright test --ui"
   },

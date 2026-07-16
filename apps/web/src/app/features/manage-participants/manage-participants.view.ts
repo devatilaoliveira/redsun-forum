@@ -17,7 +17,7 @@ import {RsDialogModalComponent} from "../../shared/ui/dialog-modal/dialog-modal.
 import {IToastService, ToastService} from "../../../services/toast.service";
 import {TaleParticipantProfileDTO} from "../../../interface/dtos/tale/TaleParticipantProfileDTO";
 import {TalesContextService} from "../../../stateServices/tales-context.service";
-import {ERole} from "../../../interface/enums/ERole";
+import {ETaleRole} from "../../../interface/enums/ETaleRole";
 
 @Component({
   selector: "rs-manage-participants",
@@ -51,9 +51,15 @@ export class ManageParticipantsView {
   protected readonly transferUsernameValue: WritableSignal<string> = signal("");
   protected readonly transferInProgress: WritableSignal<boolean> = signal(false);
   protected readonly canConfirmTransfer: Signal<boolean> = computed(() => {
-    const target = this.transferTarget();
+    const expected = this.transferConfirmationName();
     const typed = this.transferUsernameValue().trim();
-    return !!target?.username && typed.length > 0 && typed === target.username;
+    return expected.length > 0 && typed.length > 0 && typed === expected;
+  });
+  protected readonly transferConfirmationName: Signal<string> = computed(() => {
+    const target = this.transferTarget();
+    if (!target) return "";
+
+    return target.isDeleted ? this.deletedUserLabel() : target.username;
   });
 
   protected onInviteIdentifierChange(value: string): void {
@@ -111,16 +117,20 @@ export class ManageParticipantsView {
     return !!ownerId && contact?.id === ownerId;
   }
 
-  protected characterName(contact: TaleParticipantProfileDTO): string {
+  protected participantDisplayName(contact: TaleParticipantProfileDTO): string {
+    if (contact.isDeleted) {
+      return this.deletedUserLabel();
+    }
+
     const characterName = contact.characterName?.trim() ?? "";
-    return characterName.length > 0 ? characterName : "-";
+    return characterName.length > 0 ? characterName : contact.username;
   }
 
   protected characterInitials(contact: TaleParticipantProfileDTO): string {
-    return UtilFunctions.getInitials(contact.characterName);
+    return UtilFunctions.getInitials(this.participantDisplayName(contact));
   }
 
-  protected roleLabelKey(role: ERole): string {
+  protected roleLabelKey(role: ETaleRole): string {
     return `ROLE_${role}`;
   }
 
@@ -171,7 +181,7 @@ export class ManageParticipantsView {
     if (!taleId || this.isRemoving()) return;
 
     this.isRemoving.set(true);
-    this._taleService.removeParticipantById(taleId, contact.id!).pipe(
+    this._taleService.removeParticipantById(taleId, contact.id).pipe(
       finalize(() => this.isRemoving.set(false))
     ).subscribe({
       next: (tale) => {
@@ -189,5 +199,9 @@ export class ManageParticipantsView {
       message,
       variant: EVariant.DANGER
     });
+  }
+
+  private deletedUserLabel(): string {
+    return this._translateService.instant("DELETED_USER");
   }
 }

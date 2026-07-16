@@ -64,14 +64,7 @@ public class LocationService {
       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tale not found"));
 
     taleAccessPolicy.ensureNotSleeping(tale);
-
-    boolean isOwner = tale.getOwnerId() != null && tale.getOwnerId().equals(author.getId());
-    boolean isParticipant = tale.getParticipants() != null && tale.getParticipants().stream()
-      .anyMatch(user -> author.getId().equals(user.getId()));
-
-    if (!isOwner && !isParticipant) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not a participant of this tale");
-    }
+    taleAccessPolicy.ensureCanParticipateInTale(tale, author);
 
     User authorEntity = userRepository.findById(author.getId()).orElse(author);
     Location location = new Location();
@@ -134,12 +127,7 @@ public class LocationService {
 
     Tale tale = loadTaleForLocation(location);
 
-    boolean isOwner = tale.getOwnerId() != null && tale.getOwnerId().equals(requester.getId());
-    boolean isAuthor = location.getAuthor() != null && requester.getId().equals(location.getAuthor().getId());
-
-    if (!isOwner && !isAuthor) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to update this location");
-    }
+    taleAccessPolicy.ensureCanModerateContent(tale, requester, location.getAuthor().getId(), "You are not allowed to update this location");
 
     boolean hasUpdate = false;
 
@@ -223,12 +211,7 @@ public class LocationService {
 
     Tale tale = loadTaleForLocation(location);
 
-    boolean isOwner = tale.getOwnerId() != null && tale.getOwnerId().equals(requester.getId());
-    boolean isAuthor = location.getAuthor() != null && requester.getId().equals(location.getAuthor().getId());
-
-    if (!isOwner && !isAuthor) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to delete this location");
-    }
+    taleAccessPolicy.ensureCanModerateContent(tale, requester, location.getAuthor().getId(), "You are not allowed to delete this location");
 
     String imageUrl = location.getImageURL();
     locationRepository.delete(location);
@@ -253,9 +236,6 @@ public class LocationService {
 
   private Tale loadTaleForLocation(Location location) {
     UUID taleId = location.getTaleId();
-    if (taleId == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tale not found");
-    }
 
     Tale tale = taleRepository.findById(taleId)
       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tale not found"));

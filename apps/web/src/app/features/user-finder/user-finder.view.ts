@@ -13,7 +13,7 @@ import {FindUsersFiltersDTO} from "../../../interface/dtos/user/FindUsersFilters
 import {UserFinderResultDTO} from "../../../interface/dtos/user/UserFinderResultDTO";
 import {PageResponse} from "../../../interface/dtos/general/PageResponse";
 import {EProfileLanguage} from "../../../interface/enums/EProfileLanguage";
-import {ERole} from "../../../interface/enums/ERole";
+import {EFavoriteRole} from "../../../interface/enums/EFavoriteRole";
 import {ERuleSystem} from "../../../interface/enums/ERuleSystem";
 import {EVariant} from "../../../interface/enums/EVariant";
 import {LocalStoreService} from "../../../services/local-store.service";
@@ -39,13 +39,13 @@ export class UserFinderView implements OnInit {
   private readonly pageSize: number = 10;
 
   protected readonly EProfileLanguage = EProfileLanguage;
-  protected readonly ERole = ERole;
+  protected readonly EFavoriteRole = EFavoriteRole;
   protected readonly ERuleSystem = ERuleSystem;
   protected readonly EVariant = EVariant;
   protected readonly users: WritableSignal<UserFinderResultDTO[]> = signal<UserFinderResultDTO[]>([]);
   protected readonly usersPage: WritableSignal<PageResponse<UserFinderResultDTO> | null> = signal<PageResponse<UserFinderResultDTO> | null>(null);
   protected readonly usernameFilter: WritableSignal<string> = signal<string>("");
-  protected readonly selectedRole: WritableSignal<ERole | null> = signal<ERole | null>(null);
+  protected readonly selectedRole: WritableSignal<EFavoriteRole | null> = signal<EFavoriteRole | null>(null);
   protected readonly selectedRules: WritableSignal<ERuleSystem | null> = signal<ERuleSystem | null>(null);
   protected readonly selectedLanguage: WritableSignal<EProfileLanguage | null> = signal<EProfileLanguage | null>(null);
   protected readonly loading: WritableSignal<boolean> = signal<boolean>(false);
@@ -82,7 +82,7 @@ export class UserFinderView implements OnInit {
   }
 
   protected onRoleChange(value: string | null): void {
-    this.selectedRole.set(this.toEnumValue(ERole, value));
+    this.selectedRole.set(this.toEnumValue(EFavoriteRole, value));
     this.loadUsers(0, false);
   }
 

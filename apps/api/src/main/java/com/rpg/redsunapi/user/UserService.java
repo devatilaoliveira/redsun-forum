@@ -483,9 +483,9 @@ public class UserService {
     return "deleted+" + userId + "@" + DELETED_EMAIL_DOMAIN;
   }
 
-  private static ERole parseRole(String role) {
+  private static EFavoriteRole parseRole(String role) {
     try {
-      return ERole.valueOf(role.toUpperCase());
+      return EFavoriteRole.valueOf(role.toUpperCase());
     } catch (IllegalArgumentException ex) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role value: " + role, ex);
     }

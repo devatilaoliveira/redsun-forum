@@ -73,7 +73,7 @@ public class User {
   @CollectionTable(name = "user_favorite_roles", joinColumns = @JoinColumn(name = "user_id"))
   @Column(name = "favorite_role", nullable = false, length = 10)
   @OrderColumn(name = "preference_order")
-  private List<ERole> favoriteRole = new ArrayList<>();
+  private List<EFavoriteRole> favoriteRole = new ArrayList<>();
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "user_contacts", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "contact_id"))
@@ -102,7 +102,7 @@ public class User {
   }
 
   public UUID getId() {
-    return id;
+    return Objects.requireNonNull(id, "User id is only available after persistence");
   }
 
   public void setId(UUID id) {
@@ -221,11 +221,11 @@ public class User {
     this.favoriteRules = copyFavorites(favoriteRules, "favoriteRules");
   }
 
-  public List<ERole> getFavoriteRole() {
+  public List<EFavoriteRole> getFavoriteRole() {
     return favoriteRole;
   }
 
-  public void setFavoriteRole(List<ERole> favoriteRole) {
+  public void setFavoriteRole(List<EFavoriteRole> favoriteRole) {
     this.favoriteRole = copyFavorites(favoriteRole, "favoriteRole");
   }
 

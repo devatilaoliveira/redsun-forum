@@ -22,7 +22,8 @@ public class RedSunSheetHandler implements RuleCharacterSheetHandler {
 
   @Override
   public CharacterSheet getOrCreateSheet(Tale tale, UUID characterId) {
-    RedSunSheet sheet = redSunSheetRepository.findByTale_IdAndCharacterId(tale.getId(), characterId)
+    UUID taleId = requirePersistedTaleId(tale);
+    RedSunSheet sheet = redSunSheetRepository.findByTale_IdAndCharacterId(taleId, characterId)
       .orElseGet(() -> createRedSunSheet(tale, characterId));
     tale.addBasicSheet(sheet);
     return sheet;
@@ -30,7 +31,7 @@ public class RedSunSheetHandler implements RuleCharacterSheetHandler {
 
   @Override
   public boolean exists(Tale tale, UUID characterId) {
-    return redSunSheetRepository.existsByTale_IdAndCharacterId(tale.getId(), characterId);
+    return redSunSheetRepository.existsByTale_IdAndCharacterId(requirePersistedTaleId(tale), characterId);
   }
 
   @Override
@@ -52,35 +53,31 @@ public class RedSunSheetHandler implements RuleCharacterSheetHandler {
 
   @Override
   public void deleteByTale(Tale tale) {
-    redSunSheetRepository.deleteAll(redSunSheetRepository.findAllByTale_Id(tale.getId()));
+    redSunSheetRepository.deleteAll(redSunSheetRepository.findAllByTale_Id(requirePersistedTaleId(tale)));
   }
 
   @Override
   public void deleteByTaleAndCharacterId(Tale tale, UUID characterId) {
-    redSunSheetRepository.findByTale_IdAndCharacterId(tale.getId(), characterId)
+    redSunSheetRepository.findByTale_IdAndCharacterId(requirePersistedTaleId(tale), characterId)
       .ifPresent(redSunSheetRepository::delete);
   }
 
   public void ensureCompleteSheetDetails(Tale tale, UUID characterId) {
-    if (tale == null || tale.getId() == null || characterId == null) {
-      return;
-    }
-
     redSunSheetRepository.ensureRedSunDetails(tale.getId(), characterId);
   }
 
   public void deleteCompleteSheetDetails(Tale tale, UUID characterId) {
-    if (tale == null || tale.getId() == null || characterId == null) {
-      return;
-    }
-
     redSunSheetRepository.deleteRedSunDetails(tale.getId(), characterId);
   }
 
   private RedSunSheet createRedSunSheet(Tale tale, UUID characterId) {
     ensureCompleteSheetDetails(tale, characterId);
-    return redSunSheetRepository.findByTale_IdAndCharacterId(tale.getId(), characterId)
+    return redSunSheetRepository.findByTale_IdAndCharacterId(requirePersistedTaleId(tale), characterId)
       .orElseGet(() -> redSunSheetRepository.save(new RedSunSheet(tale, characterId)));
+  }
+
+  private UUID requirePersistedTaleId(Tale tale) {
+    return tale.getId();
   }
 
   private RedSunSheet requireRedSunSheet(CharacterSheet sheet) {

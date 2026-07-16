@@ -2,7 +2,7 @@ package com.rpg.redsunapi.user.persistence;
 
 import com.rpg.redsunapi.tale.enums.ELanguage;
 import com.rpg.redsunapi.tale.enums.ERuleSystem;
-import com.rpg.redsunapi.user.ERole;
+import com.rpg.redsunapi.user.EFavoriteRole;
 import com.rpg.redsunapi.user.User;
 import com.rpg.redsunapi.user.UserRepository;
 import jakarta.persistence.EntityManager;
@@ -58,7 +58,7 @@ public class UserRepositoryAdapter implements UserRepository {
   public Page<User> searchUsers(
       UUID requesterId,
       String username,
-      ERole role,
+      EFavoriteRole role,
       ERuleSystem rule,
       ELanguage language,
       Pageable pageable) {
@@ -90,7 +90,7 @@ public class UserRepositoryAdapter implements UserRepository {
       CriteriaBuilder criteriaBuilder,
       UUID requesterId,
       String username,
-      ERole role,
+      EFavoriteRole role,
       ERuleSystem rule,
       ELanguage language) {
     CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
@@ -106,7 +106,7 @@ public class UserRepositoryAdapter implements UserRepository {
       Root<User> root,
       UUID requesterId,
       String username,
-      ERole role,
+      EFavoriteRole role,
       ERuleSystem rule,
       ELanguage language) {
     List<Predicate> predicates = new ArrayList<>();

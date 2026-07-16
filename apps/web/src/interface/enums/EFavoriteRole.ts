@@ -1,4 +1,4 @@
-export enum ERole {
+export enum EFavoriteRole {
   DM = "DM",
   PLAYER = "PLAYER"
 }

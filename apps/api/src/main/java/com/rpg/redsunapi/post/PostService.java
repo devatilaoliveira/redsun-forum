@@ -9,8 +9,8 @@ import com.rpg.redsunapi.subscription.Subscription;
 import com.rpg.redsunapi.subscription.SubscriptionRepository;
 import com.rpg.redsunapi.subscription.enums.ESubscriptionPlan;
 import com.rpg.redsunapi.tale.Tale;
+import com.rpg.redsunapi.tale.TaleAccessPolicy;
 import com.rpg.redsunapi.tale.TaleRepository;
-import com.rpg.redsunapi.tale.enums.ETaleStatus;
 import com.rpg.redsunapi.user.User;
 import com.rpg.redsunapi.user.UserRepository;
 import org.jspecify.annotations.NullMarked;
@@ -39,6 +39,7 @@ public class PostService {
   private final UserRepository userRepository;
   private final SubscriptionRepository subscriptionRepository;
   private final GeminiPostTextClient geminiPostTextClient;
+  private final TaleAccessPolicy taleAccessPolicy;
 
   public record PostsForLocation(Page<Post> posts, Tale tale) {
   }
@@ -49,7 +50,8 @@ public class PostService {
     TaleRepository taleRepository,
     UserRepository userRepository,
     SubscriptionRepository subscriptionRepository,
-    GeminiPostTextClient geminiPostTextClient
+    GeminiPostTextClient geminiPostTextClient,
+    TaleAccessPolicy taleAccessPolicy
   ) {
     this.postRepository = postRepository;
     this.locationRepository = locationRepository;
@@ -57,6 +59,7 @@ public class PostService {
     this.userRepository = userRepository;
     this.subscriptionRepository = subscriptionRepository;
     this.geminiPostTextClient = geminiPostTextClient;
+    this.taleAccessPolicy = taleAccessPolicy;
   }
 
   @Transactional
@@ -68,14 +71,7 @@ public class PostService {
       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Location not found"));
 
     Tale tale = loadTaleForLocation(location);
-
-    boolean isOwner = tale.getOwnerId() != null && tale.getOwnerId().equals(author.getId());
-    boolean isParticipant = tale.getParticipants() != null && tale.getParticipants().stream()
-      .anyMatch(user -> author.getId().equals(user.getId()));
-
-    if (!isOwner && !isParticipant) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not a participant of this tale");
-    }
+    taleAccessPolicy.ensureCanParticipateInTale(tale, author);
 
     User authorEntity = userRepository.findById(author.getId()).orElse(author);
 
@@ -116,12 +112,10 @@ public class PostService {
       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Location not found"));
 
     Tale tale = loadTaleForLocation(location);
-    ensureCanViewTale(tale, requester);
+    taleAccessPolicy.ensureCanViewTale(tale, requester);
 
     Pageable pageable = buildPageable(page, size);
-    boolean isOwner = requester != null
-      && tale.getOwnerId() != null
-      && tale.getOwnerId().equals(requester.getId());
+    boolean isOwner = requester != null && tale.isOwnedBy(requester.getId());
 
     if (isOwner) {
       return new PostsForLocation(postRepository.findByLocationId(location.getId(), pageable), tale);
@@ -139,7 +133,7 @@ public class PostService {
       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Location not found"));
 
     Tale tale = loadTaleForLocation(location);
-    ensureCanViewTale(tale, requester);
+    taleAccessPolicy.ensureCanViewTale(tale, requester);
 
     return postRepository.findByLocationId(location.getId());
   }
@@ -158,7 +152,7 @@ public class PostService {
       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Location not found"));
 
     Tale tale = loadTaleForLocation(location);
-    ensureCanViewTale(tale, requester);
+    taleAccessPolicy.ensureCanViewTale(tale, requester);
 
     return post;
   }
@@ -202,11 +196,8 @@ public class PostService {
   }
 
   private void ensureCanModeratePost(Post post, Tale tale, User requester, String errorMessage) {
-    boolean isPostOwner = post.getAuthor() != null && requester.getId().equals(post.getAuthor().getId());
-    boolean isTaleOwner = tale.getOwnerId() != null && tale.getOwnerId().equals(requester.getId());
-    if (!isPostOwner && !isTaleOwner) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
-    }
+    UUID authorId = post.getAuthor() == null ? null : post.getAuthor().getId();
+    taleAccessPolicy.ensureCanModerateContent(tale, requester, authorId, errorMessage);
   }
 
   private Tale loadTaleForLocation(Location location) {
@@ -218,30 +209,8 @@ public class PostService {
     Tale tale = taleRepository.findById(taleId)
       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tale not found"));
 
-    ensureNotSleeping(tale);
+    taleAccessPolicy.ensureNotSleeping(tale);
     return tale;
-  }
-
-  private void ensureCanViewTale(Tale tale, User requester) {
-    if (Boolean.TRUE.equals(tale.getPublic())) {
-      return;
-    }
-
-    if (tale.getOwnerId() != null && tale.getOwnerId().equals(requester.getId())) {
-      return;
-    }
-
-    boolean isParticipant = tale.getParticipants() != null && tale.getParticipants().stream()
-      .anyMatch(user -> requester.getId().equals(user.getId()));
-    if (!isParticipant) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not a participant of this tale");
-    }
-  }
-
-  private void ensureNotSleeping(Tale tale) {
-    if (tale.getStatus() == ETaleStatus.SLEEP) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tale not found");
-    }
   }
 
   private Pageable buildPageable(int page, int size) {

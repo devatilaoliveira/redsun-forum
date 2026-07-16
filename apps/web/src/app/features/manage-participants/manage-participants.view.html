@@ -51,14 +51,14 @@
               <div class="avatar-column">
                 <div class="avatar">
                   @if (contact.characterImageUrl) {
-                    <img [src]="contact.characterImageUrl" [alt]="characterName(contact)" />
+                    <img [src]="contact.characterImageUrl" [alt]="participantDisplayName(contact)" />
                   } @else {
                     <span class="avatar-fallback">{{ characterInitials(contact) }}</span>
                   }
                 </div>
               </div>
               <div class="name-column">
-                {{ characterName(contact) }}
+                {{ participantDisplayName(contact) }}
               </div>
               <div class="role-column">
                 {{ roleLabelKey(contact.role) | translate }}

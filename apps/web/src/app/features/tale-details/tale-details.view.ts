@@ -4,7 +4,7 @@ import {ITaleService, TaleService} from "../../../services/tale.service";
 import {finalize} from "rxjs";
 import {RsSpinner} from "../../shared/fragments/rsSpinner/rs.spinner";
 import {EVariant} from "../../../interface/enums/EVariant";
-import {TranslatePipe} from "@ngx-translate/core";
+import {ITranslateService, TranslatePipe, TranslateService} from "@ngx-translate/core";
 import {TaleDetailsCardComponent} from "../../shared/ui/tale-details-card/tale-details-card.component";
 import {LocationsTableComponent} from "../../shared/ui/locations-table/locations-table.component";
 import {RsButton} from "../../shared/fragments/rsButton/rs.button";
@@ -35,6 +35,7 @@ export class TaleDetailsView {
   private readonly _router: Router = inject(Router);
   private readonly _printer: IPrinter = inject(Printer);
   private readonly _talesContext: TalesContextService = inject(TalesContextService);
+  private readonly _translateService: ITranslateService = inject(TranslateService);
 
   protected readonly inviteIdentifier: WritableSignal<string> = signal("");
   protected readonly inviteInProgress: WritableSignal<boolean> = signal(false);
@@ -60,6 +61,10 @@ export class TaleDetailsView {
   }
 
   protected participantDisplayName(participant: TaleParticipantProfileDTO): string {
+    if (participant.isDeleted) {
+      return this._translateService.instant("DELETED_USER");
+    }
+
     const characterName = participant.characterName?.trim() ?? "";
     if (characterName.length > 0) {
       return characterName;

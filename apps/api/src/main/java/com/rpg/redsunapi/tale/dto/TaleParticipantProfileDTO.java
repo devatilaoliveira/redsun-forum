@@ -2,73 +2,53 @@ package com.rpg.redsunapi.tale.dto;
 
 import com.rpg.redsunapi.characterSheet.BasicSheet;
 import com.rpg.redsunapi.tale.Tale;
-import com.rpg.redsunapi.user.ERole;
+import com.rpg.redsunapi.tale.ETaleRole;
 import com.rpg.redsunapi.user.User;
 
 import java.util.UUID;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public record TaleParticipantProfileDTO(
-  String id,
+  UUID id,
   String username,
-  String characterName,
-  String characterImageUrl,
-  ERole role
+  @Nullable String characterName,
+  @Nullable String characterImageUrl,
+  boolean isDeleted,
+  ETaleRole role
 ) {
 
   public static TaleParticipantProfileDTO from(User user, Tale tale) {
-    if (user == null) {
-      return null;
-    }
-
     UUID userId = user.getId();
-    String id = userId != null ? userId.toString() : null;
-    ERole role = roleFor(tale, userId);
+    ETaleRole role = tale.roleFor(userId);
     if (user.isDeleted()) {
-      return new TaleParticipantProfileDTO(id, null, null, null, role);
+      return new TaleParticipantProfileDTO(userId, "Deleted User", null, null, true, role);
     }
 
     BasicSheet sheet = basicSheetFor(tale, userId);
     return new TaleParticipantProfileDTO(
-      id,
+      userId,
       user.getUsername(),
       sheet != null ? sheet.getCharacterName() : null,
       characterImageUrlFor(sheet),
+      false,
       role
     );
   }
 
-  private static ERole roleFor(Tale tale, UUID userId) {
-    if (tale == null || userId == null) {
-      return ERole.PLAYER;
-    }
-
-    return userId.equals(tale.getOwnerId()) ? ERole.DM : ERole.PLAYER;
-  }
-
-  private static BasicSheet basicSheetFor(Tale tale, UUID userId) {
-    if (tale == null || userId == null || tale.getBasicSheets() == null) {
-      return null;
-    }
-
+  private static @Nullable BasicSheet basicSheetFor(Tale tale, UUID userId) {
     return tale.getBasicSheets().stream()
-      .filter(sheet -> sheet != null && userId.equals(sheet.getCharacterId()))
+      .filter(sheet -> userId.equals(sheet.getCharacterId()))
       .findFirst()
       .orElse(null);
   }
 
-  private static String characterImageUrlFor(BasicSheet sheet) {
+  private static @Nullable String characterImageUrlFor(@Nullable BasicSheet sheet) {
     if (sheet == null) {
       return null;
     }
 
-    return blankToNull(sheet.getCharacterImageUrl());
-  }
-
-  private static String blankToNull(String value) {
-    if (value == null || value.isBlank()) {
-      return null;
-    }
-
-    return value;
+    return sheet.getCharacterImageUrl();
   }
 }

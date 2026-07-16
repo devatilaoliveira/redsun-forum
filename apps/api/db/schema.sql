@@ -109,7 +109,7 @@ CREATE TABLE public.tales (
   owner_id uuid NOT NULL REFERENCES public.users(id),
   is_public boolean NOT NULL DEFAULT FALSE,
   image_url varchar(500),
-  description varchar(4000),
+  description varchar(4000) NOT NULL CHECK (char_length(btrim(description)) > 0),
   language varchar(10) CHECK (language IS NULL OR language IN ('EN','DE','PT')),
   rules varchar(15) NOT NULL CHECK (rules IN (
     'REDSUN','FIM_DO_MUNDO','DND','STORYTELLER','PATHFINDER','BRP','GURPS','SWADE','OTHER','CUSTOM'

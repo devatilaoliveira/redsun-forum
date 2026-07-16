@@ -5,7 +5,7 @@ import com.rpg.redsunapi.subscription.Subscription;
 import com.rpg.redsunapi.subscription.dto.SubscriptionDTO;
 import com.rpg.redsunapi.tale.enums.ELanguage;
 import com.rpg.redsunapi.tale.enums.ERuleSystem;
-import com.rpg.redsunapi.user.ERole;
+import com.rpg.redsunapi.user.EFavoriteRole;
 import com.rpg.redsunapi.user.User;
 
 import java.util.List;
@@ -20,7 +20,7 @@ public record MeResponseDto(
   String description,
   List<ELanguage> favoriteLanguage,
   List<ERuleSystem> favoriteRules,
-  List<ERole> favoriteRole,
+  List<EFavoriteRole> favoriteRole,
   SubscriptionDTO subscription,
   List<UserAsContactDTO> contacts,
   LegalAcknowledgementDto legalAcknowledgement
