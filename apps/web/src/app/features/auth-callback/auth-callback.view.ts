@@ -22,7 +22,7 @@ export class AuthCallbackView implements OnInit {
   ngOnInit(): void {
     this._authCallbackService.handle(window.location.href).subscribe(
       (result: AuthCallbackResult) => {
-        void this._router.navigate([result.redirectUrl ?? "/"], {
+        void this._router.navigateByUrl(result.redirectUrl ?? "/", {
           replaceUrl: true,
           state: result.redirectState as IAuthCallbackState | undefined
         });

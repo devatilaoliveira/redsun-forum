@@ -10,6 +10,8 @@ import {ROUTE_PATHS} from "../interface/constants/route-path.constants";
 import {EStatus} from "../interface/enums/EStatus";
 import {IAuthCallbackState} from "../interface/models/iauth-callback-state";
 import {AuthCallbackResult} from "../interface/models/iauth-callback-result";
+import {MeResponseDTO} from "../interface/dtos/user/MeResponseDTO";
+import {resolvePreferredHomeUrl} from "../infra/miscellaneous/preferred-home.functions";
 
 @Injectable({providedIn: "root"})
 export class AuthCallbackService {
@@ -41,7 +43,7 @@ export class AuthCallbackService {
     return from(this._supabaseAuthClient.exchangeCodeForSession(code)).pipe(
       switchMap((): Observable<AuthCallbackResult> => {
         return this._authService.completeSignIn().pipe(
-          switchMap((): Observable<AuthCallbackResult> => this._redirectHome()),
+          switchMap((me: MeResponseDTO): Observable<AuthCallbackResult> => this._redirectAfterSignIn(me)),
           catchError(httpError => {
             this._printer.error("Backend could not complete OAuth sign-in", httpError);
 
@@ -78,10 +80,13 @@ export class AuthCallbackService {
     );
   }
 
-  private _redirectHome(): Observable<AuthCallbackResult> {
+  private _redirectAfterSignIn(me: MeResponseDTO): Observable<AuthCallbackResult> {
     return of({
       status: EStatus.SUCCESS,
-      redirectUrl: "/"
+      redirectUrl: resolvePreferredHomeUrl(
+        me.userSettings.redirectToFavorite,
+        me.userSettings.favoriteTaleId
+      )
     });
   }
 
