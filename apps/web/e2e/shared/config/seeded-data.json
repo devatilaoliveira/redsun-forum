@@ -2,5 +2,20 @@
   "SEEDED_LOGIN_USER": {
     "email": "worker-login-1@redsun.com",
     "password": "123redsun1"
+  },
+  "SEEDED_TALE_OWNER": {
+    "id": "00000000-0000-0000-0000-000000000101",
+    "username": "worker-login-1",
+    "email": "worker-login-1@redsun.com",
+    "password": "123redsun1"
+  },
+  "SEEDED_TALE_PARTICIPANT": {
+    "id": "00000000-0000-0000-0000-000000000102",
+    "username": "worker-login-2",
+    "email": "worker-login-2@redsun.com"
+  },
+  "SEEDED_TALE": {
+    "id": "00000000-0000-0000-0000-000000000301",
+    "name": "Seeded RedSun Tale"
   }
 }

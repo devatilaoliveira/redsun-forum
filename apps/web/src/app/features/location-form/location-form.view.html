@@ -12,6 +12,7 @@
     } @else {
       <form class="form" [formGroup]="createNewLocationFormGroup" (submit)="$event.preventDefault(); onSubmit()">
         <rs-input
+          testId="location-form-name-input"
           [label]="'LOCATION_NAME' | translate"
           [placeholder]="'LOCATION_NAME_PLACEHOLDER' | translate"
           [required]="true"
@@ -22,6 +23,7 @@
         />
 
         <rs-textarea
+          testId="location-form-description-input"
           [label]="'LOCATION_DESCRIPTION' | translate"
           [placeholder]="'DESCRIPTION_YOUR_LOCATION' | translate"
           [maxLength]="UTIL_CONSTANTS.LONG_TEXT_LENGTH"
@@ -41,6 +43,7 @@
 
         <div class="cta-btn">
           <rs-button
+            testId="location-form-submit"
             [inProgress]="inProgress()"
             (pressed)="onSubmit()"
             [disabled]="!canSubmit()"

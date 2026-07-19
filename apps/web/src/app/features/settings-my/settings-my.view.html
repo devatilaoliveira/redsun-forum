@@ -5,6 +5,7 @@
       [optionsEnum]="ELanguage"
       [value]="lang"
       [allowNull]="false"
+      [disabled]="saveInProgress()"
       (valueChanged)="onLangChange($event)"
       [localizationPrefix]="'LANGUAGE_'"
     />
@@ -16,8 +17,16 @@
       [optionsEnum]="EThemeApplication"
       [value]="theme"
       [allowNull]="false"
+      [disabled]="saveInProgress()"
       (valueChanged)="onThemeChange($event)"
       [localizationPrefix]="'THEME_'"
     />
   }
+
+  <rs-checkbox
+    [label]="'REDIRECT_TO_FAVORITE' | translate"
+    [checked]="redirectToFavorite()"
+    [disabled]="saveInProgress()"
+    (checkedChange)="onRedirectToFavoriteChange($event)"
+  />
 </section>

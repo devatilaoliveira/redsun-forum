@@ -1,7 +1,7 @@
 import {HttpErrorResponse} from "@angular/common/http";
 import {Component, OnInit, inject, signal, WritableSignal} from "@angular/core";
 import {ActivatedRoute, Router, RouterLink} from "@angular/router";
-import {ITranslateService, TranslatePipe, TranslateService} from "@ngx-translate/core";
+import {TranslatePipe} from "@ngx-translate/core";
 import {finalize} from "rxjs";
 import {ROUTE_PATHS} from "../../../../interface/constants/route-path.constants";
 import {MeResponseDTO} from "../../../../interface/dtos/user/MeResponseDTO";
@@ -9,6 +9,7 @@ import {ELanguage} from "../../../../interface/enums/ELanguage";
 import {EVariant} from "../../../../interface/enums/EVariant";
 import {ILocalStoreService, LocalStoreService} from "../../../../services/local-store.service";
 import {IUserProfileService, UserProfileService} from "../../../../services/user-profile.service";
+import {AppSettingsService, IAppSettingsService} from "../../../../services/app-settings.service";
 import {RedsunTitle} from "../../../shared/fragments/redsunTitle/redsun.title";
 import {RsButton} from "../../../shared/fragments/rsButton/rs.button";
 import {RsCheckbox} from "../../../shared/fragments/rsCheckbox/rs.checkbox";
@@ -27,13 +28,13 @@ export class LegalAcceptanceView implements OnInit {
   private readonly _route: ActivatedRoute = inject(ActivatedRoute);
   private readonly _localStoreService: ILocalStoreService = inject(LocalStoreService);
   private readonly _userProfileService: IUserProfileService = inject(UserProfileService);
-  private readonly _translateService: ITranslateService = inject(TranslateService);
+  private readonly _appSettingsService: IAppSettingsService = inject(AppSettingsService);
 
   protected readonly EVariant = EVariant;
   protected readonly ELanguage = ELanguage;
   protected readonly termsRoute: string = `/${ROUTE_PATHS.terms}`;
   protected readonly privacyRoute: string = `/${ROUTE_PATHS.privacy}`;
-  protected readonly selectedLanguage: WritableSignal<ELanguage> = signal<ELanguage>(this._localStoreService.getLanguage());
+  protected readonly selectedLanguage = this._appSettingsService.language;
   protected readonly acceptedTerms: WritableSignal<boolean> = signal<boolean>(false);
   protected readonly acknowledgedPrivacy: WritableSignal<boolean> = signal<boolean>(false);
   protected readonly inProgress: WritableSignal<boolean> = signal<boolean>(false);
@@ -42,6 +43,7 @@ export class LegalAcceptanceView implements OnInit {
   ngOnInit(): void {
     const storedUser: MeResponseDTO | null = this._localStoreService.getAuthenticatedUser();
     if (storedUser) {
+      this._appSettingsService.applyUserSettings(storedUser.userSettings);
       this._setUser(storedUser);
       this._redirectIfCurrent(storedUser);
       return;
@@ -53,6 +55,7 @@ export class LegalAcceptanceView implements OnInit {
     ).subscribe({
       next: (user: MeResponseDTO) => {
         this._localStoreService.storeUser(user);
+        this._appSettingsService.applyUserSettings(user.userSettings);
         this._setUser(user);
         this._redirectIfCurrent(user);
       },
@@ -88,6 +91,7 @@ export class LegalAcceptanceView implements OnInit {
     ).subscribe({
       next: (user: MeResponseDTO) => {
         this._localStoreService.storeUser(user);
+        this._appSettingsService.applyUserSettings(user.userSettings);
         this._setUser(user);
         void this._router.navigateByUrl(this._getReturnUrl(), {replaceUrl: true});
       },
@@ -101,9 +105,7 @@ export class LegalAcceptanceView implements OnInit {
     if (!Object.values(ELanguage).includes(option.value as ELanguage)) return;
 
     const nextLang = option.value as ELanguage;
-    this.selectedLanguage.set(nextLang);
-    this._localStoreService.setLanguage(nextLang);
-    this._translateService.use(nextLang).subscribe();
+    this._appSettingsService.setTransientLanguage(nextLang).subscribe();
   }
 
   private _setUser(user: MeResponseDTO): void {

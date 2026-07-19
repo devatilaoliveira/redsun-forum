@@ -1,7 +1,7 @@
 import {Component, computed, inject, input, InputSignal} from "@angular/core";
 import {DatePipe} from "@angular/common";
 import {Router} from "@angular/router";
-import {TranslatePipe} from "@ngx-translate/core";
+import {ITranslateService, TranslatePipe, TranslateService} from "@ngx-translate/core";
 import {EVariant} from "../../../../interface/enums/EVariant";
 import {UtilFunctions} from "../../../../infra/miscellaneous/util.functions";
 import {RsBox} from "../../fragments/rsBox/rs.box";
@@ -23,6 +23,7 @@ import {RsExpandableText} from "../../fragments/rsExpandableText/rs.expandable-t
 })
 export class TaleDetailsCardComponent {
   private readonly _router: Router = inject(Router);
+  private readonly _translateService: ITranslateService = inject(TranslateService);
 
   public readonly tale: InputSignal<TaleDetailDTO> = input.required<TaleDetailDTO>();
 
@@ -34,7 +35,12 @@ export class TaleDetailsCardComponent {
     UtilFunctions.getInitials(this.tale().taleName)
   );
   protected readonly ownerName = computed<string>(() => {
-    const ownerName = this.tale().author.username;
+    const owner = this.tale().author;
+    if (owner.isDeleted) {
+      return this._translateService.instant("DELETED_USER");
+    }
+
+    const ownerName = owner.username;
     const trimmed = ownerName.trim();
     return trimmed.length > 0 ? trimmed : "-";
   });

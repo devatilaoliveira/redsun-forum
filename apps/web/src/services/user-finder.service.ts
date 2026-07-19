@@ -35,7 +35,7 @@ export class UserFinderService implements IUserFinderService {
     }
 
     if (filters.language) {
-      params = params.set("language", filters.language.toLowerCase());
+      params = params.set("language", filters.language);
     }
 
     return this._http.get<RawFindUsersResponse>(`${environment.apiBaseUrl}/user/find-users`, {params}).pipe(

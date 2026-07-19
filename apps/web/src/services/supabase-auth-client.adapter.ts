@@ -3,7 +3,7 @@ import {SupabaseProvider} from "./supabase.provider";
 import {ELoginProvider} from "../interface/enums/ELoginProvider";
 import {IOAuthOptions} from "../interface/models/ioauth-options";
 import {IPrinter, Printer} from "../infra/miscellaneous/printer.handler";
-import {Session} from "@supabase/supabase-js";
+import {AuthChangeEvent, Session, Subscription} from "@supabase/supabase-js";
 
 export interface SupabaseEmailCredentials {
   email: string;
@@ -34,7 +34,8 @@ export interface ISupabaseAuthClient {
   updatePassword(input: SupabasePasswordUpdateRequest): Promise<void>;
   exchangeCodeForSession(code: string): Promise<Session>;
   getSession(): Promise<Session | null>;
-  signOut(): Promise<void>;
+  onAuthStateChange(callback: (event: AuthChangeEvent, session: Session | null) => void): Subscription;
+  signOut(scope: "local" | "global"): Promise<void>;
 }
 
 @Injectable({providedIn: "root"})
@@ -145,24 +146,14 @@ export class SupabaseAuthClientAdapter implements ISupabaseAuthClient {
     return data.session;
   }
 
-  public async signOut(): Promise<void> {
-    try {
-      const globalResult = await this._supabaseAuthClient.signOut();
-      if (globalResult?.error) {
-        throw globalResult.error;
-      }
-    } catch (error) {
-      const message: string = error instanceof Error ? error.message : String(error);
-      const isInvalidRefreshToken: boolean = message.includes("Invalid Refresh Token") || message.includes("Refresh Token Not Found");
+  public onAuthStateChange(callback: (event: AuthChangeEvent, session: Session | null) => void): Subscription {
+    return this._supabaseAuthClient.onAuthStateChange(callback).data.subscription;
+  }
 
-      if (!isInvalidRefreshToken) {
-        throw error;
-      }
-
-      const localResult = await this._supabaseAuthClient.signOut({scope: "local"});
-      if (localResult?.error) {
-        throw localResult.error;
-      }
+  public async signOut(scope: "local" | "global"): Promise<void> {
+    const {error} = await this._supabaseAuthClient.signOut({scope});
+    if (error) {
+      throw error;
     }
   }
 }

@@ -6,8 +6,8 @@ import com.rpg.redsunapi.characterSheet.dto.BasicSheetUpsertDTO;
 import com.rpg.redsunapi.characterSheet.dto.CharacterSheetResponseDTO;
 import com.rpg.redsunapi.storage.CharacterStorageService;
 import com.rpg.redsunapi.tale.Tale;
+import com.rpg.redsunapi.tale.TaleAccessPolicy;
 import com.rpg.redsunapi.tale.TaleRepository;
-import com.rpg.redsunapi.tale.enums.ETaleStatus;
 import com.rpg.redsunapi.tale.enums.ERuleSystem;
 import com.rpg.redsunapi.user.User;
 import org.jspecify.annotations.NullMarked;
@@ -38,25 +38,28 @@ public class CharacterSheetService {
   private final BasicSheetHandler basicSheetHandler;
   private final RedSunSheetHandler redSunSheetHandler;
   private final CharacterStorageService characterStorageService;
+  private final TaleAccessPolicy taleAccessPolicy;
 
   public CharacterSheetService(
     TaleRepository taleRepository,
     CharacterSheetHandlerRegistry handlerRegistry,
     BasicSheetHandler basicSheetHandler,
     RedSunSheetHandler redSunSheetHandler,
-    CharacterStorageService characterStorageService
+    CharacterStorageService characterStorageService,
+    TaleAccessPolicy taleAccessPolicy
   ) {
     this.taleRepository = taleRepository;
     this.handlerRegistry = handlerRegistry;
     this.basicSheetHandler = basicSheetHandler;
     this.redSunSheetHandler = redSunSheetHandler;
     this.characterStorageService = characterStorageService;
+    this.taleAccessPolicy = taleAccessPolicy;
   }
 
   @Transactional
   public CharacterSheetResponseDTO getCharacterSheet(UUID taleId, UUID characterSheetId, User requester) {
     Tale tale = requireActiveTale(taleId);
-    requireCanRead(tale, requester.getId(), characterSheetId);
+    taleAccessPolicy.ensureCanReadCharacterSheet(tale, requester.getId());
 
     RuleCharacterSheetHandler handler = resolveHandlerForCharacter(tale, characterSheetId);
     CharacterSheet sheet = handler.getOrCreateSheet(tale, characterSheetId);
@@ -113,7 +116,7 @@ public class CharacterSheetService {
     SheetUpdater updater
   ) throws IOException {
     Tale tale = requireActiveTale(taleId);
-    requireCanWrite(tale, requester.getId(), characterSheetId);
+    taleAccessPolicy.ensureCanWriteCharacterSheet(tale, requester.getId(), characterSheetId);
     requireMatchingSheetType(tale, characterSheetId, redSunEndpoint);
     if (isTaleOwner(tale, characterSheetId)) {
       redSunSheetHandler.deleteCompleteSheetDetails(tale, characterSheetId);
@@ -184,7 +187,7 @@ public class CharacterSheetService {
       return;
     }
 
-    if (isTaleOwner(tale, participant.getId())) {
+    if (tale.isOwnedBy(participant.getId())) {
       initializeCharacterSheetForTaleOwner(tale);
       return;
     }
@@ -216,7 +219,7 @@ public class CharacterSheetService {
     if (tale.getParticipants() != null) {
       tale.getParticipants().stream()
         .filter(user -> user != null && user.getId() != null)
-        .filter(user -> !isTaleOwner(tale, user.getId()))
+        .filter(user -> !tale.isOwnedBy(user.getId()))
         .map(user -> user.getId())
         .forEach(participantIds::add);
     }
@@ -241,7 +244,7 @@ public class CharacterSheetService {
   }
 
   public void handleOwnershipTransfer(Tale tale, UUID previousOwnerId, UUID newOwnerId) {
-    if (previousOwnerId != null && !previousOwnerId.equals(newOwnerId) && isParticipant(tale, previousOwnerId)) {
+    if (!previousOwnerId.equals(newOwnerId)) {
       RuleCharacterSheetHandler participantHandler = resolveParticipantHandler(tale);
       CharacterSheet previousOwnerSheet = participantHandler.getOrCreateSheet(tale, previousOwnerId);
       if (previousOwnerSheet.getCharacterName() == null || previousOwnerSheet.getCharacterName().isBlank()) {
@@ -262,24 +265,8 @@ public class CharacterSheetService {
 
   private Tale requireActiveTale(UUID taleId) {
     Tale tale = taleRepository.findById(taleId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tale not found"));
-    if (tale.getStatus() == ETaleStatus.SLEEP) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tale not found");
-    }
+    taleAccessPolicy.ensureNotSleeping(tale);
     return tale;
-  }
-
-  private void requireCanRead(Tale tale, UUID requesterId, UUID targetUserId) {
-    if (requesterId.equals(tale.getOwnerId()) || requesterId.equals(targetUserId) || isParticipant(tale, requesterId)) {
-      return;
-    }
-
-    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot access this character sheet.");
-  }
-
-  private void requireCanWrite(Tale tale, UUID requesterId, UUID targetUserId) {
-    if (!requesterId.equals(tale.getOwnerId()) && !requesterId.equals(targetUserId)) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot access this character sheet.");
-    }
   }
 
   private RuleCharacterSheetHandler resolveHandlerForCharacter(Tale tale, UUID characterId) {
@@ -296,14 +283,7 @@ public class CharacterSheetService {
   }
 
   private boolean isTaleOwner(Tale tale, UUID userId) {
-    return tale != null && userId != null && userId.equals(tale.getOwnerId());
-  }
-
-  private boolean isParticipant(Tale tale, UUID userId) {
-    return tale != null
-      && userId != null
-      && tale.getParticipants() != null
-      && tale.getParticipants().stream().anyMatch(user -> user != null && userId.equals(user.getId()));
+    return tale.isOwnedBy(userId);
   }
 
   @FunctionalInterface

@@ -1,6 +1,6 @@
-import {inject, Injectable} from "@angular/core";
+import {DestroyRef, inject, Injectable} from "@angular/core";
 import {environment} from "../environments/environment";
-import {Session} from "@supabase/supabase-js";
+import {AuthChangeEvent, Session, Subscription} from "@supabase/supabase-js";
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {map, switchMap} from "rxjs/operators";
@@ -15,6 +15,7 @@ import {IUserProfileService, UserProfileService} from "./user-profile.service";
 import {MeResponseDTO} from "../interface/dtos/user/MeResponseDTO";
 import {UtilFunctions} from "../infra/miscellaneous/util.functions";
 import {TaleContextStateService} from "../stateServices/tale-context-state.service";
+import {AppSettingsService, IAppSettingsService} from "./app-settings.service";
 
 export interface IAuthService {
   loginWithProvider(provider: ELoginProvider): Promise<void>;
@@ -24,6 +25,8 @@ export interface IAuthService {
   completeSignIn(): Observable<MeResponseDTO>;
 
   logout(): Promise<void>;
+
+  clearInvalidSession(): Promise<void>;
 
   getCurrentSession(): Promise<Session | null>;
 }
@@ -37,6 +40,22 @@ export class AuthService implements IAuthService {
   private readonly _userProfileService: IUserProfileService = inject(UserProfileService);
   private readonly _printer: IPrinter = inject(Printer);
   private readonly _taleContextState: TaleContextStateService = inject(TaleContextStateService);
+  private readonly _appSettingsService: IAppSettingsService = inject(AppSettingsService);
+  private readonly _destroyRef: DestroyRef = inject(DestroyRef);
+
+  private _logoutPromise: Promise<void> | null = null;
+
+  constructor() {
+    const subscription: Subscription = this._supabaseAuthClient.onAuthStateChange(
+      (event: AuthChangeEvent, session: Session | null): void => {
+        if (event === "SIGNED_OUT" || (event === "INITIAL_SESSION" && !session)) {
+          this._clearLocalAuthState();
+        }
+      }
+    );
+
+    this._destroyRef.onDestroy((): void => subscription.unsubscribe());
+  }
 
   public async loginWithProvider(provider: ELoginProvider): Promise<void> {
     const options: IOAuthOptions = this._getOAuthOptions(provider);
@@ -61,6 +80,7 @@ export class AuthService implements IAuthService {
       switchMap((me: MeResponseDTO) => this.recordSessionEstablished().pipe(
         map((): MeResponseDTO => {
           this._localStoreService.storeUser(me);
+          this._appSettingsService.applyUserSettings(me.userSettings);
           return me;
         })
       ))
@@ -68,19 +88,48 @@ export class AuthService implements IAuthService {
   }
 
   public async logout(): Promise<void> {
-    this._authSessionService.clearCachedSession();
-    this._localStoreService.removeUser();
-    this._taleContextState.clear();
+    return this._signOutCurrentSession();
+  }
+
+  public async clearInvalidSession(): Promise<void> {
+    return this._signOutCurrentSession();
+  }
+
+  private async _signOutCurrentSession(): Promise<void> {
+    if (this._logoutPromise) {
+      return this._logoutPromise;
+    }
+
+    const logoutPromise: Promise<void> = this._performSignOut();
+    this._logoutPromise = logoutPromise;
 
     try {
-      await this._supabaseAuthClient.signOut();
-    } catch (error) {
-      this._printer.warn("Supabase signOut failed during logout; local session was cleared.", error);
+      await logoutPromise;
+    } finally {
+      if (this._logoutPromise === logoutPromise) {
+        this._logoutPromise = null;
+      }
     }
   }
 
   public async getCurrentSession(): Promise<Session | null> {
     return this._authSessionService.getCurrentSession();
+  }
+
+  private async _performSignOut(): Promise<void> {
+    this._clearLocalAuthState();
+
+    try {
+      await this._supabaseAuthClient.signOut("local");
+    } catch (error) {
+      this._printer.warn("Supabase signOut failed during logout; RedSun local state was cleared.", error);
+    }
+  }
+
+  private _clearLocalAuthState(): void {
+    this._localStoreService.removeUser();
+    this._taleContextState.clear();
+    this._appSettingsService.resetToDetectedDefaults();
   }
 
   private _getOAuthOptions(provider: ELoginProvider): IOAuthOptions {

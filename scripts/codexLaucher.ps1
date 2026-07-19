@@ -192,7 +192,7 @@ $codexArgs = @(
 )
 
 $presetModels = @{
-  Frontier = "gpt-5.5"
+  Frontier = "gpt-5.6-sol"
   Balanced = "gpt-5.4"
   Mini     = "gpt-5.4-mini"
 }
@@ -202,7 +202,7 @@ $resolvedModel = if (-not [string]::IsNullOrWhiteSpace($Model)) {
 } elseif (-not [string]::IsNullOrWhiteSpace($ModelPreset)) {
   $presetModels[$ModelPreset]
 } else {
-  $null
+  "gpt-5.6-sol"
 }
 
 if (-not [string]::IsNullOrWhiteSpace($resolvedModel)) {

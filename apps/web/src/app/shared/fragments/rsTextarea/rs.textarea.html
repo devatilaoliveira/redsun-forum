@@ -18,6 +18,7 @@
     [attr.readonly]="blocked() ? '' : null"
     [attr.aria-readonly]="blocked()"
     [attr.maxlength]="maxLengthAttr()"
+    [attr.data-testid]="testId() ?? null"
     [value]="currentValue()"
     (input)="onInput($event)"
     (blur)="onBlur()"
@@ -28,6 +29,7 @@
       class="error"
       [class.is-visible]="showError()"
       [id]="errorId()"
+      [attr.data-testid]="testId() ? testId() + '-error' : null"
       [attr.aria-live]="showError() ? 'polite' : null"
     >
       {{ showError() ? validationError() : "" }}

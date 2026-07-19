@@ -26,7 +26,7 @@ import {IToastService, ToastService} from "../../../services/toast.service";
 import {RsCheckbox} from "../../shared/fragments/rsCheckbox/rs.checkbox";
 import {EProfileLanguage} from "../../../interface/enums/EProfileLanguage";
 import {ERuleSystem} from "../../../interface/enums/ERuleSystem";
-import {ERole} from "../../../interface/enums/ERole";
+import {EFavoriteRole} from "../../../interface/enums/EFavoriteRole";
 import {EProvider} from "../../../interface/enums/EProvider";
 
 type ProfileDetailsFormGroup = FormGroup<{
@@ -34,7 +34,7 @@ type ProfileDetailsFormGroup = FormGroup<{
   description: FormControl<string>;
   favoriteLanguage: FormControl<EProfileLanguage[]>;
   favoriteRules: FormControl<ERuleSystem[]>;
-  favoriteRole: FormControl<ERole[]>;
+  favoriteRole: FormControl<EFavoriteRole[]>;
 }>;
 
 const USER_PREFERENCE_MAX_ITEMS = 10;
@@ -87,7 +87,7 @@ export class ProfileDetailsView {
   protected readonly avatarUploading: WritableSignal<boolean> = signal<boolean>(false);
   protected readonly profileLanguageOptions: EProfileLanguage[] = Object.values(EProfileLanguage);
   protected readonly ruleSystemOptions: ERuleSystem[] = Object.values(ERuleSystem);
-  protected readonly roleOptions: ERole[] = Object.values(ERole);
+  protected readonly roleOptions: EFavoriteRole[] = Object.values(EFavoriteRole);
   protected readonly profileFormGroup: ProfileDetailsFormGroup = this._formBuilder.group({
     username: this._formBuilder.control<string>("", {validators: [
       Validators.required,
@@ -98,7 +98,7 @@ export class ProfileDetailsView {
     description: this._formBuilder.control<string>("", {validators: [Validators.maxLength(UTIL_CONSTANTS.EXTRA_LONG_TEXT_LENGTH)]}),
     favoriteLanguage: this._formBuilder.control<EProfileLanguage[]>([], {validators: [Validators.maxLength(USER_PREFERENCE_MAX_ITEMS)]}),
     favoriteRules: this._formBuilder.control<ERuleSystem[]>([], {validators: [Validators.maxLength(USER_PREFERENCE_MAX_ITEMS)]}),
-    favoriteRole: this._formBuilder.control<ERole[]>([], {validators: [Validators.maxLength(USER_PREFERENCE_MAX_ITEMS)]})
+    favoriteRole: this._formBuilder.control<EFavoriteRole[]>([], {validators: [Validators.maxLength(USER_PREFERENCE_MAX_ITEMS)]})
   });
   protected readonly controls = this.profileFormGroup.controls;
   protected readonly EVariant = EVariant;
@@ -234,7 +234,7 @@ export class ProfileDetailsView {
     this.updateArrayControl(this.controls.favoriteRules, value, checked);
   }
 
-  protected onFavoriteRoleToggle(value: ERole, checked: boolean): void {
+  protected onFavoriteRoleToggle(value: EFavoriteRole, checked: boolean): void {
     this.updateArrayControl(this.controls.favoriteRole, value, checked);
   }
 

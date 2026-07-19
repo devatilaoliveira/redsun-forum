@@ -17,7 +17,7 @@ public record TaleCreateRequestDTO(
   String taleName,
   @Nullable List<String> participantsIds,
   @NotNull Boolean isPublic,
-  @Size(max = 4000) String description,
+  @NotBlank @Size(max = 4000) String description,
   @Nullable @Size(max = 50, message = "language must be 50 characters or fewer") String language,
   Optional<MultipartFile> image,
   Optional<ETaleStatus> status,

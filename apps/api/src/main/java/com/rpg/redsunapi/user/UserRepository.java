@@ -22,7 +22,7 @@ public interface UserRepository {
   Page<User> searchUsers(
       UUID requesterId,
       String username,
-      ERole role,
+      EFavoriteRole role,
       ERuleSystem rule,
       ELanguage language,
       Pageable pageable);

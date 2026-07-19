@@ -3,11 +3,13 @@
     <rs-view-header [title]="'MANAGE_PARTICIPANTS' | translate" />
     <form class="form" (submit)="$event.preventDefault(); onAddParticipant()">
       <rs-input
+        testId="manage-participants-identifier-input"
         [label]="'ADD_MEMBER_BY_EMAIL_OR_USERNAME' | translate"
         [value]="inviteIdentifier()"
         (valueChanged)="onInviteIdentifierChange($event)"
       />
       <rs-button
+        testId="manage-participants-add-submit"
         [type]="'submit'"
         [inProgress]="inviteInProgress()"
         [disabled]="!inviteIdentifier().trim() || inviteInProgress()"
@@ -41,18 +43,22 @@
                 { text: ('ASSIGN_TALE_OWNER' | translate), action: EAction.TRANSFER },
                 { text: ('DELETE' | translate), action: EAction.DELETE }
               ];
-            <button class="row" (click)="onParticipantPressed(contact)">
+            <button
+              class="row"
+              [attr.data-testid]="'manage-participants-row-' + contact.id"
+              (click)="onParticipantPressed(contact)"
+            >
               <div class="avatar-column">
                 <div class="avatar">
                   @if (contact.characterImageUrl) {
-                    <img [src]="contact.characterImageUrl" [alt]="characterName(contact)" />
+                    <img [src]="contact.characterImageUrl" [alt]="participantDisplayName(contact)" />
                   } @else {
                     <span class="avatar-fallback">{{ characterInitials(contact) }}</span>
                   }
                 </div>
               </div>
               <div class="name-column">
-                {{ characterName(contact) }}
+                {{ participantDisplayName(contact) }}
               </div>
               <div class="role-column">
                 {{ roleLabelKey(contact.role) | translate }}

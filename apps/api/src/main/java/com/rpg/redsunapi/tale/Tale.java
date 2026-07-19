@@ -8,22 +8,26 @@ import com.rpg.redsunapi.user.User;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.UuidGenerator;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 @Entity
 @Table(name = "tales")
+@NullMarked
 public class Tale {
 
   @Id
   @GeneratedValue
   @UuidGenerator
   @Column(updatable = false)
-  private UUID id;
+  private @Nullable UUID id;
 
   @Column(name = "tale_name", nullable = false, length = 120)
   private String taleName;
@@ -43,14 +47,14 @@ public class Tale {
   private Boolean isPublic = Boolean.FALSE;
 
   @Column(name = "image_url", length = 500)
-  private String imageURL;
+  private @Nullable String imageURL;
 
-  @Column(length = 4000)
+  @Column(length = 4000, nullable = false)
   private String description;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "language", length = 10)
-  private ELanguage language;
+  private @Nullable ELanguage language;
 
   @Enumerated(EnumType.STRING)
   @Column(length = 15, nullable = false)
@@ -72,61 +76,35 @@ public class Tale {
   @OneToMany(mappedBy = "tale", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<BasicSheet> basicSheets = new HashSet<>();
 
+  @SuppressWarnings("NullAway.Init")
   public Tale() {
   }
 
   public Tale(
-    UUID id,
     String taleName,
     UUID ownerId,
     Set<User> participants,
     Boolean isPublic,
-    String imageURL,
     String description,
-    ELanguage language,
-    ERuleSystem rules,
-    OffsetDateTime creationDate,
-    OffsetDateTime lastTimeActive,
-    ETaleStatus status,
-    Set<BasicSheet> basicSheets
+    @Nullable ELanguage language,
+    ERuleSystem rules
   ) {
-    this.id = id;
+
+    OffsetDateTime now = OffsetDateTime.now();
     this.taleName = taleName;
     this.ownerId = ownerId;
-    this.participants = participants != null ? participants : new HashSet<>();
-    this.isPublic = isPublic != null ? isPublic : Boolean.FALSE;
-    this.imageURL = imageURL;
+    this.participants = participants;
+    this.isPublic = isPublic;
     this.description = description;
     this.language = language;
     this.rules = rules;
-    this.creationDate = creationDate;
-    this.lastTimeActive = lastTimeActive;
-    this.status = status;
-    setBasicSheets(basicSheets);
-  }
-
-  @PrePersist
-  public void prePersist() {
-    OffsetDateTime now = OffsetDateTime.now();
-    if (creationDate == null) {
-      creationDate = now;
-    }
-    if (lastTimeActive == null) {
-      lastTimeActive = creationDate;
-    }
-    if (isPublic == null) {
-      isPublic = Boolean.FALSE;
-    }
-    if (participants == null) {
-      participants = new HashSet<>();
-    }
-    if (basicSheets == null) {
-      basicSheets = new HashSet<>();
-    }
+    this.creationDate =  now;
+    this.lastTimeActive = now;
+    this.status = ETaleStatus.ACTIVE;
   }
 
   public UUID getId() {
-    return id;
+    return Objects.requireNonNull(id, "Tale id is only available after persistence");
   }
 
   public void setId(UUID id) {
@@ -153,24 +131,57 @@ public class Tale {
     return participants;
   }
 
-  public void setParticipants(Set<User> participants) {
-    this.participants = participants != null ? participants : new HashSet<>();
+  public boolean isOwnedBy(UUID userId) {
+    return userId.equals(ownerId);
+  }
+
+  public boolean hasParticipant(UUID userId) {
+    return findParticipant(userId).isPresent();
+  }
+
+  public void addParticipant(User user) {
+    participants.add(user);
+  }
+
+  public boolean removeParticipant(UUID userId) {
+    return participants.removeIf(participant -> userId.equals(participant.getId()));
+  }
+
+  public Optional<User> findParticipant(UUID userId) {
+    return participants.stream()
+      .filter(participant -> userId.equals(participant.getId()))
+      .findFirst();
+  }
+
+  public ETaleRole roleFor(UUID userId) {
+    if (isOwnedBy(userId)) {
+      return ETaleRole.DM;
+    }
+    if (hasParticipant(userId)) {
+      return ETaleRole.PLAYER;
+    }
+
+    return ETaleRole.NONE;
   }
 
   public Boolean getPublic() {
     return isPublic;
   }
 
-  public void setPublic(Boolean aPublic) {
-    isPublic = aPublic != null ? aPublic : Boolean.FALSE;
+  public void setPublic(Boolean isPublic) {
+    this.isPublic = isPublic;
   }
 
-  public String getImageURL() {
+  public @Nullable String getImageURL() {
     return imageURL;
   }
 
   public void setImageURL(String imageURL) {
     this.imageURL = imageURL;
+  }
+
+  public void clearImageURL() {
+    this.imageURL = null;
   }
 
   public String getDescription() {
@@ -181,11 +192,11 @@ public class Tale {
     this.description = description;
   }
 
-  public ELanguage getLanguage() {
+  public @Nullable ELanguage getLanguage() {
     return language;
   }
 
-  public void setLanguage(ELanguage language) {
+  public void setLanguage(@Nullable ELanguage language) {
     this.language = language;
   }
 
@@ -229,27 +240,12 @@ public class Tale {
     return basicSheets;
   }
 
-  public void setBasicSheets(Set<BasicSheet> basicSheets) {
-    this.basicSheets = basicSheets != null ? basicSheets : new HashSet<>();
-    this.basicSheets.forEach(sheet -> sheet.setTale(this));
-  }
-
   public void addBasicSheet(BasicSheet sheet) {
-    if (sheet == null) {
-      return;
-    }
-    if (basicSheets == null) {
-      basicSheets = new HashSet<>();
-    }
     sheet.setTale(this);
     basicSheets.add(sheet);
   }
 
   public void removeBasicSheet(UUID characterId) {
-    if (basicSheets == null || characterId == null) {
-      return;
-    }
-
     basicSheets.removeIf(sheet -> characterId.equals(sheet.getCharacterId()));
   }
 

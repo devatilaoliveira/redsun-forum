@@ -1,6 +1,6 @@
 package com.rpg.redsunapi.user;
 
-public enum ERole {
+public enum EFavoriteRole {
   DM,
   PLAYER
 }

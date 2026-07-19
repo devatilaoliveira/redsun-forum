@@ -1,5 +1,5 @@
 import {EProfileLanguage} from "../../enums/EProfileLanguage";
-import {ERole} from "../../enums/ERole";
+import {EFavoriteRole} from "../../enums/EFavoriteRole";
 import {ERuleSystem} from "../../enums/ERuleSystem";
 
 export interface MeRequestDTO {
@@ -7,5 +7,5 @@ export interface MeRequestDTO {
   description?: string;
   favoriteLanguage?: EProfileLanguage[] | null;
   favoriteRules?: ERuleSystem[] | null;
-  favoriteRole?: ERole[] | null;
+  favoriteRole?: EFavoriteRole[] | null;
 }

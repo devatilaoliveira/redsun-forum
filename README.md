@@ -19,10 +19,10 @@ Unless noted otherwise, commands in this README start from the repository root.
 Use the root launcher to start a layered Codex session:
 
 ```powershell
-.\scripts\rsAgents.ps1 -App repo
-.\scripts\rsAgents.ps1 -App api
-.\scripts\rsAgents.ps1 -App web
-.\scripts\rsAgents.ps1 -App all
+.\scripts\codexLaucher.ps1 -App repo
+.\scripts\codexLaucher.ps1 -App api
+.\scripts\codexLaucher.ps1 -App web
+.\scripts\codexLaucher.ps1 -App all
 ```
 
 `-App repo` loads only the shared core layer for repository-level tasks.
@@ -33,9 +33,9 @@ Use the root launcher to start a layered Codex session:
 Model overrides are available for a single session:
 
 ```powershell
-.\scripts\rsAgents.ps1 -App api -Model gpt-5.4-mini -ReasoningEffort medium
-.\scripts\rsAgents.ps1 -App web -ModelPreset Balanced -ReasoningEffort medium
-.\scripts\rsAgents.ps1 -App all -ModelPreset Frontier -ReasoningEffort xhigh
+.\scripts\codexLaucher.ps1 -App api -Model gpt-5.4-mini -ReasoningEffort medium
+.\scripts\codexLaucher.ps1 -App web -ModelPreset Balanced -ReasoningEffort medium
+.\scripts\codexLaucher.ps1 -App all -ModelPreset Frontier -ReasoningEffort xhigh
 ```
 
 Available presets:
@@ -49,7 +49,7 @@ Use `-Model` for exact OpenAI model IDs. Use `-ModelPreset` for convenience alia
 Validate layer resolution without starting Codex:
 
 ```powershell
-.\scripts\rsAgents.ps1 -App api -DryRun
+.\scripts\codexLaucher.ps1 -App api -DryRun
 ```
 
 ### Database Reset

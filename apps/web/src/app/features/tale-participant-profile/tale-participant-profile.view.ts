@@ -1,7 +1,7 @@
 import {Component, computed, inject, OnInit, Signal, signal, WritableSignal} from "@angular/core";
 import {ActivatedRoute, Router} from "@angular/router";
 import {finalize} from "rxjs";
-import {TranslatePipe} from "@ngx-translate/core";
+import {ITranslateService, TranslatePipe, TranslateService} from "@ngx-translate/core";
 import {CharacterSheetService, ICharacterSheetService} from "../../../services/character-sheet.service";
 import {
   CharacterSheetDTO,
@@ -42,6 +42,7 @@ export class TaleParticipantProfileView implements OnInit {
   private readonly _characterSheetService: ICharacterSheetService = inject(CharacterSheetService);
   private readonly _printer: IPrinter = inject(Printer);
   private readonly _talesContext: TalesContextService = inject(TalesContextService);
+  private readonly _translateService: ITranslateService = inject(TranslateService);
 
   private readonly taleId: string | null = this._route.snapshot.paramMap.get(ROUTE_PATHS.taleId);
   protected readonly participantId: string | null = this._route.snapshot.paramMap.get(ROUTE_PATHS.id);
@@ -60,12 +61,16 @@ export class TaleParticipantProfileView implements OnInit {
     return this._talesContext.participants().find((participant) => participant.id === participantId) ?? null;
   });
   protected readonly displayName: Signal<string> = computed(() => {
+    const participant = this.participant();
+    if (participant?.isDeleted) {
+      return this._translateService.instant("DELETED_USER");
+    }
+
     const sheetName = this.sheet()?.characterName?.trim() ?? "";
     if (sheetName.length > 0) {
       return sheetName;
     }
 
-    const participant = this.participant();
     const participantName = participant?.characterName?.trim() ?? "";
     return participantName.length > 0 ? participantName : participant?.username ?? "";
   });

@@ -1,20 +1,13 @@
 package com.rpg.redsunapi.tale.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 public enum ELanguage {
-  EN("en"),
-  DE("de"),
-  PT("pt");
+  EN,
+  DE,
+  PT;
 
-  private final String value;
-
-  ELanguage(String value) {
-    this.value = value;
-  }
-
-  public String getValue() {
-    return value;
-  }
-
+  @JsonCreator
   public static ELanguage from(String raw) {
     if (raw == null) {
       return null;
@@ -26,7 +19,7 @@ public enum ELanguage {
     }
 
     for (ELanguage language : values()) {
-      if (language.value.equals(value)) {
+      if (language.name().equals(value)) {
         return language;
       }
     }

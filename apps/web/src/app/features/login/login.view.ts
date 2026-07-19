@@ -3,7 +3,6 @@ import {from, finalize, switchMap} from "rxjs";
 import {Router} from "@angular/router";
 import {ROUTE_PATHS} from "../../../interface/constants/route-path.constants";
 import {IAuthCallbackState} from "../../../interface/models/iauth-callback-state";
-import {ILocalStoreService, LocalStoreService} from "../../../services/local-store.service";
 import {RedsunTitle} from "../../shared/fragments/redsunTitle/redsun.title";
 import {NgOptimizedImage} from "@angular/common";
 import {ITranslateService, TranslatePipe, TranslateService} from "@ngx-translate/core";
@@ -11,7 +10,6 @@ import {RsInput} from "../../shared/fragments/rsInput/rs.input";
 import {RsButton} from "../../shared/fragments/rsButton/rs.button";
 import {EVariant} from "../../../interface/enums/EVariant";
 import {IAuthService, AuthService} from "../../../services/auth.service";
-import {MeResponseDTO} from "../../../interface/dtos/user/MeResponseDTO";
 import {RsButtonText} from "../../shared/fragments/rsButtonText/rs.button-text";
 import {EMAIL_PATTERN} from "../../../interface/constants/pattern-validators";
 import {PublicLegalFooterComponent} from "../../shared/ui/public-legal-footer/public-legal-footer.component";
@@ -19,6 +17,7 @@ import {ISupabaseAuthClient, SupabaseAuthClientAdapter} from "../../../services/
 import {GoogleButton} from "../../shared/fragments/googleButton/google.button";
 import {ELanguage} from "../../../interface/enums/ELanguage";
 import {RsOptionsMenu, RsOptionsMenuOption} from "../../shared/fragments/rsOptionsMenu/rs.options-menu";
+import {AppSettingsService, IAppSettingsService} from "../../../services/app-settings.service";
 
 @Component({
   selector: "rs-login",
@@ -30,13 +29,13 @@ import {RsOptionsMenu, RsOptionsMenuOption} from "../../shared/fragments/rsOptio
 export class LoginView implements OnInit {
   protected readonly emailPattern: RegExp = EMAIL_PATTERN;
   private readonly _router: Router = inject(Router);
-  private readonly _localStoreService: ILocalStoreService = inject(LocalStoreService);
   private readonly _translateService: ITranslateService = inject(TranslateService);
   private readonly _authService: IAuthService = inject(AuthService);
   private readonly _supabaseAuthClient: ISupabaseAuthClient = inject(SupabaseAuthClientAdapter);
+  private readonly _appSettingsService: IAppSettingsService = inject(AppSettingsService);
   protected errorMessage: WritableSignal<string | null> = signal<string | null>(null);
   protected inProgress: WritableSignal<boolean> = signal<boolean>(false);
-  protected readonly selectedLanguage: WritableSignal<ELanguage> = signal<ELanguage>(this._localStoreService.getLanguage());
+  protected readonly selectedLanguage = this._appSettingsService.language;
   protected email: string = "";
   protected password: string = "";
   protected readonly EVariant = EVariant;
@@ -72,8 +71,7 @@ export class LoginView implements OnInit {
       switchMap(() => this._authService.completeSignIn()),
       finalize(() => this.inProgress.set(false))
     ).subscribe({
-      next: (me: MeResponseDTO) => {
-        this._localStoreService.storeUser(me);
+      next: () => {
         void this._router.navigate(["/"], {replaceUrl: true});
       },
       error: (error: unknown) => {
@@ -95,9 +93,7 @@ export class LoginView implements OnInit {
     if (!Object.values(ELanguage).includes(option.value as ELanguage)) return;
 
     const nextLang = option.value as ELanguage;
-    this.selectedLanguage.set(nextLang);
-    this._localStoreService.setLanguage(nextLang);
-    this._translateService.use(nextLang).subscribe();
+    this._appSettingsService.setTransientLanguage(nextLang).subscribe();
   }
 
   private _resolveLoginError(error: unknown): string {

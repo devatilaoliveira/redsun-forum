@@ -2,7 +2,7 @@ package com.rpg.redsunapi.user.dto;
 
 import com.rpg.redsunapi.tale.enums.ELanguage;
 import com.rpg.redsunapi.tale.enums.ERuleSystem;
-import com.rpg.redsunapi.user.ERole;
+import com.rpg.redsunapi.user.EFavoriteRole;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -18,6 +18,6 @@ public record MeRequestDto(
   @Nullable @Size(max = 4000) String description,
   @Nullable @Size(max = 10) List<ELanguage> favoriteLanguage,
   @Nullable @Size(max = 10) List<ERuleSystem> favoriteRules,
-  @Nullable @Size(max = 10) List<ERole> favoriteRole
+  @Nullable @Size(max = 10) List<EFavoriteRole> favoriteRole
 ) {
 }

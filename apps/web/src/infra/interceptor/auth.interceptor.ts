@@ -6,8 +6,13 @@ import {Session} from "@supabase/supabase-js";
 import {AuthService} from "../../services/auth.service";
 import {AuthenticationError} from "../errors/authentication.error";
 import {ROUTE_PATHS} from "../../interface/constants/route-path.constants";
+import {isApiRequest} from "./api-request.helper";
 
 export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> => {
+  if (!isApiRequest(req.url)) {
+    return next(req);
+  }
+
   const _authService: AuthService = inject(AuthService);
 
   return from(_authService.getCurrentSession()).pipe(
@@ -27,7 +32,7 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
               return throwError(() => error);
             }
 
-            return from(_authService.logout()).pipe(
+            return from(_authService.clearInvalidSession()).pipe(
               switchMap(() => {
                 return throwError(() => new AuthenticationError(`/${ROUTE_PATHS.login}`, error));
               })

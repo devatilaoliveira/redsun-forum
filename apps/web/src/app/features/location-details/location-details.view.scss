@@ -78,6 +78,11 @@ $min-content: bp.$bp-xs;
       rs-button {
         max-width: 100px;
       }
+
+      .clear-inputs-btn {
+        margin-right: auto;
+        margin-left: calc(40px + var(--space-0-5, 1rem));
+      }
     }
   }
 
@@ -114,7 +119,12 @@ $min-content: bp.$bp-xs;
 }
 @media (max-width: $min-content) {
   .input-row {
-    display: flex;
-    flex-direction: column;
+    rs-avatar {
+      display: none;
+    }
+  }
+
+  .location-details .post-form .post-actions .clear-inputs-btn {
+    margin-left: 0;
   }
 }

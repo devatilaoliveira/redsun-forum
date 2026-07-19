@@ -16,6 +16,7 @@ DROP TABLE IF EXISTS public.user_contacts CASCADE;
 DROP TABLE IF EXISTS public.user_favorite_roles CASCADE;
 DROP TABLE IF EXISTS public.user_favorite_rules CASCADE;
 DROP TABLE IF EXISTS public.user_favorite_languages CASCADE;
+DROP TABLE IF EXISTS public.user_settings CASCADE;
 DROP TABLE IF EXISTS public.subscriptions CASCADE;
 DROP TABLE IF EXISTS public.users CASCADE;
 
@@ -37,6 +38,13 @@ CREATE TABLE public.users (
 );
 
 -- User preferences
+CREATE TABLE public.user_settings (
+  user_id uuid PRIMARY KEY REFERENCES public.users(id) ON DELETE CASCADE,
+  app_language varchar(20) NOT NULL DEFAULT 'PT' CHECK (app_language IN ('EN','DE','PT')),
+  app_theme varchar(20) NOT NULL DEFAULT 'DARK' CHECK (app_theme IN ('DARK','LIGHT')),
+  redirect_to_favorite boolean NOT NULL DEFAULT FALSE
+);
+
 CREATE TABLE public.user_favorite_languages (
   user_id uuid NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
   preference_order integer NOT NULL CHECK (preference_order BETWEEN 0 AND 9),
@@ -109,7 +117,7 @@ CREATE TABLE public.tales (
   owner_id uuid NOT NULL REFERENCES public.users(id),
   is_public boolean NOT NULL DEFAULT FALSE,
   image_url varchar(500),
-  description varchar(4000),
+  description varchar(4000) NOT NULL CHECK (char_length(btrim(description)) > 0),
   language varchar(10) CHECK (language IS NULL OR language IN ('EN','DE','PT')),
   rules varchar(15) NOT NULL CHECK (rules IN (
     'REDSUN','FIM_DO_MUNDO','DND','STORYTELLER','PATHFINDER','BRP','GURPS','SWADE','OTHER','CUSTOM'

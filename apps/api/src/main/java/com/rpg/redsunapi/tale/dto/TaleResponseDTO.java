@@ -34,7 +34,7 @@ public record TaleResponseDTO(
       tale.getTaleName(),
       tale.getPublic(),
       tale.getDescription(),
-      language == null ? null : language.getValue(),
+      language == null ? null : language.name(),
       status,
       tale.getImageURL(),
       rulesSystem,

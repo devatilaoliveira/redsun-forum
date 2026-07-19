@@ -12,9 +12,13 @@ import com.rpg.redsunapi.tale.enums.ELanguage;
 import com.rpg.redsunapi.tale.enums.ERuleSystem;
 import com.rpg.redsunapi.user.dto.MeRequestDto;
 import com.rpg.redsunapi.user.dto.MeResponseDto;
+import com.rpg.redsunapi.user.dto.UserSettingsDto;
+import com.rpg.redsunapi.user.dto.UserSettingsInitializationRequestDto;
+import com.rpg.redsunapi.user.dto.UserSettingsRequestDto;
 import com.rpg.redsunapi.user.dto.UserAsContactDTO;
 import com.rpg.redsunapi.user.dto.UserAsContactProfileDTO;
 import com.rpg.redsunapi.utils.GeneralUtil;
+import com.rpg.redsunapi.user.persistence.JpaUserSettingsRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -48,24 +52,27 @@ public class UserService {
   private final AvatarStorageService avatarStorageService;
   private final UserRepository userRepository;
   private final SubscriptionRepository subscriptionRepository;
+  private final JpaUserSettingsRepository userSettingsRepository;
   private final SupabaseAuthAdminClient supabaseAuthAdminClient;
   private final LegalDocumentService legalDocumentService;
 
   public UserService(
       UserRepository userRepository,
       SubscriptionRepository subscriptionRepository,
+      JpaUserSettingsRepository userSettingsRepository,
       AvatarStorageService avatarStorageService,
       SupabaseAuthAdminClient supabaseAuthAdminClient,
       LegalDocumentService legalDocumentService) {
     this.userRepository = userRepository;
     this.subscriptionRepository = subscriptionRepository;
+    this.userSettingsRepository = userSettingsRepository;
     this.avatarStorageService = avatarStorageService;
     this.supabaseAuthAdminClient = supabaseAuthAdminClient;
     this.legalDocumentService = legalDocumentService;
   }
 
   @Transactional
-  public User upsertUser(UUID userId, String email, Provider provider) {
+  public UserUpsertResult upsertUser(UUID userId, String email, Provider provider) {
     Objects.requireNonNull(provider, "provider");
     String normalizedEmail = GeneralUtil.normalizeEmail(email);
     if (normalizedEmail == null || normalizedEmail.isBlank()) {
@@ -79,11 +86,11 @@ public class UserService {
       }
       if (user.getProvider() != provider) {
         user.setProvider(provider);
-        return userRepository.save(user);
+        return new UserUpsertResult(userRepository.save(user), false);
       }
-      return user;
+      return new UserUpsertResult(user, false);
     }
-    return createUser(userId, normalizedEmail, provider);
+    return new UserUpsertResult(createUser(userId, normalizedEmail, provider), true);
   }
 
   private User createUser(UUID userId, String email, Provider provider) {
@@ -97,15 +104,35 @@ public class UserService {
 
     User savedUser = userRepository.save(user);
     subscriptionRepository.save(new Subscription(savedUser));
+    userSettingsRepository.save(new UserSettings(savedUser));
     return savedUser;
+  }
+
+  @Transactional
+  public void initializeUserSettings(UUID userId, UserSettingsInitializationRequestDto request) {
+    UserSettings settings = userSettingsRepository.findById(userId)
+        .orElseThrow(() -> new IllegalStateException("Missing settings for user " + userId));
+
+    if (request.appLanguage() != null) {
+      settings.setAppLanguage(request.appLanguage());
+    }
+    if (request.appTheme() != null) {
+      settings.setAppTheme(request.appTheme());
+    }
+
+    userSettingsRepository.save(settings);
   }
 
   @Transactional(readOnly = true)
   public MeResponseDto toMeResponse(User user, List<UserAsContactDTO> contacts) {
     User responseUser = userRepository.findById(user.getId()).orElse(user);
+    UserSettingsDto userSettings = userSettingsRepository.findById(responseUser.getId())
+        .map(UserSettingsDto::from)
+        .orElseThrow(() -> new IllegalStateException("Missing settings for user " + responseUser.getId()));
     Subscription subscription = getSubscriptionForUser(responseUser.getId());
     return MeResponseDto.from(
         responseUser,
+        userSettings,
         contacts,
         subscription,
         legalDocumentService.currentTermsVersion(),
@@ -127,6 +154,52 @@ public class UserService {
     User savedUser = userRepository.save(user);
     List<UserAsContactDTO> contacts = getContactsForUser(savedUser.getId());
     return toMeResponse(savedUser, contacts);
+  }
+
+  @Transactional
+  public MeResponseDto updateMySettings(UUID userId, UserSettingsRequestDto request) {
+    if (request == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request body is required");
+    }
+
+    User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    ensureActiveUser(user);
+
+    boolean hasUpdate = false;
+    UserSettings settings = userSettingsRepository.findById(user.getId())
+        .orElseThrow(() -> new IllegalStateException("Missing settings for user " + user.getId()));
+
+    if (request.appLanguage() != null) {
+      ELanguage language = request.appLanguage();
+      if (settings.getAppLanguage() != language) {
+        settings.setAppLanguage(language);
+      }
+      hasUpdate = true;
+    }
+
+    if (request.appTheme() != null) {
+      EThemeApplication theme = request.appTheme();
+      if (settings.getAppTheme() != theme) {
+        settings.setAppTheme(theme);
+      }
+      hasUpdate = true;
+    }
+
+    if (request.redirectToFavorite() != null) {
+      boolean redirectToFavorite = request.redirectToFavorite();
+      if (settings.isRedirectToFavorite() != redirectToFavorite) {
+        settings.setRedirectToFavorite(redirectToFavorite);
+      }
+      hasUpdate = true;
+    }
+
+    if (!hasUpdate) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No settings updates provided");
+    }
+
+    userSettingsRepository.save(settings);
+    List<UserAsContactDTO> contacts = getContactsForUser(user.getId());
+    return toMeResponse(user, contacts);
   }
 
   private Subscription getSubscriptionForUser(UUID userId) {
@@ -483,9 +556,9 @@ public class UserService {
     return "deleted+" + userId + "@" + DELETED_EMAIL_DOMAIN;
   }
 
-  private static ERole parseRole(String role) {
+  private static EFavoriteRole parseRole(String role) {
     try {
-      return ERole.valueOf(role.toUpperCase());
+      return EFavoriteRole.valueOf(role.toUpperCase());
     } catch (IllegalArgumentException ex) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role value: " + role, ex);
     }

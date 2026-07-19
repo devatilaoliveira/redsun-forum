@@ -7,7 +7,7 @@ spring:
 supabase:
   url: ${SUPABASE_URL}
   secret-key: ${SUPABASE_SECRET_KEY}
-  storage-url: ${}
+  storage-url: ${SUPABASE_STORAGE_URL}
 
 springdoc:
   api-docs:

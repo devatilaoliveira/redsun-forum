@@ -2,7 +2,7 @@ import {Component, computed, input, InputSignal, Signal} from "@angular/core";
 import {TranslatePipe} from "@ngx-translate/core";
 import {UserAsContactProfileDTO} from "../../../../interface/dtos/user/UserAsContactProfileDTO";
 import {EProfileLanguage} from "../../../../interface/enums/EProfileLanguage";
-import {ERole} from "../../../../interface/enums/ERole";
+import {EFavoriteRole} from "../../../../interface/enums/EFavoriteRole";
 import {ERuleSystem} from "../../../../interface/enums/ERuleSystem";
 import {EVariant} from "../../../../interface/enums/EVariant";
 import {RsBadge} from "../../fragments/rsBadge/rs.badge";
@@ -24,7 +24,7 @@ export class ContactAboutCardComponent {
     () => this.contact().favoriteLanguage ?? []
   );
 
-  protected readonly favoriteRoles: Signal<ERole[]> = computed<ERole[]>(
+  protected readonly favoriteRoles: Signal<EFavoriteRole[]> = computed<EFavoriteRole[]>(
     () => this.contact().favoriteRole ?? []
   );
 
@@ -51,7 +51,7 @@ export class ContactAboutCardComponent {
     return `SYSTEM_RULE_${rules}`;
   }
 
-  protected roleLabelKey(role: ERole): string {
+  protected roleLabelKey(role: EFavoriteRole): string {
     return `ROLE_${role}`;
   }
 }
