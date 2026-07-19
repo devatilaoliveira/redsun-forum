@@ -10,6 +10,8 @@ import {RsSideNavItem} from "../../../../interface/models/side-nav-item";
 import {DEFAULT_SIDE_NAV_ITEMS} from "../../../../interface/constants/side-nav.constants";
 import {ROUTE_PATHS} from "../../../../interface/constants/route-path.constants";
 import {TaleContextStateService} from "../../../../stateServices/tale-context-state.service";
+import {AppSettingsService, IAppSettingsService} from "../../../../services/app-settings.service";
+import {resolvePreferredHomeUrl} from "../../../../infra/miscellaneous/preferred-home.functions";
 
 @Component({
   selector: "rs-top-bar-navigator",
@@ -52,6 +54,7 @@ export class RsTopBarNavigatorComponent implements OnInit {
   private readonly _destroyRef: DestroyRef = inject(DestroyRef);
   private readonly _document: Document = inject(DOCUMENT);
   private readonly _taleState: TaleContextStateService = inject(TaleContextStateService);
+  private readonly _appSettingsService: IAppSettingsService = inject(AppSettingsService);
 
   constructor() {
     this.manageVisible = this._taleState.canManage;
@@ -228,7 +231,10 @@ export class RsTopBarNavigatorComponent implements OnInit {
   }
 
   protected onLogoClick(): void {
-    void this._router.navigate(["/"]);
+    void this._router.navigateByUrl(resolvePreferredHomeUrl(
+      this._appSettingsService.redirectToFavorite(),
+      this._appSettingsService.favoriteTaleId()
+    ));
   }
 
   private openMenu(): void {

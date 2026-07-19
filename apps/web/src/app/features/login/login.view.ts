@@ -18,6 +18,8 @@ import {GoogleButton} from "../../shared/fragments/googleButton/google.button";
 import {ELanguage} from "../../../interface/enums/ELanguage";
 import {RsOptionsMenu, RsOptionsMenuOption} from "../../shared/fragments/rsOptionsMenu/rs.options-menu";
 import {AppSettingsService, IAppSettingsService} from "../../../services/app-settings.service";
+import {MeResponseDTO} from "../../../interface/dtos/user/MeResponseDTO";
+import {resolvePreferredHomeUrl} from "../../../infra/miscellaneous/preferred-home.functions";
 
 @Component({
   selector: "rs-login",
@@ -71,8 +73,14 @@ export class LoginView implements OnInit {
       switchMap(() => this._authService.completeSignIn()),
       finalize(() => this.inProgress.set(false))
     ).subscribe({
-      next: () => {
-        void this._router.navigate(["/"], {replaceUrl: true});
+      next: (me: MeResponseDTO) => {
+        void this._router.navigateByUrl(
+          resolvePreferredHomeUrl(
+            me.userSettings.redirectToFavorite,
+            me.userSettings.favoriteTaleId
+          ),
+          {replaceUrl: true}
+        );
       },
       error: (error: unknown) => {
         void this._authService.logout();

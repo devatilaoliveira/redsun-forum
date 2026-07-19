@@ -8,6 +8,8 @@ import com.rpg.redsunapi.subscription.Subscription;
 import com.rpg.redsunapi.subscription.SubscriptionRepository;
 import com.rpg.redsunapi.supabase.SupabaseAuthAdminClient;
 import com.rpg.redsunapi.supabase.exception.SupabaseAuthException;
+import com.rpg.redsunapi.tale.Tale;
+import com.rpg.redsunapi.tale.TaleService;
 import com.rpg.redsunapi.tale.enums.ELanguage;
 import com.rpg.redsunapi.tale.enums.ERuleSystem;
 import com.rpg.redsunapi.user.dto.MeRequestDto;
@@ -55,6 +57,7 @@ public class UserService {
   private final JpaUserSettingsRepository userSettingsRepository;
   private final SupabaseAuthAdminClient supabaseAuthAdminClient;
   private final LegalDocumentService legalDocumentService;
+  private final TaleService taleService;
 
   public UserService(
       UserRepository userRepository,
@@ -62,13 +65,15 @@ public class UserService {
       JpaUserSettingsRepository userSettingsRepository,
       AvatarStorageService avatarStorageService,
       SupabaseAuthAdminClient supabaseAuthAdminClient,
-      LegalDocumentService legalDocumentService) {
+      LegalDocumentService legalDocumentService,
+      TaleService taleService) {
     this.userRepository = userRepository;
     this.subscriptionRepository = subscriptionRepository;
     this.userSettingsRepository = userSettingsRepository;
     this.avatarStorageService = avatarStorageService;
     this.supabaseAuthAdminClient = supabaseAuthAdminClient;
     this.legalDocumentService = legalDocumentService;
+    this.taleService = taleService;
   }
 
   @Transactional
@@ -200,6 +205,41 @@ public class UserService {
     userSettingsRepository.save(settings);
     List<UserAsContactDTO> contacts = getContactsForUser(user.getId());
     return toMeResponse(user, contacts);
+  }
+
+  @Transactional
+  public MeResponseDto setFavoriteTale(UUID userId, UUID taleId) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    ensureActiveUser(user);
+
+    Tale tale = taleService.findTaleById(taleId, user);
+    UserSettings settings = userSettingsRepository.findById(userId)
+        .orElseThrow(() -> new IllegalStateException("Missing settings for user " + userId));
+
+    @Nullable Tale currentFavorite = settings.getFavoriteTale();
+    if (currentFavorite == null || !currentFavorite.getId().equals(tale.getId())) {
+      settings.setFavoriteTale(tale);
+      userSettingsRepository.save(settings);
+    }
+
+    return toMeResponse(user, getContactsForUser(userId));
+  }
+
+  @Transactional
+  public MeResponseDto clearFavoriteTale(UUID userId) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    ensureActiveUser(user);
+
+    UserSettings settings = userSettingsRepository.findById(userId)
+        .orElseThrow(() -> new IllegalStateException("Missing settings for user " + userId));
+    if (settings.getFavoriteTale() != null) {
+      settings.setFavoriteTale(null);
+      userSettingsRepository.save(settings);
+    }
+
+    return toMeResponse(user, getContactsForUser(userId));
   }
 
   private Subscription getSubscriptionForUser(UUID userId) {

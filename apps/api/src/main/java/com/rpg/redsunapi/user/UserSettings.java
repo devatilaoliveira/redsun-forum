@@ -1,5 +1,6 @@
 package com.rpg.redsunapi.user;
 
+import com.rpg.redsunapi.tale.Tale;
 import com.rpg.redsunapi.tale.enums.ELanguage;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,9 +9,11 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -38,6 +41,10 @@ public class UserSettings {
 
   @Column(name = "redirect_to_favorite", nullable = false)
   private boolean redirectToFavorite;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "favorite_tale_id")
+  private @Nullable Tale favoriteTale;
 
   public UserSettings() {
   }
@@ -88,5 +95,13 @@ public class UserSettings {
 
   public void setRedirectToFavorite(boolean redirectToFavorite) {
     this.redirectToFavorite = redirectToFavorite;
+  }
+
+  public @Nullable Tale getFavoriteTale() {
+    return favoriteTale;
+  }
+
+  public void setFavoriteTale(@Nullable Tale favoriteTale) {
+    this.favoriteTale = favoriteTale;
   }
 }

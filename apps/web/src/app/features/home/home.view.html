@@ -3,6 +3,13 @@
     <div class="content">
       <rs-view-header [title]="'WELCOME' | translate:{name: user.username}" />
       <rs-avatar [src]="user?.imageURL || null" [userName]="user?.username || null" [size]="200"/>
+      @if (favoriteTale(); as tale) {
+        <rs-tale-card
+          class="favorite-tale"
+          [tale]="tale"
+          (pressed)="onFavoriteTalePressed($event)"
+        />
+      }
       <rs-patch-notes [title]="patchNotesTitle" [groups]="patchNoteGroups" />
     </div>
   </section>

@@ -42,7 +42,8 @@ CREATE TABLE public.user_settings (
   user_id uuid PRIMARY KEY REFERENCES public.users(id) ON DELETE CASCADE,
   app_language varchar(20) NOT NULL DEFAULT 'PT' CHECK (app_language IN ('EN','DE','PT')),
   app_theme varchar(20) NOT NULL DEFAULT 'DARK' CHECK (app_theme IN ('DARK','LIGHT')),
-  redirect_to_favorite boolean NOT NULL DEFAULT FALSE
+  redirect_to_favorite boolean NOT NULL DEFAULT FALSE,
+  favorite_tale_id uuid
 );
 
 CREATE TABLE public.user_favorite_languages (
@@ -129,6 +130,11 @@ CREATE TABLE public.tales (
 CREATE INDEX idx_tales_owner ON public.tales(owner_id);
 CREATE INDEX idx_tales_is_public ON public.tales(is_public);
 CREATE INDEX idx_tales_last_active ON public.tales(last_time_active DESC, creation_date DESC);
+
+ALTER TABLE public.user_settings
+  ADD CONSTRAINT fk_user_settings_favorite_tale
+  FOREIGN KEY (favorite_tale_id) REFERENCES public.tales(id) ON DELETE SET NULL;
+CREATE INDEX idx_user_settings_favorite_tale ON public.user_settings(favorite_tale_id);
 
 -- Tale participants
 CREATE TABLE public.tale_participants (
