@@ -20,6 +20,54 @@
     overflow: hidden;
     background: var(--color-background);
 
+    .favorite-button {
+      position: absolute;
+      z-index: 2;
+      top: var(--space-1);
+      right: var(--space-1);
+      display: grid;
+      width: 2.75rem;
+      height: 2.75rem;
+      padding: 0.45rem;
+      place-items: center;
+      border: 0;
+      border-radius: 50%;
+      background: color-mix(in srgb, var(--color-background) 72%, transparent);
+      color: var(--color-red);
+      cursor: pointer;
+      transition: background-color 160ms ease, transform 160ms ease, opacity 160ms ease;
+    }
+
+    .favorite-button:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--color-background) 88%, transparent);
+      transform: scale(1.06);
+    }
+
+    .favorite-button:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 3px;
+    }
+
+    .favorite-button:disabled {
+      cursor: wait;
+      opacity: 0.55;
+    }
+
+    .favorite-icon {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      fill: transparent;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.8;
+    }
+
+    .favorite-button--selected .favorite-icon {
+      fill: currentColor;
+    }
+
     .card-image {
       width: 100%;
       height: 100%;

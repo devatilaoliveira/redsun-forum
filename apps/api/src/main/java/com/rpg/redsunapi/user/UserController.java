@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -69,6 +70,21 @@ public class UserController {
     @Valid @RequestBody UserSettingsRequestDto request
   ) {
     return ResponseEntity.ok(userService.updateMySettings(principal.user().getId(), request));
+  }
+
+  @PutMapping("/me/settings/favorite-tale/{taleId}")
+  public ResponseEntity<MeResponseDto> setFavoriteTale(
+    @AuthenticationPrincipal AuthenticatedUser principal,
+    @PathVariable UUID taleId
+  ) {
+    return ResponseEntity.ok(userService.setFavoriteTale(principal.user().getId(), taleId));
+  }
+
+  @DeleteMapping("/me/settings/favorite-tale")
+  public ResponseEntity<MeResponseDto> clearFavoriteTale(
+    @AuthenticationPrincipal AuthenticatedUser principal
+  ) {
+    return ResponseEntity.ok(userService.clearFavoriteTale(principal.user().getId()));
   }
 
   @PostMapping("/me/legal-acknowledgement")

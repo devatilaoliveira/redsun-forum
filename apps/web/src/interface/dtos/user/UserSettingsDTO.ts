@@ -5,4 +5,5 @@ export interface UserSettingsDTO {
   appLanguage: ELanguage;
   appTheme: EThemeApplication;
   redirectToFavorite: boolean;
+  favoriteTaleId: string | null;
 }

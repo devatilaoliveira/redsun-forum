@@ -1,5 +1,18 @@
 <rs-box class="tale-details-card" [minHeight]="420">
   <div class="cover">
+    <button
+      class="favorite-button"
+      type="button"
+      [class.favorite-button--selected]="isFavorite()"
+      [attr.aria-label]="favoriteLabel()"
+      [attr.aria-pressed]="isFavorite()"
+      [disabled]="favoriteSaving()"
+      (click)="onFavoritePressed()"
+    >
+      <svg class="favorite-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <use href="/assets/svgs/favorite.svg#favorite-heart"></use>
+      </svg>
+    </button>
     @if (hasImage()) {
       <rs-img
         class="card-image"
@@ -77,3 +90,18 @@
     </div>
   </div>
 </rs-box>
+
+@if (favoriteDialogMode()) {
+  <rs-dialog-modal
+    [title]="favoriteDialogTitle()"
+    [ctaBtnOne]="cancelFavoriteCta()"
+    [ctaBtnTwo]="confirmFavoriteCta()"
+    (closePressed)="closeFavoriteDialog()"
+    (ctaBtnOnePressed)="closeFavoriteDialog()"
+    (ctaBtnTwoPressed)="confirmFavoriteChange()"
+  >
+    <ng-template>
+      <p>{{ favoriteDialogMessage() }}</p>
+    </ng-template>
+  </rs-dialog-modal>
+}

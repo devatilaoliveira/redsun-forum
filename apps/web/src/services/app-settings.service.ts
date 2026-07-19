@@ -10,6 +10,7 @@ export interface IAppSettingsService {
   readonly language: Signal<ELanguage>;
   readonly theme: Signal<EThemeApplication>;
   readonly redirectToFavorite: Signal<boolean>;
+  readonly favoriteTaleId: Signal<string | null>;
 
   initDefaults(settings?: UserSettingsDTO): Observable<InterpolatableTranslation>;
   applyUserSettings(settings: UserSettingsDTO): void;
@@ -25,10 +26,12 @@ export class AppSettingsService implements IAppSettingsService {
   private readonly _language: WritableSignal<ELanguage> = signal<ELanguage>(this._detectLanguage());
   private readonly _theme: WritableSignal<EThemeApplication> = signal<EThemeApplication>(this._detectTheme());
   private readonly _redirectToFavorite: WritableSignal<boolean> = signal<boolean>(false);
+  private readonly _favoriteTaleId: WritableSignal<string | null> = signal<string | null>(null);
 
   readonly language: Signal<ELanguage> = this._language.asReadonly();
   readonly theme: Signal<EThemeApplication> = this._theme.asReadonly();
   readonly redirectToFavorite: Signal<boolean> = this._redirectToFavorite.asReadonly();
+  readonly favoriteTaleId: Signal<string | null> = this._favoriteTaleId.asReadonly();
 
   public static toTranslateLang(language: ELanguage): string {
     return language.toLowerCase();
@@ -38,10 +41,12 @@ export class AppSettingsService implements IAppSettingsService {
     const language: ELanguage = this._toLanguage(settings?.appLanguage) ?? this._language();
     const theme: EThemeApplication = this._toTheme(settings?.appTheme) ?? this._theme();
     const redirectToFavorite: boolean = settings?.redirectToFavorite ?? false;
+    const favoriteTaleId: string | null = settings?.favoriteTaleId ?? null;
 
     this._language.set(language);
     this._theme.set(theme);
     this._redirectToFavorite.set(redirectToFavorite);
+    this._favoriteTaleId.set(favoriteTaleId);
     this._themeHandler.setTheme(this._theme());
     return this._translate.use(AppSettingsService.toTranslateLang(this._language()));
   }
@@ -50,6 +55,7 @@ export class AppSettingsService implements IAppSettingsService {
     this._language.set(settings.appLanguage);
     this._theme.set(settings.appTheme);
     this._redirectToFavorite.set(settings.redirectToFavorite);
+    this._favoriteTaleId.set(settings.favoriteTaleId ?? null);
     this._themeHandler.setTheme(settings.appTheme);
     this._translate.use(AppSettingsService.toTranslateLang(settings.appLanguage)).subscribe();
   }
@@ -61,6 +67,7 @@ export class AppSettingsService implements IAppSettingsService {
     this._language.set(language);
     this._theme.set(theme);
     this._redirectToFavorite.set(false);
+    this._favoriteTaleId.set(null);
     this._themeHandler.setTheme(theme);
     this._translate.use(AppSettingsService.toTranslateLang(language)).subscribe();
   }
