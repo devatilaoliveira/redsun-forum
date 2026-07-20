@@ -124,6 +124,8 @@
   "USE_ANOTHER_EMAIL": "Andere E-Mail verwenden",
   "BACK_TO_LOGIN": "Zurück zum Login",
   "GO_BACK": "Zurück",
+  "GO_TO_HOME": "Zur Startseite",
+  "GO_TO_FAVORITE_CAMPAIGN": "Zur Lieblingskampagne",
   "AUTHENTICATING": "Authentifizierung läuft...",
   "AUTH_CALLBACK_SIGNING_IN": "Du wirst angemeldet. Bitte warte...",
   "VERIFIED": "E-Mail verifiziert",

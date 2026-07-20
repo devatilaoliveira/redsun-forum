@@ -14,8 +14,8 @@
         <button
           type="button"
           class="brand-button brand-button--logo brand-button--left"
-          aria-label="Go to home"
-          (click)="onLogoClick()"
+          [attr.aria-label]="preferredHomeLabelKey() | translate"
+          (click)="onBrandClick()"
         >
           <img
             src="/assets/svgs/rs.svg"
@@ -31,8 +31,8 @@
         <button
           type="button"
           class="brand-button brand-button--title"
-          aria-label="Go to home"
-          (click)="onLogoClick()"
+          [attr.aria-label]="preferredHomeLabelKey() | translate"
+          (click)="onBrandClick()"
         >
           <rs-title [fontSize]="'1.4rem'"/>
         </button>
