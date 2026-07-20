@@ -1,5 +1,6 @@
 export const ROUTE_PATHS = {
   settings: "settings",
+  patchNotes: "patch_notes",
   login: "login",
   forgotPassword: "forgot-password",
   register: "register",

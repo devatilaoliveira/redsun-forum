@@ -1,0 +1,38 @@
+<section class="patch-notes-view">
+  <div class="content">
+    <rs-view-header [title]="'PATCH_NOTES' | translate" />
+
+    @if (isInitialLoading()) {
+      <div class="status" role="status">
+        <rs-spinner [variant]="EVariant.PRIMARY" />
+        <p>{{ 'PATCH_NOTES_LOADING' | translate }}</p>
+      </div>
+    } @else if (initialLoadFailed()) {
+      <div class="status" role="alert">
+        <p>{{ 'PATCH_NOTES_LOAD_ERROR' | translate }}</p>
+        <rs-button-text (pressed)="retryInitialLoad()">
+          {{ 'RETRY' | translate }}
+        </rs-button-text>
+      </div>
+    } @else if (!hasNotes()) {
+      <p class="status" role="status">{{ 'PATCH_NOTES_EMPTY' | translate }}</p>
+    } @else {
+      <rs-patch-notes [title]="'PATCH_NOTES_RELEASES' | translate" [groups]="notes()" />
+
+      @if (loadMoreFailed()) {
+        <p class="load-more-error" role="alert">{{ 'PATCH_NOTES_LOAD_MORE_ERROR' | translate }}</p>
+      }
+
+      @if (hasMore()) {
+        <div class="load-more">
+          <rs-button-text [inProgress]="isLoadingMore()" (pressed)="loadMore()">
+            {{ 'LOAD_MORE' | translate }}
+          </rs-button-text>
+          @if (isLoadingMore()) {
+            <span class="visually-hidden" role="status">{{ 'PATCH_NOTES_LOADING_MORE' | translate }}</span>
+          }
+        </div>
+      }
+    }
+  </div>
+</section>

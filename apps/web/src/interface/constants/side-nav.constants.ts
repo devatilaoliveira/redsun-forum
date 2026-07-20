@@ -39,6 +39,11 @@ export const DEFAULT_SIDE_NAV_ITEMS: RsSideNavItem[] = [
     routePath: `/${ROUTE_PATHS.profileDetails}`
   },
   {
+    iconAddress: "/assets/svgs/auto_stories.svg",
+    label: "PATCH_NOTES",
+    routePath: `/${ROUTE_PATHS.patchNotes}`
+  },
+  {
     iconAddress: "/assets/svgs/settings.svg",
     label: "SETTINGS",
     routePath: `/${ROUTE_PATHS.settings}`

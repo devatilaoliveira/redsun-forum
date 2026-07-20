@@ -16,6 +16,18 @@
       tabindex="-1"
       (keydown)="onDrawerKeydown($event)"
     >
+      <rs-button
+        (pressed)="handleNavSelection()"
+        [inProgress]="inProgress()"
+        [variant]="EVariant.BLACK"
+        [customStyle]="customStyle"
+        routerLink="/"
+        [routerLinkActiveOptions]="{ exact: true }"
+        routerLinkActive="is-active"
+      >
+        <img rsButtonIcon ngSrc="/assets/svgs/home.svg" alt="" aria-hidden="true" height="24" width="24"/>
+        {{ 'HOME' | translate }}
+      </rs-button>
       @for (item of navItems(); track item.routePath) {
         <rs-button
           (pressed)="handleNavSelection()"

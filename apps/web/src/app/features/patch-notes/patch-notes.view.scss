@@ -1,0 +1,58 @@
+@use "../../../styles/mixins" as mix;
+
+:host {
+  @include mix.main-host();
+}
+
+.patch-notes-view {
+  @include mix.main-wrapper();
+  gap: var(--space-2, 1rem);
+}
+
+.content {
+  display: flex;
+  width: min(720px, 100%);
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2, 1rem);
+}
+
+rs-view-header,
+rs-patch-notes {
+  width: 100%;
+}
+
+.status {
+  display: flex;
+  min-height: 8rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1, 1rem);
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.load-more {
+  display: flex;
+  justify-content: center;
+}
+
+.load-more-error {
+  margin: 0;
+  color: var(--color-danger);
+  text-align: center;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

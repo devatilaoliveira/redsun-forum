@@ -12,6 +12,7 @@ GRANT CONNECT ON DATABASE :"APP_DB_NAME" TO :"APP_DB_ROLE";
 
 GRANT USAGE ON SCHEMA public TO :"APP_DB_ROLE";
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO :"APP_DB_ROLE";
+REVOKE INSERT, UPDATE, DELETE ON public.patch_notes FROM :"APP_DB_ROLE";
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO :"APP_DB_ROLE";
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO :"APP_DB_ROLE";
 
@@ -88,6 +89,7 @@ WHERE schemaname = 'public'
     'client_error_reports',
     'user_settings',
     'subscriptions',
+    'patch_notes',
     'user_contacts',
     'user_favorite_languages',
     'user_favorite_rules',
@@ -101,7 +103,16 @@ WHERE schemaname = 'public'
     'letters',
     'letter_recipients',
     'letter_read_by'
-  )
+)
+\gexec
+
+SELECT format(
+  'CREATE POLICY backend_runtime_access ON %I.%I FOR SELECT TO %I USING (true)',
+  'public',
+  'patch_notes',
+  :'APP_DB_ROLE'
+)
+WHERE to_regclass('public.patch_notes') IS NOT NULL
 \gexec
 
 SELECT format(

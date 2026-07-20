@@ -3,11 +3,11 @@
     <h2 id="patch-notes-title" class="eyebrow">{{ title() }}</h2>
   </header>
 
-  @for (group of groups(); track group.date + group.title) {
+  @for (group of groups(); track group.id) {
     <article class="patch-group">
       <div class="heading-row">
         <h3>{{ group.title }}</h3>
-        <time class="version" [dateTime]="group.date">{{ patchDateDisplay(group.date) }}</time>
+        <time class="version" [dateTime]="group.releaseDate">{{ patchDateDisplay(group.releaseDate) }}</time>
       </div>
 
       <p class="summary">{{ group.summary }}</p>
