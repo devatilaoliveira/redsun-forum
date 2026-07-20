@@ -2,6 +2,98 @@
 -- Run this only after the schema, auth wipe, storage setup, Data API hardening,
 -- and app role grants have been applied.
 
+INSERT INTO public.patch_notes (id, release_date, content_pt, content_en, content_de)
+VALUES
+  (
+    '00000000-0000-0000-0000-000000000210',
+    DATE '2026-07-06',
+    $$
+    {
+      "title": "Patch 2.1",
+      "summary": "Este patch melhora a navegação entre personagens, ajusta a apresentação dos locais e deixa os deploys do frontend mais estáveis.",
+      "items": [
+        {"title": "Autenticação mais estável", "description": "O fluxo de autenticação do frontend foi simplificado para usar redirecionamento direto, tratar melhor erros de callback e limpar a sessão quando o login não é concluído corretamente."},
+        {"title": "Modos de postagem preservam melhor o conteúdo", "description": "Ao alternar entre texto, dados e ficha de personagem em um local, o compositor agora mantém ou limpa os campos de forma mais previsível, evitando perda desnecessária do que estava sendo escrito."},
+        {"title": "Participantes levam ao perfil do personagem", "description": "A lista de participantes no gerenciamento da história agora abre o perfil do personagem, seguindo o mesmo comportamento do carrossel da história."},
+        {"title": "Cartão de local mais compacto", "description": "O avatar do autor agora aparece na mesma linha do nome, liberando espaço em telas pequenas e mantendo o layout consistente em todos os tamanhos."},
+        {"title": "Acesso ao personagem pelo local", "description": "Ao clicar no avatar do autor em um local, o jogador agora abre a ficha do personagem daquela história."},
+        {"title": "Deploys mais seguros", "description": "O frontend ganhou regras de cache para Workers Static Assets e recupera automaticamente uma vez quando uma aba antiga tenta carregar arquivos de uma versão anterior."},
+        {"title": "Melhoria de texto mais fiel ao narrador", "description": "A melhoria automática de postagens agora preserva melhor se o texto foi narrado em primeira pessoa pelo jogador ou em terceira pessoa pelo narrador."}
+      ]
+    }
+    $$::jsonb,
+    $$
+    {
+      "title": "Patch 2.1",
+      "summary": "This patch improves character navigation, refines location presentation, and makes frontend deployments more reliable.",
+      "items": [
+        {"title": "More reliable authentication", "description": "The frontend authentication flow now uses direct redirects, handles callback errors more reliably, and clears the session when sign-in does not finish correctly."},
+        {"title": "Post modes preserve content better", "description": "When switching between text, dice, and character sheet modes in a location, the composer now keeps or clears fields more predictably and avoids unnecessary loss of drafted content."},
+        {"title": "Participants link to character profiles", "description": "The participant list in campaign management now opens the character profile, matching the behavior of the campaign carousel."},
+        {"title": "More compact location cards", "description": "The author's avatar now appears on the same line as their name, freeing space on small screens and keeping the layout consistent at every size."},
+        {"title": "Character access from locations", "description": "Selecting an author's avatar in a location now opens that player's character sheet for the campaign."},
+        {"title": "Safer deployments", "description": "The frontend now includes cache rules for Workers Static Assets and automatically recovers once when an old tab requests files from a previous version."},
+        {"title": "Text improvements stay true to the narrator", "description": "Automatic post improvement now better preserves whether the text was narrated in first person by the player or in third person by the narrator."}
+      ]
+    }
+    $$::jsonb,
+    $$
+    {
+      "title": "Patch 2.1",
+      "summary": "Dieser Patch verbessert die Navigation zwischen Charakteren, die Darstellung von Orten und die Zuverlässigkeit von Frontend-Deployments.",
+      "items": [
+        {"title": "Stabilere Authentifizierung", "description": "Der Authentifizierungsablauf im Frontend verwendet nun direkte Weiterleitungen, behandelt Callback-Fehler zuverlässiger und löscht die Sitzung, wenn die Anmeldung nicht korrekt abgeschlossen wird."},
+        {"title": "Beitragsmodi bewahren Inhalte besser", "description": "Beim Wechsel zwischen Text, Würfeln und Charakterbogen an einem Ort behält oder löscht der Editor Felder nun vorhersehbarer und verhindert unnötigen Verlust von Entwürfen."},
+        {"title": "Teilnehmer führen zum Charakterprofil", "description": "Die Teilnehmerliste in der Kampagnenverwaltung öffnet nun das Charakterprofil und verhält sich damit wie das Kampagnenkarussell."},
+        {"title": "Kompaktere Ortskarten", "description": "Der Avatar des Autors steht nun in derselben Zeile wie der Name. Das spart Platz auf kleinen Bildschirmen und sorgt für ein einheitliches Layout."},
+        {"title": "Charakterzugriff über Orte", "description": "Ein Klick auf den Avatar des Autors an einem Ort öffnet nun dessen Charakterbogen für diese Kampagne."},
+        {"title": "Sicherere Deployments", "description": "Das Frontend besitzt nun Cache-Regeln für Workers Static Assets und stellt sich einmal automatisch wieder her, wenn ein alter Tab Dateien einer vorherigen Version anfordert."},
+        {"title": "Textverbesserung bleibt der Erzählperspektive treu", "description": "Die automatische Verbesserung von Beiträgen bewahrt nun besser, ob ein Text vom Spieler in der ersten Person oder vom Erzähler in der dritten Person erzählt wurde."}
+      ]
+    }
+    $$::jsonb
+  ),
+  (
+    '00000000-0000-0000-0000-000000000200',
+    DATE '2026-07-05',
+    $$
+    {
+      "title": "Patch 2.0",
+      "summary": "Este patch melhora o jogo nas localizações, deixa os dados das postagens mais claros e ajusta pequenos pontos de acesso.",
+      "items": [
+        {"title": "Fichas RedSun compactas em locais", "description": "Jogadores em histórias RedSun podem abrir uma ficha compacta no compositor de postagens do local para consulta rápida durante o jogo."},
+        {"title": "Compositor de postagens melhorado", "description": "Os modos texto, dados gerais e dados RedSun ficam mais fáceis de identificar, postagens podem ser maiores e o backend agora registra o tipo da postagem."},
+        {"title": "Horários de postagem mais claros", "description": "Datas de postagens agora usam rótulos relativos localizados, como há menos de 1 h, horas, dias e há mais de uma semana."},
+        {"title": "Acesso ao perfil pelo avatar", "description": "Ao clicar no avatar do autor em uma postagem, o jogador agora abre o perfil do personagem daquela história."}
+      ]
+    }
+    $$::jsonb,
+    $$
+    {
+      "title": "Patch 2.0",
+      "summary": "This patch improves play in locations, makes post dice results clearer, and polishes a few access points.",
+      "items": [
+        {"title": "Compact RedSun sheets in locations", "description": "Players in RedSun campaigns can open a compact sheet from the location post composer for quick reference during play."},
+        {"title": "Improved post composer", "description": "Text, general dice, and RedSun dice modes are easier to identify, posts can be longer, and the backend now records each post's type."},
+        {"title": "Clearer post times", "description": "Post dates now use localized relative labels, such as less than an hour ago, hours, days, and more than a week ago."},
+        {"title": "Profile access from avatars", "description": "Selecting an author's avatar on a post now opens that player's character profile for the campaign."}
+      ]
+    }
+    $$::jsonb,
+    $$
+    {
+      "title": "Patch 2.0",
+      "summary": "Dieser Patch verbessert das Spiel an Orten, stellt Würfelergebnisse in Beiträgen klarer dar und optimiert einige Zugriffswege.",
+      "items": [
+        {"title": "Kompakte RedSun-Bögen an Orten", "description": "Spieler in RedSun-Kampagnen können im Beitragseditor eines Ortes einen kompakten Charakterbogen zur schnellen Einsicht während des Spiels öffnen."},
+        {"title": "Verbesserter Beitragseditor", "description": "Text-, allgemeine Würfel- und RedSun-Würfelmodi sind leichter zu erkennen, Beiträge können länger sein und das Backend speichert nun den Beitragstyp."},
+        {"title": "Klarere Beitragszeiten", "description": "Beitragsdaten verwenden nun lokalisierte relative Angaben wie vor weniger als einer Stunde, Stunden, Tagen oder vor mehr als einer Woche."},
+        {"title": "Profilzugriff über Avatare", "description": "Ein Klick auf den Avatar eines Autors in einem Beitrag öffnet nun dessen Charakterprofil für die Kampagne."}
+      ]
+    }
+    $$::jsonb
+  );
+
 DO $$
 BEGIN
   IF to_regclass('auth.users') IS NULL THEN

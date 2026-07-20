@@ -1,18 +1,7 @@
 import {Component, inject, input, InputSignal} from "@angular/core";
 import {ITimeDisplayHandler, TimeDisplayHandler} from "../../../../infra/miscellaneous/time-display.handler";
 import {RsDivider} from "../../fragments/rsDivider/rs.divider";
-
-export interface PatchNoteItem {
-  readonly title: string;
-  readonly description: string;
-}
-
-export interface PatchNoteGroup {
-  readonly title: string;
-  readonly date: string;
-  readonly summary: string;
-  readonly items: readonly PatchNoteItem[];
-}
+import {PatchNoteDTO} from "../../../../interface/dtos/patchNote/PatchNoteDTO";
 
 @Component({
   selector: "rs-patch-notes",
@@ -25,7 +14,7 @@ export class PatchNotesComponent {
   private readonly _timeDisplayHandler: ITimeDisplayHandler = inject(TimeDisplayHandler);
 
   public readonly title: InputSignal<string> = input.required<string>();
-  public readonly groups: InputSignal<readonly PatchNoteGroup[]> = input.required<readonly PatchNoteGroup[]>();
+  public readonly groups: InputSignal<readonly PatchNoteDTO[]> = input.required<readonly PatchNoteDTO[]>();
 
   protected patchDateDisplay(date: string): string {
     return this._timeDisplayHandler.display(date, "date");

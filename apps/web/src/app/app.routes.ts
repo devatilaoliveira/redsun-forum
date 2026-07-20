@@ -122,6 +122,11 @@ export const routes: Routes = [
         }
       },
       {
+        path: ROUTE_PATHS.patchNotes,
+        loadComponent: () => import("./features/patch-notes/patch-notes.view").then((module) => module.PatchNotesView),
+        title: "PATCH_NOTES"
+      },
+      {
         path: ROUTE_PATHS.settings,
         loadComponent: () => import("./features/settings-my/settings-my.view").then((module) => module.SettingsMyView),
         title: "SETTINGS"

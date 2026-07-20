@@ -3,6 +3,7 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- Drop existing tables to start from scratch
 DROP TABLE IF EXISTS public.client_error_reports CASCADE;
+DROP TABLE IF EXISTS public.patch_notes CASCADE;
 DROP TABLE IF EXISTS public.letter_read_by CASCADE;
 DROP TABLE IF EXISTS public.letter_recipients CASCADE;
 DROP TABLE IF EXISTS public.letters CASCADE;
@@ -79,6 +80,25 @@ CREATE TABLE public.subscriptions (
   current_period_end timestamptz,
   cancel_at_period_end boolean NOT NULL DEFAULT FALSE
 );
+
+-- Localized, SQL-managed product release notes
+CREATE TABLE public.patch_notes (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  release_date date NOT NULL,
+  content_pt jsonb NOT NULL,
+  content_en jsonb NOT NULL,
+  content_de jsonb NOT NULL,
+  CONSTRAINT chk_patch_notes_content_pt_shape CHECK (
+    jsonb_path_match(content_pt, '$.type() == "object" && $.title.type() == "string" && $.summary.type() == "string" && $.items.type() == "array" && !exists($.items[*] ? (@.type() != "object" || !exists(@.title) || @.title.type() != "string" || !exists(@.description) || @.description.type() != "string"))') IS TRUE
+  ),
+  CONSTRAINT chk_patch_notes_content_en_shape CHECK (
+    jsonb_path_match(content_en, '$.type() == "object" && $.title.type() == "string" && $.summary.type() == "string" && $.items.type() == "array" && !exists($.items[*] ? (@.type() != "object" || !exists(@.title) || @.title.type() != "string" || !exists(@.description) || @.description.type() != "string"))') IS TRUE
+  ),
+  CONSTRAINT chk_patch_notes_content_de_shape CHECK (
+    jsonb_path_match(content_de, '$.type() == "object" && $.title.type() == "string" && $.summary.type() == "string" && $.items.type() == "array" && !exists($.items[*] ? (@.type() != "object" || !exists(@.title) || @.title.type() != "string" || !exists(@.description) || @.description.type() != "string"))') IS TRUE
+  )
+);
+CREATE INDEX idx_patch_notes_release_date_id ON public.patch_notes(release_date DESC, id DESC);
 
 -- User contacts
 CREATE TABLE public.user_contacts (
