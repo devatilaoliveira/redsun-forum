@@ -134,6 +134,7 @@
   "VERIFIED_AUTHENTICATING": "Completing your email confirmation.",
   "VERIFIED_FAILED": "Email confirmation could not be completed. Please try the link again or log in.",
   "HOME": "Home",
+  "RULEBOOK": "Rulebook",
   "CONTACTS": "Contacts",
   "CONTACT_ABOUT": "About",
   "CONTACT_NOT_FOUND": "Contact not found.",

@@ -28,6 +28,15 @@
         <img rsButtonIcon ngSrc="/assets/svgs/home.svg" alt="" aria-hidden="true" height="24" width="24"/>
         {{ 'HOME' | translate }}
       </rs-button>
+      <rs-button
+        (pressed)="openRulebook()"
+        [inProgress]="inProgress()"
+        [variant]="EVariant.BLACK"
+        [customStyle]="customStyle"
+      >
+        <img rsButtonIcon ngSrc="/assets/svgs/auto_stories.svg" alt="" aria-hidden="true" height="24" width="24"/>
+        {{ 'RULEBOOK' | translate }}
+      </rs-button>
       @for (item of navItems(); track item.routePath) {
         <rs-button
           (pressed)="handleNavSelection()"
