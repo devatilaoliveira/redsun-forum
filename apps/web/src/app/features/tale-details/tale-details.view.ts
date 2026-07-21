@@ -1,4 +1,4 @@
-import {Component, inject, signal, WritableSignal} from "@angular/core";
+import {Component, computed, inject, Signal, signal, WritableSignal} from "@angular/core";
 import {Router} from "@angular/router";
 import {ITaleService, TaleService} from "../../../services/tale.service";
 import {finalize} from "rxjs";
@@ -14,6 +14,9 @@ import {ROUTE_PATHS} from "../../../interface/constants/route-path.constants";
 import {IPrinter, Printer} from "../../../infra/miscellaneous/printer.handler";
 import {TalesContextService} from "../../../stateServices/tales-context.service";
 import {TaleParticipantProfileDTO} from "../../../interface/dtos/tale/TaleParticipantProfileDTO";
+import {RsRoundIconButton} from "../../shared/fragments/rsRoundIconButton/rs.round-icon-button";
+import {ETaleRole} from "../../../interface/enums/ETaleRole";
+import {LocalStoreService} from "../../../services/local-store.service";
 
 @Component({
   selector: "rs-tale-details",
@@ -25,7 +28,8 @@ import {TaleParticipantProfileDTO} from "../../../interface/dtos/tale/TalePartic
     LocationsTableComponent,
     RsButton,
     RsCarousel,
-    RsAvatar
+    RsAvatar,
+    RsRoundIconButton
   ],
   templateUrl: "./tale-details.view.html",
   styleUrl: "./tale-details.view.scss"
@@ -36,11 +40,25 @@ export class TaleDetailsView {
   private readonly _printer: IPrinter = inject(Printer);
   private readonly _talesContext: TalesContextService = inject(TalesContextService);
   private readonly _translateService: ITranslateService = inject(TranslateService);
+  private readonly _localStoreService: LocalStoreService = inject(LocalStoreService);
 
   protected readonly inviteIdentifier: WritableSignal<string> = signal("");
   protected readonly inviteInProgress: WritableSignal<boolean> = signal(false);
   protected readonly tale = this._talesContext.tale;
   protected readonly isLoading = this._talesContext.isLoading;
+  protected readonly isDm: Signal<boolean> = computed<boolean>(() => {
+    const tale = this.tale();
+    const currentUserId = this._localStoreService.user()?.id;
+    if (!tale || !currentUserId) {
+      return false;
+    }
+
+    const currentTaleProfile = tale.author.id === currentUserId
+      ? tale.author
+      : tale.participants.find((participant) => participant.id === currentUserId);
+
+    return currentTaleProfile?.role === ETaleRole.DM;
+  });
 
   protected async navigateToListofLocations(): Promise<void> {
     const taleId = this._talesContext.taleId();
@@ -49,6 +67,15 @@ export class TaleDetailsView {
     }
 
     void this._router.navigate(["/", ROUTE_PATHS.tales, taleId, ROUTE_PATHS.locations]);
+  }
+
+  protected navigateToSearch(): void {
+    const taleId = this._talesContext.taleId();
+    if (!this.isDm() || !taleId) {
+      return;
+    }
+
+    void this._router.navigate(["/", ROUTE_PATHS.tales, taleId, ROUTE_PATHS.search]);
   }
 
   protected onParticipantPressed(participant: TaleParticipantProfileDTO): void {

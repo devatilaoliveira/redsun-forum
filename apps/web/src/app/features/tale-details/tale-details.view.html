@@ -30,6 +30,14 @@
       }
       <div class="table-locals">
         <div class="actions">
+          @if (isDm()) {
+            <rs-round-icon-button
+              [iconSrc]="'/assets/svgs/search.svg'"
+              [ariaLabel]="'SEARCH_LOCATION' | translate"
+              (pressed)="navigateToSearch()"
+              [variant]="EVariant.PREMIUM"
+            />
+          }
           <div>
             <rs-button (pressed)="navigateToListofLocations()">
               {{ 'VIEW_LOCATIONS' | translate }}

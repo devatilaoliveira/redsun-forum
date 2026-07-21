@@ -253,6 +253,7 @@
   "INVALID_FILTERS_RESET": "Um ou mais filtros são inválidos. Os filtros foram redefinidos.",
   "ACCOUNT_LOAD_FOR_USER_SEARCH_FAILED": "Não foi possível carregar sua conta para a busca de usuários.",
   "SEARCH_BY_USERNAME": "Buscar por nome de usuário",
+  "SEARCH_LOCATION": "Buscar local",
   "USER_FINDER_YOU": "Você",
   "USER_FINDER_NO_ROLES": "Sem preferência de papel",
   "USER_FINDER_NO_RULES": "Sem preferência de regra",

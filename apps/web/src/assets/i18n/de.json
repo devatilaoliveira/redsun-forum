@@ -253,6 +253,7 @@
   "INVALID_FILTERS_RESET": "Mindestens ein Filter ist ungültig. Die Filter wurden zurückgesetzt.",
   "ACCOUNT_LOAD_FOR_USER_SEARCH_FAILED": "Dein Konto konnte für die Benutzersuche nicht geladen werden.",
   "SEARCH_BY_USERNAME": "Nach Benutzername suchen",
+  "SEARCH_LOCATION": "Ort durchsuchen",
   "USER_FINDER_YOU": "Du",
   "USER_FINDER_NO_ROLES": "Keine Rollenpräferenz",
   "USER_FINDER_NO_RULES": "Keine Regelpräferenz",

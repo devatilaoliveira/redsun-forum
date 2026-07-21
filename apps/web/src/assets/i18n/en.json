@@ -253,6 +253,7 @@
   "INVALID_FILTERS_RESET": "One or more filters are invalid. Filters were reset.",
   "ACCOUNT_LOAD_FOR_USER_SEARCH_FAILED": "Your account could not be loaded for user search.",
   "SEARCH_BY_USERNAME": "Search by username",
+  "SEARCH_LOCATION": "Search location",
   "USER_FINDER_YOU": "You",
   "USER_FINDER_NO_ROLES": "No role preference",
   "USER_FINDER_NO_RULES": "No rule preference",
