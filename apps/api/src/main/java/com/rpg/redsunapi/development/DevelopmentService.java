@@ -59,10 +59,6 @@ public class DevelopmentService {
     if (filter == null || filter.isBlank()) {
       return null;
     }
-    String normalized = filter.trim().toLowerCase(Locale.ROOT);
-    if (normalized.length() < 3) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Search filters must contain at least 3 characters");
-    }
-    return normalized;
+    return filter.trim().toLowerCase(Locale.ROOT);
   }
 }

@@ -445,7 +445,7 @@
   "SEARCH_POSTS_CHARACTER_NAME_PLACEHOLDER": "e.g. Zir",
   "SEARCH_POSTS_CONTENT": "Post content",
   "SEARCH_POSTS_CONTENT_PLACEHOLDER": "Search within post content",
-  "SEARCH_POSTS_MIN_CHARACTERS": "Enter at least 3 characters in each populated filter.",
+  "SEARCH_POSTS_ACTION": "Search",
   "MY_TALES_EMPTY": "You have not created any campaigns yet.",
   "FIND_TALE_EMPTY": "No campaigns to show yet.",
   "SYSTEM_RULE_DND": "D&D",

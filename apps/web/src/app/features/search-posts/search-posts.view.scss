@@ -34,6 +34,12 @@
     width: 100%;
   }
 
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+  }
+
   .message {
     color: var(--color-muted);
     font-size: var(--text-small);
@@ -43,9 +49,6 @@
     color: var(--color-danger);
   }
 
-  .filter-hint {
-    align-self: flex-start;
-  }
 }
 
 @media (max-width: bp.$bp-xs) {

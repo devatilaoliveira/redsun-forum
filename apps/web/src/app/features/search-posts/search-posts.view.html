@@ -16,15 +16,21 @@
     />
   </div>
 
-  @if (!filtersReady()) {
-    <p class="message filter-hint">{{ 'SEARCH_POSTS_MIN_CHARACTERS' | translate }}</p>
-  }
+  <div class="actions">
+    <rs-button
+      [disabled]="searchDisabled()"
+      [inProgress]="isLoading()"
+      (pressed)="onSearch()"
+    >
+      {{ 'SEARCH_POSTS_ACTION' | translate }}
+    </rs-button>
+  </div>
 
-  @if ((isLoading() || filtersPending()) && filtersReady()) {
+  @if (isLoading()) {
     <div class="status" aria-live="polite">
       <rs-spinner [variant]="EVariant.PRIMARY" />
     </div>
-  } @else if (filtersReady()) {
+  } @else if (hasSearched()) {
     @if (loadFailed()) {
       <p class="message error" role="alert">{{ 'SEARCH_POSTS_LOAD_ERROR' | translate }}</p>
     } @else if (posts().length === 0) {

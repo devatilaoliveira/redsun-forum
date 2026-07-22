@@ -2,7 +2,6 @@ package com.rpg.redsunapi.development;
 
 import com.rpg.redsunapi.authentication.AuthenticatedUser;
 import com.rpg.redsunapi.post.dto.PostDTO;
-import jakarta.validation.constraints.Size;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
@@ -33,8 +32,8 @@ public class DevelopmentController {
   public ResponseEntity<List<PostDTO>> searchPosts(
     @AuthenticationPrincipal AuthenticatedUser principal,
     @PathVariable UUID taleId,
-    @RequestParam(required = false) @Size(min = 3) @Nullable String characterName,
-    @RequestParam(required = false) @Size(min = 3) @Nullable String content
+    @RequestParam(required = false) @Nullable String characterName,
+    @RequestParam(required = false) @Nullable String content
   ) {
     return ResponseEntity.ok(developmentService.searchPosts(taleId, principal.user(), characterName, content));
   }
