@@ -22,11 +22,11 @@ public interface JpaDevelopmentRepository extends JpaRepository<Post, UUID> {
         WHERE location.taleId = :taleId
       )
       AND (
-        :contentFilter IS NULL
+        :contentFilter = ''
         OR LOCATE(:contentFilter, LOWER(p.content)) > 0
       )
       AND (
-        :characterNameFilter IS NULL
+        :characterNameFilter = ''
         OR EXISTS (
           SELECT sheet.id
           FROM BasicSheet sheet
