@@ -2,8 +2,6 @@
 @use "../../../styles/breakpoints" as bp;
 
 $small-content: bp.$bp-sm;
-$min-content: bp.$bp-xs;
-
 :host {
   display: flex;
   justify-content: center;
@@ -49,17 +47,6 @@ $min-content: bp.$bp-xs;
       }
     }
 
-    .input-row {
-      display: flex;
-      width: 100%;
-      gap: var(--space-0-5, 1rem);
-
-      .textarea-wrapper {
-        display: block;
-        width: 100%;
-      }
-    }
-
     .dice-row {
       display: flex;
       flex-direction: column;
@@ -81,7 +68,7 @@ $min-content: bp.$bp-xs;
 
       .clear-inputs-btn {
         margin-right: auto;
-        margin-left: calc(40px + var(--space-0-5, 1rem));
+        margin-left: 0;
       }
     }
   }
@@ -115,16 +102,5 @@ $min-content: bp.$bp-xs;
   .empty {
     color: var(--color-muted);
     font-size: var(--text-small);
-  }
-}
-@media (max-width: $min-content) {
-  .input-row {
-    rs-avatar {
-      display: none;
-    }
-  }
-
-  .location-details .post-form .post-actions .clear-inputs-btn {
-    margin-left: 0;
   }
 }
