@@ -1,4 +1,5 @@
 import {Component, inject} from "@angular/core";
+import {CdkVirtualScrollableElement} from "@angular/cdk/scrolling";
 import {RouterOutlet} from "@angular/router";
 import {ITranslateService, TranslateModule, TranslateService} from "@ngx-translate/core";
 import {ELanguage} from "../interface/enums/ELanguage";
@@ -9,6 +10,7 @@ import {RsToastHostComponent} from "./shared/ui/toast/toast-host.component";
 @Component({
   selector: "app-root",
   imports: [
+    CdkVirtualScrollableElement,
     RouterOutlet,
     TranslateModule,
     RsTopBarNavigatorComponent,

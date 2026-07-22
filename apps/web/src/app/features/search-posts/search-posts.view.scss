@@ -20,11 +20,19 @@
     min-height: 64px;
   }
 
-  .posts-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
+  .posts-viewport {
+    display: block;
     width: 100%;
+  }
+
+  .post-row {
+    box-sizing: border-box;
+    height: 320px;
+    padding-bottom: 16px;
+
+    rs-post-details-card {
+      height: 100%;
+    }
   }
 
   .filters {

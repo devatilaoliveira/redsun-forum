@@ -23,6 +23,7 @@ export class PostDetailsCardComponent {
 
   public readonly post: InputSignal<PostDTO> = input.required<PostDTO>();
   public readonly options: InputSignal<RsMoreOption[]> = input<RsMoreOption[]>([]);
+  public readonly constrainedHeight: InputSignal<boolean> = input<boolean>(false);
   public readonly actionSelected: OutputEmitterRef<RsMoreOption> = output<RsMoreOption>();
   protected readonly EVariant = EVariant;
   protected readonly isContentVisible = signal<boolean>(false);

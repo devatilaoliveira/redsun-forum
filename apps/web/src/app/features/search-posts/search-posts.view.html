@@ -5,12 +5,14 @@
     <rs-input
       [label]="'SEARCH_POSTS_CHARACTER_NAME' | translate"
       [placeholder]="'SEARCH_POSTS_CHARACTER_NAME_PLACEHOLDER' | translate"
+      testId="search-posts-character-name"
       [value]="characterNameFilter()"
       (valueChanged)="onCharacterNameFilterChange($event)"
     />
     <rs-input
       [label]="'SEARCH_POSTS_CONTENT' | translate"
       [placeholder]="'SEARCH_POSTS_CONTENT_PLACEHOLDER' | translate"
+      testId="search-posts-content"
       [value]="contentFilter()"
       (valueChanged)="onContentFilterChange($event)"
     />
@@ -20,6 +22,7 @@
     <rs-button
       [disabled]="searchDisabled()"
       [inProgress]="isLoading()"
+      testId="search-posts-submit"
       (pressed)="onSearch()"
     >
       {{ 'SEARCH_POSTS_ACTION' | translate }}
@@ -36,11 +39,27 @@
     } @else if (posts().length === 0) {
       <p class="message">{{ 'SEARCH_POSTS_EMPTY' | translate }}</p>
     } @else {
-      <div class="posts-list">
-        @for (post of posts(); track post.id) {
-          <rs-post-details-card [post]="post" />
-        }
-      </div>
+<!--      <div class="posts-list">-->
+<!--        @for (post of posts(); track post.id) {-->
+<!--          <rs-post-details-card [post]="post" />-->
+<!--        }-->
+<!--      </div>-->
+      <!-- Virtualization limits DOM work only; the full response is still queried, downloaded, and held in memory. -->
+      <cdk-virtual-scroll-viewport
+        class="posts-viewport"
+        data-testid="search-posts-viewport"
+        [itemSize]="320"
+        [minBufferPx]="640"
+        [maxBufferPx]="1280"
+      >
+        <div
+          class="post-row"
+          data-testid="search-posts-row"
+          *cdkVirtualFor="let post of posts(); trackBy: trackPostById"
+        >
+          <rs-post-details-card [post]="post" [constrainedHeight]="true" />
+        </div>
+      </cdk-virtual-scroll-viewport>
     }
   }
 </section>

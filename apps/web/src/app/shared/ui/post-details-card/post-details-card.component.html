@@ -1,4 +1,8 @@
-<article class="post-details" [class.inactive]="isInactive()">
+<article
+  class="post-details"
+  [class.inactive]="isInactive()"
+  [class.constrained-height]="constrainedHeight()"
+>
   <div class="header">
     <a class="author-avatar-link" [routerLink]="authorProfileLink()" [attr.aria-label]="authorName()">
       <rs-avatar [src]="post().author.characterImageUrl || ''" [userName]="post().author.characterName" [size]="60" />

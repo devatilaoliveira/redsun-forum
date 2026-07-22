@@ -7,6 +7,7 @@
 .post-details {
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
   padding: var(--space-1);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
@@ -103,6 +104,24 @@
     .post-content {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  &.constrained-height {
+    height: 100%;
+
+    .header {
+      flex: 0 0 auto;
+    }
+
+    .content.is-visible {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+
+      .content-inner {
+        overflow-y: auto;
+      }
     }
   }
 }

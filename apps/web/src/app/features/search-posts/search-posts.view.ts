@@ -1,6 +1,7 @@
 import {Component, computed, DestroyRef, inject, OnInit, Signal, signal, WritableSignal} from "@angular/core";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {ActivatedRoute} from "@angular/router";
+import {ScrollingModule} from "@angular/cdk/scrolling";
 import {TranslatePipe} from "@ngx-translate/core";
 import {finalize} from "rxjs";
 import {IDevelopmentService, DevelopmentService} from "../../../services/development.service";
@@ -16,7 +17,7 @@ import {PostDetailsCardComponent} from "../../shared/ui/post-details-card/post-d
 @Component({
   selector: "rs-search-posts",
   standalone: true,
-  imports: [TranslatePipe, RsButton, RsInput, RsSpinner, RsViewHeader, PostDetailsCardComponent],
+  imports: [ScrollingModule, TranslatePipe, RsButton, RsInput, RsSpinner, RsViewHeader, PostDetailsCardComponent],
   templateUrl: "./search-posts.view.html",
   styleUrl: "./search-posts.view.scss"
 })
@@ -73,6 +74,10 @@ export class SearchPostsView implements OnInit {
 
   protected onContentFilterChange(value: string): void {
     this.contentFilter.set(value);
+  }
+
+  protected trackPostById(_index: number, post: PostDTO): string {
+    return post.id;
   }
 
   private optionalFilter(value: string): string | undefined {
