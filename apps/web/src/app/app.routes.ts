@@ -165,10 +165,10 @@ export const routes: Routes = [
                 title: "TALE"
               },
               {
-                path: ROUTE_PATHS.search,
-                loadComponent: () => import("./features/search/search.view").then((module) => module.SearchView),
+                path: ROUTE_PATHS.searchPosts,
+                loadComponent: () => import("./features/search-posts/search-posts.view").then((module) => module.SearchPostsView),
                 canActivate: [TaleOwnerGuard],
-                title: "SEARCH_LOCATION"
+                title: "SEARCH_POSTS_TITLE"
               },
               {
                 path: `${ROUTE_PATHS.manage}/${ROUTE_PATHS.participants}`,

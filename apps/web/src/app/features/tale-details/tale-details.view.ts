@@ -75,7 +75,7 @@ export class TaleDetailsView {
       return;
     }
 
-    void this._router.navigate(["/", ROUTE_PATHS.tales, taleId, ROUTE_PATHS.search]);
+    void this._router.navigate(["/", ROUTE_PATHS.tales, taleId, ROUTE_PATHS.searchPosts]);
   }
 
   protected onParticipantPressed(participant: TaleParticipantProfileDTO): void {

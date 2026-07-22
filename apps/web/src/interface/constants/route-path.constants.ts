@@ -36,5 +36,5 @@ export const ROUTE_PATHS = {
   dataProtection: "data-protection",
   reportContent: "report-content",
   cookies: "cookies",
-  search: "search"
+  searchPosts: "search-posts"
 } as const;
