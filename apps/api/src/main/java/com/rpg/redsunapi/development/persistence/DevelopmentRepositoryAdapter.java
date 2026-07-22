@@ -27,8 +27,12 @@ public class DevelopmentRepositoryAdapter implements DevelopmentRepository {
     return jpaDevelopmentRepository.findPostsByTaleIdAndStatus(
       taleId,
       EPostStatus.ACTIVE,
-      characterNameFilter,
-      contentFilter
+      nullToEmpty(characterNameFilter),
+      nullToEmpty(contentFilter)
     );
+  }
+
+  private String nullToEmpty(@Nullable String filter) {
+    return filter == null ? "" : filter;
   }
 }
