@@ -20,7 +20,6 @@ import {RsViewHeader} from "../../shared/fragments/rsViewHeader/rs.view-header";
 import {LocalDetailsCardComponent} from "../../shared/ui/local-details-card/local-details-card.component";
 import {LocalStoreService} from "../../../services/local-store.service";
 import {MeResponseDTO} from "../../../interface/dtos/user/MeResponseDTO";
-import {RsAvatar} from "../../shared/fragments/rsAvatar/rs.avatar";
 import {UTIL_CONSTANTS} from "../../../interface/constants/util.constants";
 import {RsDiceInput, RsDiceListValue} from "../../shared/fragments/rsDiceInput/rs.dice-input";
 import {RsRedsunDiceInput, RsRedsunDiceListValue} from "../../shared/fragments/rsRedsunDiceInput/rs.redsun-dice-input";
@@ -29,7 +28,6 @@ import {RsMoreOption} from "../../shared/fragments/rsMoreOptions/rs.more-options
 import {RsDialogModalComponent} from "../../shared/ui/dialog-modal/dialog-modal.component";
 import {PostDetailsCardComponent} from "../../shared/ui/post-details-card/post-details-card.component";
 import {ROUTE_PATHS} from "../../../interface/constants/route-path.constants";
-import {TaleParticipantProfileDTO} from "../../../interface/dtos/tale/TaleParticipantProfileDTO";
 import {TalesContextService} from "../../../stateServices/tales-context.service";
 import {RsTooltip} from "../../shared/fragments/rsTooltip/rs.tooltip";
 import {ERuleSystem} from "../../../interface/enums/ERuleSystem";
@@ -81,7 +79,6 @@ interface VisiblePostViewModel {
     RsTextarea,
     RsViewHeader,
     LocalDetailsCardComponent,
-    RsAvatar,
     RsDiceInput,
     RsRedsunDiceInput,
     RsRoundIconButton,
@@ -220,15 +217,6 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   protected readonly pendingDeletePost: WritableSignal<PostDTO | null> = signal<PostDTO | null>(null);
   protected readonly loadedPostsCount: Signal<number> = computed(() => this.locationDetails()?.posts.length ?? 0);
   protected readonly totalPostsCount: Signal<number> = computed(() => this.totalPosts() ?? this.loadedPostsCount());
-  protected readonly currentTaleParticipant: Signal<TaleParticipantProfileDTO | null> = computed(() => {
-    const currentUser = this.user();
-    if (!currentUser) {
-      return null;
-    }
-
-    return this._talesContext.participants().find((participant) => participant.id === currentUser.id) ?? null;
-  });
-
   private readonly pageSize = 10;
   private composerInputModeBeforeCharacterSheet: ComposerInputMode | null = null;
 

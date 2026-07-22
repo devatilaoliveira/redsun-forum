@@ -1,7 +1,8 @@
 import {DOCUMENT, Location} from "@angular/common";
-import {Component, DestroyRef, effect, ElementRef, HostListener, inject, OnInit, signal, Signal, ViewChild, WritableSignal} from "@angular/core";
+import {Component, computed, DestroyRef, effect, ElementRef, HostListener, inject, OnInit, signal, Signal, ViewChild, WritableSignal} from "@angular/core";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {ActivatedRoute, NavigationEnd, Router, UrlTree} from "@angular/router";
+import {TranslatePipe} from "@ngx-translate/core";
 import {filter} from "rxjs";
 import {RedsunTitle} from "../../fragments/redsunTitle/redsun.title";
 import {RsRoundIconButton} from "../../fragments/rsRoundIconButton/rs.round-icon-button";
@@ -16,7 +17,7 @@ import {resolvePreferredHomeUrl} from "../../../../infra/miscellaneous/preferred
 @Component({
   selector: "rs-top-bar-navigator",
   standalone: true,
-  imports: [RedsunTitle, RsRoundIconButton, RsSideNavComponent],
+  imports: [RedsunTitle, RsRoundIconButton, RsSideNavComponent, TranslatePipe],
   templateUrl: "./top-bar-navigator.component.html",
   styleUrl: "./top-bar-navigator.component.scss"
 })
@@ -45,6 +46,13 @@ export class RsTopBarNavigatorComponent implements OnInit {
   protected readonly playerVisible: Signal<boolean>;
   protected readonly manageNavItems: WritableSignal<RsSideNavItem[]> = signal([]);
   protected readonly playerNavItems: WritableSignal<RsSideNavItem[]> = signal([]);
+  protected readonly preferredHomeUrl: Signal<string> = computed(() => resolvePreferredHomeUrl(
+    this._appSettingsService.redirectToFavorite(),
+    this._appSettingsService.favoriteTaleId()
+  ));
+  protected readonly preferredHomeLabelKey: Signal<string> = computed(() =>
+    this.preferredHomeUrl() === "/" ? "GO_TO_HOME" : "GO_TO_FAVORITE_CAMPAIGN"
+  );
 
 
   private previousBodyOverflow: string | null = null;
@@ -230,11 +238,8 @@ export class RsTopBarNavigatorComponent implements OnInit {
     this._location.back();
   }
 
-  protected onLogoClick(): void {
-    void this._router.navigateByUrl(resolvePreferredHomeUrl(
-      this._appSettingsService.redirectToFavorite(),
-      this._appSettingsService.favoriteTaleId()
-    ));
+  protected onBrandClick(): void {
+    void this._router.navigateByUrl(this.preferredHomeUrl());
   }
 
   private openMenu(): void {

@@ -21,6 +21,7 @@ import {EVariant} from "../../../../interface/enums/EVariant";
 import {IStyleMap} from "../../../../interface/models/istyle-map";
 import {ROUTE_PATHS} from "../../../../interface/constants/route-path.constants";
 import {RsSideNavItem} from "../../../../interface/models/side-nav-item";
+import {UTIL_CONSTANTS} from "../../../../interface/constants/util.constants";
 
 @Component({
   selector: "rs-side-nav",
@@ -92,6 +93,10 @@ export class RsSideNavComponent {
     this.navSelected.emit();
   }
 
+  protected openRulebook(): void {
+    this._document.defaultView?.open(UTIL_CONSTANTS.RULEBOOK_URL, "_blank", "noopener,noreferrer");
+    this.handleNavSelection();
+  }
 
   protected async logout(): Promise<void> {
     this.inProgress.set(true);

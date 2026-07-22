@@ -52,23 +52,14 @@
           }
         </div>
         @if (postInputMode() === POST_INPUT_MODE.post) {
-          <div class="input-row">
-            <rs-avatar
-              [src]="currentTaleParticipant()?.characterImageUrl || ''"
-              [userName]="currentTaleParticipant()?.characterName || null"
-              [size]="40"
-            />
-            <div class="textarea-wrapper">
-              <rs-textarea
-                [placeholder]="'POST_PLACEHOLDER' | translate"
-                [maxLength]="UTIL_CONSTANTS.LONG_TEXT_LENGTH"
-                [rows]="4"
-                [blocked]="postInProgress() || improvePostInProgress()"
-                [value]="postContent()"
-                (valueChanged)="onPostContentChange($event)"
-              />
-            </div>
-          </div>
+          <rs-textarea
+            [placeholder]="'POST_PLACEHOLDER' | translate"
+            [maxLength]="UTIL_CONSTANTS.LONG_TEXT_LENGTH"
+            [rows]="4"
+            [blocked]="postInProgress() || improvePostInProgress()"
+            [value]="postContent()"
+            (valueChanged)="onPostContentChange($event)"
+          />
         } @else if (showDiceInput()) {
           <div class="dice-row">
             <rs-dice-input

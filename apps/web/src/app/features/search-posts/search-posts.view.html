@@ -1,0 +1,40 @@
+<section class="search-posts">
+  <rs-view-header [title]="'SEARCH_POSTS_TITLE' | translate" />
+
+  <div class="filters">
+    <rs-input
+      [label]="'SEARCH_POSTS_CHARACTER_NAME' | translate"
+      [placeholder]="'SEARCH_POSTS_CHARACTER_NAME_PLACEHOLDER' | translate"
+      [value]="characterNameFilter()"
+      (valueChanged)="onCharacterNameFilterChange($event)"
+    />
+    <rs-input
+      [label]="'SEARCH_POSTS_CONTENT' | translate"
+      [placeholder]="'SEARCH_POSTS_CONTENT_PLACEHOLDER' | translate"
+      [value]="contentFilter()"
+      (valueChanged)="onContentFilterChange($event)"
+    />
+  </div>
+
+  @if (!filtersReady()) {
+    <p class="message filter-hint">{{ 'SEARCH_POSTS_MIN_CHARACTERS' | translate }}</p>
+  }
+
+  @if ((isLoading() || filtersPending()) && filtersReady()) {
+    <div class="status" aria-live="polite">
+      <rs-spinner [variant]="EVariant.PRIMARY" />
+    </div>
+  } @else if (filtersReady()) {
+    @if (loadFailed()) {
+      <p class="message error" role="alert">{{ 'SEARCH_POSTS_LOAD_ERROR' | translate }}</p>
+    } @else if (posts().length === 0) {
+      <p class="message">{{ 'SEARCH_POSTS_EMPTY' | translate }}</p>
+    } @else {
+      <div class="posts-list">
+        @for (post of posts(); track post.id) {
+          <rs-post-details-card [post]="post" />
+        }
+      </div>
+    }
+  }
+</section>

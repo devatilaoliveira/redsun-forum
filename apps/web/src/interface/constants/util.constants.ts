@@ -2,6 +2,7 @@ export const UTIL_CONSTANTS = {
   I18N_PREFIX: "assets/i18n/",
   JSON_EXTENSION: ".json",
   OAUTH_CALLBACK_PATH: "oauth/callback",
+  RULEBOOK_URL: "https://rulebook.redsunrpg.com.br",
   FILE: "file", // WARNING: This has to be the same as the 'file' defined in the backend.
   DEFAULT_ASPECT_RATIO: "16 / 9",
   DEFAULT_RESIZE_HEIGHT: 405,
