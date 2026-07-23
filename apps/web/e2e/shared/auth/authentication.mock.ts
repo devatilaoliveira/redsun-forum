@@ -23,6 +23,7 @@ export const buildUser = (email: string, currentLegalAcknowledgement: boolean): 
     appLanguage: ELanguage.EN,
     appTheme: EThemeApplication.DARK,
     redirectToFavorite: false,
+    favoriteTaleId: null,
   },
   contacts: [],
   legalAcknowledgement: {
