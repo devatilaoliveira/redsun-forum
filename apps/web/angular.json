@@ -36,6 +36,12 @@
             ]
           },
           "configurations": {
+            "local": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "outputHashing": "none"
+            },
             "prod": {
               "budgets": [
                 {
@@ -102,6 +108,9 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "configurations": {
+            "local": {
+              "buildTarget": "redsun-web:build:local"
+            },
             "prod": {
               "buildTarget": "redsun-web:build:prod"
             },

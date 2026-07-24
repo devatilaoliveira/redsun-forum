@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
   [switch]$Reset,
+  [switch]$NoCache,
   [int]$HealthTimeoutSeconds = 120
 )
 
@@ -12,10 +13,12 @@ $excludedSupabaseServices = "logflare,vector,realtime,edge-runtime,imgproxy,post
 $supabaseRoot = Split-Path -Parent $PSScriptRoot
 $apiRoot = Split-Path -Parent $supabaseRoot
 $composeFile = Join-Path -Path $apiRoot -ChildPath "docker-compose.yml"
+$debugComposeFile = Join-Path -Path $apiRoot -ChildPath "docker-compose.debug.yml"
 $containerEnvFile = Join-Path -Path $apiRoot -ChildPath ".env.local.container"
 $resetScript = Join-Path -Path $PSScriptRoot -ChildPath "reset-local-supabase.ps1"
 $statusFile = $null
 $resetEnvFile = $null
+$remoteDebugEnabled = $PSBoundParameters.ContainsKey("Debug")
 
 function Get-RequiredCommand {
   param(
@@ -209,12 +212,14 @@ function Wait-ForApiHealth {
 function Show-ApiFailureLogs {
   param(
     [Parameter(Mandatory)]
-    [string]$DockerCommand
+    [string]$DockerCommand,
+    [Parameter(Mandatory)]
+    [string[]]$ComposeArguments
   )
 
   Write-Host ""
   Write-Host "Recent API logs:"
-  $logs = @(& $DockerCommand compose --project-directory $apiRoot --file $composeFile logs --no-color --tail 200 api 2>&1)
+  $logs = @(& $DockerCommand @ComposeArguments logs --no-color --tail 200 api 2>&1)
   $logs | ForEach-Object { Write-Host $_ }
 
   $logText = $logs | Out-String
@@ -241,6 +246,12 @@ try {
     -Command $docker `
     -Arguments @("compose", "version") `
     -FailureMessage "Docker Compose is unavailable. Install a Docker distribution that includes Compose v2."
+
+  $composeArguments = @("compose", "--project-directory", $apiRoot, "--file", $composeFile)
+  if ($remoteDebugEnabled) {
+    $composeArguments += @("--file", $debugComposeFile)
+    Write-Host "Remote JVM debugging is enabled at localhost:5005 (suspend=n)."
+  }
 
   $installedSupabaseVersionOutput = ((& $supabase --version 2>&1) | Out-String).Trim()
   if ($LASTEXITCODE -ne 0) {
@@ -294,16 +305,32 @@ try {
       -FailureMessage "The explicit local reset failed. Review the SQL error above."
   }
 
-  Write-Host "Building and starting the API container..."
+  if ($NoCache) {
+    Write-Host "Rebuilding only the RedSun API image without cache and pulling newer base images."
+    Write-Host "Supabase services use published images and are not rebuilt by -NoCache."
+  } else {
+    Write-Host "Building and starting the API container..."
+  }
   try {
-    Invoke-CheckedCommand `
-      -Command $docker `
-      -Arguments @("compose", "--project-directory", $apiRoot, "--file", $composeFile, "up", "--detach", "--build") `
-      -FailureMessage "Docker Compose could not build or start the API."
+    if ($NoCache) {
+      Invoke-CheckedCommand `
+        -Command $docker `
+        -Arguments ($composeArguments + @("build", "--no-cache", "--pull", "api")) `
+        -FailureMessage "Docker Compose could not rebuild the RedSun API image without cache."
+      Invoke-CheckedCommand `
+        -Command $docker `
+        -Arguments ($composeArguments + @("up", "--detach", "--no-build", "api")) `
+        -FailureMessage "Docker Compose could not start the rebuilt RedSun API image."
+    } else {
+      Invoke-CheckedCommand `
+        -Command $docker `
+        -Arguments ($composeArguments + @("up", "--detach", "--build", "api")) `
+        -FailureMessage "Docker Compose could not build or start the API."
+    }
     Wait-ForApiHealth -TimeoutSeconds $HealthTimeoutSeconds
   }
   catch {
-    Show-ApiFailureLogs -DockerCommand $docker
+    Show-ApiFailureLogs -DockerCommand $docker -ComposeArguments $composeArguments
     throw
   }
 }

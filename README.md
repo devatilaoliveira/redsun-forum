@@ -1,100 +1,93 @@
 # RedSun
 
-RedSun is a monorepo for a role-playing forum application:
+RedSun is a monorepo for an Angular frontend, Spring Boot API, and
+Supabase-backed role-playing forum application. Unless noted otherwise, run
+commands from the repository root in PowerShell.
 
-- `apps/api` — Spring Boot backend.
-- `apps/web` — Angular frontend.
-- `apps/api/supabase` — local Supabase infrastructure and database utilities.
-
-Unless noted otherwise, run commands from the repository root.
-
-## Local development
-
-The complete API, database, Auth, and Storage setup is documented in the
-[focused Supabase guide](apps/api/supabase/README.md).
-
-First-time or intentionally clean API startup:
+## Clean first start
 
 ```powershell
-.\apps\api\supabase\scripts\start-local.ps1 -Reset
+# 1. Install frontend dependencies
+Push-Location apps\web
+npm ci
+Pop-Location
+
+# 2. Start Docker Desktop and verify it is ready
+docker info
+
+# 3. Initialize local Supabase and rebuild/start the API without cache
+.\apps\api\supabase\scripts\start-local.ps1 -Reset -NoCache
 ```
 
-Daily API start and data-preserving stop:
+`-Reset` is destructive and is intended only for first initialization or an
+intentional clean reset. The lifecycle wrapper starts the local
+Supabase/database services before the API container. `-NoCache` rebuilds only
+the RedSun API image; Supabase uses published Docker images.
 
-```powershell
-.\apps\api\supabase\scripts\start-local.ps1
-.\apps\api\supabase\scripts\stop-local.ps1
-```
-
-`-Reset` is destructive. The focused guide covers required tool versions,
-endpoints, host-run Maven connectivity, container connectivity, remote
-backup/reset commands, restore protections, and local verification.
-
-Run the web app:
+Start the fully local frontend:
 
 ```powershell
 Push-Location apps\web
-npm ci
 npm run start:local
 Pop-Location
 ```
 
-Open `http://localhost:4200/`.
+`npm run start:local` automatically prepares local runtime values before
+Angular starts.
 
-## Production
+Primary endpoints:
 
-Production never starts the local Supabase stack. The root
-`docker-compose.yml` contains only the RedSun API service and receives hosted
-Supabase/database settings from `apps/api/.env.prod` by default:
+- Frontend: `http://localhost:4200`
+- Backend health: `http://localhost:8080/actuator/health`
+- Supabase Studio: `http://localhost:54323`
 
-```powershell
-docker compose up -d --build
-```
-
-To select another hosted environment file whose path is relative to the
-repository root:
+## Daily local start
 
 ```powershell
-$env:API_ENV_FILE = "apps/api/.env.prod"
-docker compose up -d --build
-Remove-Item env:API_ENV_FILE -ErrorAction SilentlyContinue
-```
+.\apps\api\supabase\scripts\start-local.ps1
 
-The local Supabase configuration under `apps/api/supabase` is development/CI
-infrastructure and is never started by production Compose.
-
-## Verification
-
-Run API tests against an initialized local stack:
-
-```powershell
-Push-Location apps\api
-.\supabase\scripts\prepare-local-api-env.ps1 -OutputFile .env.local
-.\mvnw.cmd test
+Push-Location apps\web
+npm run start:local
 Pop-Location
 ```
 
-API and browser E2E automation live in:
-
-- `.github/workflows/api-ci.yml`
-- `.github/workflows/e2e-ci.yml`
-
-Do not run full frontend builds from the agent environment; use the E2E
-workflow or targeted non-build checks instead.
-
-## Codex agent sessions
-
-Start a layered repository session with:
+Stop containers while preserving local data:
 
 ```powershell
-.\scripts\codexLaucher.ps1 -App repo
-.\scripts\codexLaucher.ps1 -App api
-.\scripts\codexLaucher.ps1 -App web
+.\apps\api\supabase\scripts\stop-local.ps1
+```
+
+Do not use `npm ci`, `-Reset`, or `-NoCache` in the normal daily path.
+
+## Local frontend against production
+
+> **Caution:** only the Angular development server is local. API calls,
+> authentication, Storage operations, and database-backed actions target
+> production services and can affect production data.
+
+```powershell
+Push-Location apps\web
+npm run start:local-prod
+Pop-Location
+```
+
+This command does not require or start the local Supabase/backend stack.
+
+## Optional Codex agent launcher
+
+```powershell
 .\scripts\codexLaucher.ps1 -App all
 ```
 
-Validate layer resolution without launching Codex:
+Other selections are `web`, `api`, and `repo`. Validate layer selection without
+launching Codex:
 
 ```powershell
-.\scripts\codexLaucher.ps1 -App api -DryRun
+.\scripts\codexLaucher.ps1 -App all -DryRun
 ```
+
+## Documentation
+
+- [Local development](docs/local-development.md): installation, environment
+  selection, Docker debugging, troubleshooting, Supabase schema and seed
+  behavior, security, backup, restore, and remote database operations.

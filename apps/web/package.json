@@ -10,6 +10,8 @@
     "build": "ng build",
     "start:prod": "ng serve --configuration prod --port 4200",
     "start:stage": "ng serve --configuration stage --port 4200",
+    "prestart:local": "powershell -ExecutionPolicy Bypass -File ./scripts/prepare-local-web-env.ps1",
+    "start:local": "ng serve --configuration local --port 4200",
     "start:local-prod": "ng serve --configuration local-prod --port 4200",
     "lint": "ng lint",
     "fix": "ng lint --fix",
