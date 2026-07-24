@@ -55,7 +55,6 @@ public class UserSettings {
 
   public UserSettings(User user, ELanguage appLanguage, EThemeApplication appTheme) {
     this.user = Objects.requireNonNull(user, "user");
-    this.userId = user.getId();
     this.appLanguage = appLanguage;
     this.appTheme = appTheme;
   }
@@ -70,7 +69,6 @@ public class UserSettings {
 
   public void setUser(User user) {
     this.user = Objects.requireNonNull(user, "user");
-    this.userId = user.getId();
   }
 
   public ELanguage getAppLanguage() {
