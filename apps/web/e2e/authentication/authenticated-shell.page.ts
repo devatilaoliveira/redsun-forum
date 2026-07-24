@@ -13,4 +13,8 @@ export class AuthenticatedShellE2e {
     await this.menuButton.click();
     await this.logoutButton.click();
   }
+
+  async isVisible(): Promise<boolean> {
+    return this.menuButton.isVisible();
+  }
 }

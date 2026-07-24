@@ -103,6 +103,9 @@ Debug mode exposes JDWP on `localhost:5005` with `suspend=n`.
 Reset runs:
 
 ```text
+supabase stop (when the local stack is already running)
+  -> reloads config.toml on the next start
+supabase start
 supabase db reset --local
   -> migrations in timestamp order
   -> apps/api/supabase/seed.sql
