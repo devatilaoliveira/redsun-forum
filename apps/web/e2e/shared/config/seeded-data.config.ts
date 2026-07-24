@@ -17,6 +17,11 @@ interface SeededTaleParticipant {
   email: string;
 }
 
+interface SeededTaleVisitor extends SeededLoginUser {
+  id: string;
+  username: string;
+}
+
 interface SeededTale {
   id: string;
   name: string;
@@ -26,6 +31,7 @@ interface SeededDataMap {
   SEEDED_LOGIN_USER: SeededLoginUser;
   SEEDED_TALE_OWNER: SeededTaleOwner;
   SEEDED_TALE_PARTICIPANT: SeededTaleParticipant;
+  SEEDED_TALE_VISITOR: SeededTaleVisitor;
   SEEDED_TALE: SeededTale;
 }
 

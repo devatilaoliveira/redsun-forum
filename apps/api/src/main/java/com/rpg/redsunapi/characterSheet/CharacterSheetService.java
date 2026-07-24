@@ -56,13 +56,13 @@ public class CharacterSheetService {
     this.taleAccessPolicy = taleAccessPolicy;
   }
 
-  @Transactional
+  @Transactional(readOnly = true)
   public CharacterSheetResponseDTO getCharacterSheet(UUID taleId, UUID characterSheetId, User requester) {
     Tale tale = requireActiveTale(taleId);
-    taleAccessPolicy.ensureCanReadCharacterSheet(tale, requester.getId());
+    taleAccessPolicy.ensureCanReadCharacterSheet(tale, requester.getId(), characterSheetId);
 
     RuleCharacterSheetHandler handler = resolveHandlerForCharacter(tale, characterSheetId);
-    CharacterSheet sheet = handler.getOrCreateSheet(tale, characterSheetId);
+    CharacterSheet sheet = handler.getSheet(tale, characterSheetId);
     Object payload = handler.toResponseSheet(sheet);
 
     return new CharacterSheetResponseDTO(tale.getRules(), payload);

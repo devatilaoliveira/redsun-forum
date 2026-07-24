@@ -4,6 +4,7 @@ import {GuestGuard} from "../infra/guard/guest.guard";
 import {AuthGuard} from "../infra/guard/auth.guard";
 import {TaleOwnerGuard} from "../infra/guard/tale-owner.guard";
 import {TaleParticipantGuard} from "../infra/guard/tale-participant.guard";
+import {TaleViewerGuard} from "../infra/guard/tale-viewer.guard";
 import {HomeView} from "./features/home/home.view";
 import {ROUTE_PATHS} from "../interface/constants/route-path.constants";
 import {UTIL_CONSTANTS} from "../interface/constants/util.constants";
@@ -197,7 +198,7 @@ export const routes: Routes = [
               {
                 path: `${ROUTE_PATHS.participants}/:${ROUTE_PATHS.id}`,
                 loadComponent: () => import("./features/tale-participant-profile/tale-participant-profile.view").then((module) => module.TaleParticipantProfileView),
-                canActivate: [TaleParticipantGuard],
+                canActivate: [TaleViewerGuard],
                 title: "TALE_PARTICIPANT_PROFILE"
               },
               {

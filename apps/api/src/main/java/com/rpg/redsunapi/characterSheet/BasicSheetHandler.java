@@ -4,12 +4,14 @@ import com.rpg.redsunapi.characterSheet.core.RuleCharacterSheetHandler;
 import com.rpg.redsunapi.characterSheet.dto.BasicSheetDTO;
 import com.rpg.redsunapi.characterSheet.dto.BasicSheetUpsertDTO;
 import com.rpg.redsunapi.tale.Tale;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
+@NullMarked
 @Component
 public class BasicSheetHandler implements RuleCharacterSheetHandler {
 
@@ -20,11 +22,13 @@ public class BasicSheetHandler implements RuleCharacterSheetHandler {
   }
 
   @Override
-  public CharacterSheet getOrCreateSheet(Tale tale, UUID characterId) {
-    if (tale == null || tale.getId() == null || characterId == null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tale and character id are required");
-    }
+  public CharacterSheet getSheet(Tale tale, UUID characterId) {
+    return basicSheetRepository.findByTale_IdAndCharacterId(tale.getId(), characterId)
+      .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Character sheet not found"));
+  }
 
+  @Override
+  public CharacterSheet getOrCreateSheet(Tale tale, UUID characterId) {
     BasicSheet sheet = basicSheetRepository.findByTale_IdAndCharacterId(tale.getId(), characterId)
       .orElseGet(() -> basicSheetRepository.save(new BasicSheet(tale, characterId)));
     tale.addBasicSheet(sheet);
@@ -33,10 +37,6 @@ public class BasicSheetHandler implements RuleCharacterSheetHandler {
 
   @Override
   public boolean exists(Tale tale, UUID characterId) {
-    if (tale == null || tale.getId() == null || characterId == null) {
-      return false;
-    }
-
     return basicSheetRepository.existsByTale_IdAndCharacterId(tale.getId(), characterId);
   }
 
@@ -58,10 +58,6 @@ public class BasicSheetHandler implements RuleCharacterSheetHandler {
 
   @Override
   public void deleteByTale(Tale tale) {
-    if (tale == null || tale.getId() == null) {
-      return;
-    }
-
     basicSheetRepository.deleteByTaleId(tale.getId());
   }
 

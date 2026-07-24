@@ -31,12 +31,16 @@ public record TaleMembership(Tale tale, UUID requesterId) {
     return isOwner() || isParticipant();
   }
 
+  public boolean isMember(UUID userId) {
+    return tale.isOwnedBy(userId) || tale.hasParticipant(userId);
+  }
+
   public boolean canModerateAuthoredContent(@Nullable UUID authorId) {
     return isOwner() || requesterId.equals(authorId);
   }
 
   public boolean canWriteCharacterSheet(UUID characterSheetId) {
-    return isOwner() || requesterId.equals(characterSheetId);
+    return isMember(characterSheetId) && (isOwner() || requesterId.equals(characterSheetId));
   }
 
   public ETaleRole role() {

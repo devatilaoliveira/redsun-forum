@@ -39,6 +39,7 @@ import {
 } from "../../../interface/dtos/characterSheet/CharacterSheetDTO";
 import {RedSunSheetResponseDTO} from "../../../interface/dtos/characterSheet/RedSunSheetResponseDTO";
 import {CompactRedSunSheetComponent} from "./compact-redsun-sheet/compact-redsun-sheet.component";
+import {TaleAccessRole} from "../../../interface/enums/TaleAccessRole";
 
 type PostFormGroup = FormGroup<{
   content: FormControl<string>;
@@ -153,8 +154,9 @@ export class LocationDetailsView implements OnInit, OnDestroy {
   protected readonly isRedsunTale: Signal<boolean> = computed(() => (
     this._talesContext.tale()?.rules === ERuleSystem.REDSUN
   ));
+  protected readonly canParticipate: Signal<boolean> = this._talesContext.canPlay;
   protected readonly canUseCharacterSheetInput: Signal<boolean> = computed(() => (
-    this.isRedsunTale() && !this.isCurrentUserTaleOwner()
+    this.isRedsunTale() && this._talesContext.role() === TaleAccessRole.Participant
   ));
   protected readonly isPremium: Signal<boolean> = computed(() => (
     this.user()?.subscription?.plan === ESubscriptionPlan.PREMIUM
