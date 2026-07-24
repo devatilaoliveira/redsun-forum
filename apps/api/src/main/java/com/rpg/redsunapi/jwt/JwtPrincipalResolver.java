@@ -22,8 +22,11 @@ public class JwtPrincipalResolver {
   private final JwtDecoder supabaseJwtDecoder;
 
   @Autowired
-  public JwtPrincipalResolver(@Value("${supabase.url}") String supabaseUrl) {
-    this(createSupabaseJwtDecoder(supabaseUrl));
+  public JwtPrincipalResolver(
+    @Value("${supabase.url}") String supabaseUrl,
+    @Value("${supabase.jwt-issuer:}") String configuredJwtIssuer
+  ) {
+    this(createSupabaseJwtDecoder(supabaseUrl, configuredJwtIssuer));
   }
 
   JwtPrincipalResolver(JwtDecoder supabaseJwtDecoder) {
@@ -49,15 +52,18 @@ public class JwtPrincipalResolver {
     return topLevelProvider == null || topLevelProvider.isBlank() ? null : topLevelProvider;
   }
 
-  private static JwtDecoder createSupabaseJwtDecoder(String supabaseUrl) {
+  private static JwtDecoder createSupabaseJwtDecoder(String supabaseUrl, String configuredJwtIssuer) {
     String normalizedSupabaseUrl = supabaseUrl.replaceAll("/+$", "");
+    String jwtIssuer = configuredJwtIssuer.isBlank()
+        ? normalizedSupabaseUrl + "/auth/v1"
+        : configuredJwtIssuer.replaceAll("/+$", "");
     NimbusJwtDecoder decoder = NimbusJwtDecoder
         .withJwkSetUri(normalizedSupabaseUrl + "/auth/v1/.well-known/jwks.json")
         .jwsAlgorithm(SignatureAlgorithm.ES256)
         .build();
 
     OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(
-        JwtValidators.createDefaultWithIssuer(normalizedSupabaseUrl + "/auth/v1")
+        JwtValidators.createDefaultWithIssuer(jwtIssuer)
     );
     decoder.setJwtValidator(validator);
     return decoder;

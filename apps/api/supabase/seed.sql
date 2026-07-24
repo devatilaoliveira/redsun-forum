@@ -1,6 +1,5 @@
 -- Deterministic local/CI seed data.
--- Run this only after the schema, auth wipe, storage setup, Data API hardening,
--- and app role grants have been applied.
+-- Supabase runs this after all migrations during first start and db reset.
 
 INSERT INTO public.patch_notes (id, release_date, content_pt, content_en, content_de)
 VALUES

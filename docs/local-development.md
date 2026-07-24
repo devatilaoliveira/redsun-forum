@@ -1,66 +1,42 @@
 # Local Development
 
-This guide covers workstation setup, environment selection, local startup,
-Docker debugging, Supabase schema and seed behavior, database security,
-backup, restore, remote database operations, and common failures.
+Run commands from the repository root in PowerShell unless a command says
+otherwise.
 
-Unless noted otherwise, run commands from the repository root in PowerShell.
+## Supported environments
 
-## Topology and startup order
+RedSun has two environments only:
 
-Start the system in dependency order:
-
-1. Install frontend dependencies.
-2. Start the Docker daemon.
-3. Start local Supabase, including PostgreSQL, Auth, Storage, and Studio.
-4. Build and start the RedSun API.
-5. Start the Angular development server.
-
-The lifecycle wrapper performs steps 3 and 4 in that order and waits for the
-API health endpoint. The frontend then reads the running local Supabase
-publishable key before Angular starts.
-
-## Environment matrix
-
-| Command | Frontend | Backend | Supabase/database |
+| Environment | Frontend | API | Database, Auth, Storage |
 | --- | --- | --- | --- |
-| `npm run start:local` | Local Angular dev server | Local `http://localhost:8080` | Local `http://localhost:54321` |
-| `npm run start:local-prod` | Local Angular dev server | Production API | Production Supabase |
+| Local | Angular on the host | Docker container | Local Supabase in Docker |
+| Production | Cloudflare | Coolify | Hosted Supabase |
 
-Keep these commands separate. `start:local` generates local runtime values and
-uses `environment.ts`; `start:local-prod` replaces that file with
-`environment.prod.ts`. Running the local preparation hook for
-`start:local-prod` would misleadingly overwrite `public/env.js`, even though
-the compiled application uses production targets.
+Local code does not load production dotenv files. There is no stage mode and
+no command for running the local frontend against production services.
 
-## Windows installation
+## Requirements
 
-Install the following tools:
+- Docker Desktop using Linux containers and Docker Compose v2
+- Supabase CLI exactly `2.109.1`
+- Node `>=24.15.0 <25`
+- PowerShell 7 on Linux/macOS, or Windows PowerShell 5.1/PowerShell 7 on Windows
+- Java 21 only when running Maven directly on the host
 
-- Node 24 LTS satisfying `>=24.15.0 <25` from the
-  [official Node download](https://nodejs.org/en/download). Verify with
-  `node --version`.
-- Docker Engine 24 or newer with Docker Compose v2, provided by Docker Desktop
-  configured for WSL 2 and Linux containers using the
-  [official Windows guide](https://docs.docker.com/desktop/setup/install/windows-install/).
-  Verify the daemon with `docker info` and Compose with
-  `docker compose version`.
-- A stable Supabase CLI `>=2.108.0 <3.0.0` using the
-  [official CLI guide](https://supabase.com/docs/guides/local-development/cli/getting-started).
-  CI currently pins `2.109.1`; verify with `supabase --version`.
-- PostgreSQL 17 client tools (`psql`, `pg_dump`, and `pg_restore`) from the
-  [official PostgreSQL Windows page](https://www.postgresql.org/download/windows/).
-  Ensure the tools are on `PATH`.
-- Windows PowerShell 5.1 or PowerShell 7.4 or newer. Verify with
-  `$PSVersionTable.PSVersion`.
+Verify the required local tools:
 
-Java 21 is optional for running the API outside Docker. IntelliJ IDEA is
-optional for backend development and remote JVM debugging; configure the
-project SDK and Maven runner to use Java 21.
+```powershell
+docker info
+docker compose version
+supabase --version
+node --version
+```
 
-## Clean first start
+The Supabase local stack is development-only. Do not expose its ports publicly.
 
-Install the frontend dependencies:
+## First start
+
+Install the pinned frontend dependencies:
 
 ```powershell
 Push-Location apps\web
@@ -68,27 +44,26 @@ npm ci
 Pop-Location
 ```
 
-`npm ci` installs the exact dependency versions from `package-lock.json`.
-
-Start Docker Desktop, verify it is ready, then initialize local data and
-rebuild the API image from fresh base layers:
+Start Supabase and the API:
 
 ```powershell
-docker info
-.\apps\api\supabase\scripts\start-local.ps1 -Reset -NoCache
+.\local.ps1 start
 ```
 
-`-Reset` is destructive. Use it only for first initialization or an
-intentional clean reset. `-NoCache` applies only to the RedSun API image:
-Compose builds it with `--no-cache --pull`, while Supabase services continue
-to use their published Docker images.
+On a fresh Supabase instance, `supabase start` applies every committed
+migration and then runs `seed.sql`. The lifecycle script subsequently:
 
-The lifecycle wrapper starts the required Supabase services, generates the
-ignored `apps/api/.env.local.container`, performs the explicit reset, builds
-the API container, and waits for the backend health endpoint to report `UP`.
-The first run can take several minutes while Docker downloads images.
+1. Reads the CLI-issued publishable/anon and service-role keys from
+   `supabase status --output env`.
+2. Changes `redsun_dev` into a local login using the committed
+   `local-redsun-password`.
+3. Writes the service-role key to ignored `apps/api/.env.local.keys`.
+4. Writes fixed browser-local URLs and the publishable key to ignored
+   `apps/web/public/env.js`.
+5. Builds and starts the API container.
+6. Waits for `http://localhost:8080/actuator/health` to report `UP`.
 
-Start the fully local frontend:
+Start Angular in another terminal:
 
 ```powershell
 Push-Location apps\web
@@ -96,431 +71,294 @@ npm run start:local
 Pop-Location
 ```
 
-The `prestart:local` npm hook reads the publishable key from the running local
-Supabase stack and writes local frontend, API, and Supabase values to
-`public/env.js`. If Supabase is unavailable, it fails before Angular starts.
+Angular does not discover Supabase keys itself. If `public/env.js` is missing or
+stale, rerun `.\local.ps1 start`.
 
-Primary endpoints:
+## Lifecycle commands
 
-| Service | URL |
+### Start or resume
+
+```powershell
+.\local.ps1 start
+```
+
+This preserves database, Auth, and Storage mutations. It refreshes generated
+keys/configuration and recreates the API container.
+
+Use the same entrypoint for an uncached API image build or JVM debugging:
+
+```powershell
+.\local.ps1 start -NoCache
+.\local.ps1 start -DebugApi
+```
+
+Debug mode exposes JDWP on `localhost:5005` with `suspend=n`.
+
+### Reset
+
+```powershell
+.\local.ps1 reset
+```
+
+Reset runs:
+
+```text
+supabase db reset --local
+  -> migrations in timestamp order
+  -> apps/api/supabase/seed.sql
+  -> local redsun_dev password provisioning
+  -> runtime key/config refresh
+  -> API restart and health check
+```
+
+It removes all local database mutations, including records created by E2E, and
+restores the deterministic seed state. No custom table/Auth/Storage wipe
+sequence is used.
+
+### Stop
+
+```powershell
+.\local.ps1 stop
+```
+
+This stops the API Compose project and Supabase without using
+`supabase stop --no-backup`, so local state is preserved.
+
+## Fixed local configuration
+
+The API container gets fixed non-secret values directly from
+`apps/api/docker-compose.yml`:
+
+| Setting | Local value |
 | --- | --- |
-| Frontend | `http://localhost:4200` |
-| Backend health | `http://localhost:8080/actuator/health` |
-| Supabase Studio | `http://localhost:54323` |
-| Supabase API gateway (Auth and Storage) | `http://localhost:54321` |
-| PostgreSQL | `localhost:54322` |
-| Mailpit | `http://localhost:54324` |
+| Frontend and CORS origin | `http://localhost:4200` |
+| Database URL | `jdbc:postgresql://host.docker.internal:54322/postgres?sslmode=disable` |
+| Database role | `redsun_dev` |
+| Database password | `local-redsun-password` |
+| Supabase URL | `http://host.docker.internal:54321` |
+| Supabase JWT issuer | `http://127.0.0.1:54321/auth/v1` |
+| Storage URL | `http://host.docker.internal:54321/storage/v1/object/public/` |
+| Brevo/Gemini credentials | Non-secret local placeholders |
 
-## Daily start and stop
+Only the dynamically issued API service-role key is stored in
+`apps/api/.env.local.keys`.
 
-Start the existing local data and API, then the frontend:
+The browser runtime file contains:
+
+- `APP_ENV=local`
+- `BASE_URL=http://localhost:4200`
+- `API_BASE_URL=http://localhost:8080`
+- `SUPABASE_URL=http://127.0.0.1:54321`
+- The CLI-issued publishable/anon key
+
+It never contains the service-role/secret key.
+
+## Migrations and seed data
+
+`apps/api/supabase/config.toml` retains PostgreSQL 17, enables migrations, and
+enables the standard `seed.sql` lifecycle.
+
+`apps/api/supabase/migrations/` contains:
+
+- The provisional production schema baseline.
+- A separate forward migration for the private schema, `redsun_dev` role and
+  grants, explicit Data API revocations, public/private RLS, and the four
+  Storage bucket definitions.
+
+There are no declarative schema files. Create future migration files with:
 
 ```powershell
-.\apps\api\supabase\scripts\start-local.ps1
-
-Push-Location apps\web
-npm run start:local
-Pop-Location
+supabase migration new <descriptive-name> --workdir apps/api
 ```
 
-Stop containers while preserving local database, Auth, and Storage data:
+Then verify the complete history with `.\local.ps1 reset`.
+
+`apps/api/supabase/seed.sql` contains deterministic synthetic fixtures only:
+
+- Three login-capable Supabase Auth users and identities
+- Matching application users and subscriptions
+- A seeded tale, owner participant, and character sheet
+- Localized patch-note fixtures
+
+Seeded browser credentials:
+
+| Email | Password |
+| --- | --- |
+| `worker-login-1@redsun.com` | `123redsun1` |
+| `worker-login-2@redsun.com` | `123redsun2` |
+| `worker-login-3@redsun.com` | `123redsun3` |
+
+Production data is never copied into local or CI. Production `db push` must
+never use `--include-seed`.
+
+## Database security
+
+Migrations define `redsun_dev` without assigning production credentials. The
+role is explicitly denied superuser, role creation, database creation,
+replication, and `BYPASSRLS` privileges.
+
+All 18 application tables in `public` have RLS enabled. The private username
+counter also has defense-in-depth RLS. `anon` and `authenticated` receive no
+application-table privileges and cannot use the private schema. The backend
+role has the required table, sequence, function, and RLS-policy access;
+`patch_notes` remains read-only to the backend.
+
+The application migration defines four public Storage buckets:
+
+- `avatars`
+- `tales`
+- `locations`
+- `characters`
+
+Uploads and deletes go through the API using the service-role key. The
+frontend receives only the publishable/anon key.
+
+## Verification
+
+### Health, role, RLS, and fixtures
+
+After reset:
 
 ```powershell
-.\apps\api\supabase\scripts\stop-local.ps1
+Invoke-RestMethod http://localhost:8080/actuator/health
+
+docker exec supabase_db_redsun-supabase psql -U postgres -d postgres -c `
+  "select rolcanlogin, rolsuper, rolcreaterole, rolcreatedb, rolreplication, rolbypassrls from pg_roles where rolname = 'redsun_dev';"
+
+docker exec supabase_db_redsun-supabase psql -U postgres -d postgres -c `
+  "select count(*) as seeded_auth_users from auth.users;"
+
+docker exec supabase_db_redsun-supabase psql -U postgres -d postgres -c `
+  "select id from storage.buckets where id in ('avatars','tales','locations','characters') order by id;"
+
+docker exec supabase_db_redsun-supabase psql -U postgres -d postgres -c `
+  "select n.nspname, c.relname, c.relrowsecurity from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname in ('public','private') and c.relkind = 'r' order by 1,2;"
 ```
 
-Do not use `npm ci`, `-Reset`, or `-NoCache` in the normal daily path.
-Do not add `--no-backup` to `supabase stop`; that flag deletes local data.
+Expected results:
 
-## Backend Docker debugging
+- `redsun_dev` can log in locally and every elevated attribute is false.
+- Exactly three seeded Auth users exist.
+- All four application buckets exist.
+- Every application table reports RLS enabled.
 
-Start the API with its existing JDWP configuration:
+The Playwright suite logs in with the seeded credentials, providing a real
+email/password Auth verification against local Supabase.
+
+### Persistence versus reset
+
+Create a marker through the restricted backend role:
 
 ```powershell
-.\apps\api\supabase\scripts\start-local.ps1 -Debug
+docker exec -e PGPASSWORD=local-redsun-password supabase_db_redsun-supabase `
+  psql -h 127.0.0.1 -U redsun_dev -d postgres -v ON_ERROR_STOP=1 -c `
+  "insert into public.client_error_reports (message, name) values ('persistence-marker', 'local-verification');"
 ```
 
-Add `-NoCache` if the API image itself needs a clean rebuild:
+Run `.\local.ps1 stop`, then `.\local.ps1 start`, and confirm the marker still
+exists. Run `.\local.ps1 reset` and confirm it is gone and the seed users are
+restored.
+
+### Maven tests
+
+Run the API directly against local Supabase:
 
 ```powershell
-.\apps\api\supabase\scripts\start-local.ps1 -Debug -NoCache
-```
+$env:DB_USER = "redsun_dev"
+$env:DB_PASSWORD = "local-redsun-password"
+$env:SPRING_DATASOURCE_URL = "jdbc:postgresql://127.0.0.1:54322/postgres?sslmode=disable"
+$env:SUPABASE_URL = "http://127.0.0.1:54321"
+$env:SUPABASE_STORAGE_URL = "http://127.0.0.1:54321/storage/v1/object/public/"
+$env:SUPABASE_SECRET_KEY = (
+  supabase status --workdir apps/api --output env |
+    Select-String '^SERVICE_ROLE_KEY='
+).Line.Split('=', 2)[1].Trim('"')
 
-The flags also combine with `-Reset` when an intentional database reset is
-needed. Attach an IntelliJ **Remote JVM Debug** configuration to
-`localhost:5005`. The container uses `suspend=n`, so the API starts immediately
-instead of waiting for the debugger. Port `8080` remains the HTTP endpoint.
-
-Inspect API logs with the same Compose overlay used for debugging:
-
-```powershell
-docker compose --project-directory apps/api `
-  --file apps/api/docker-compose.yml `
-  --file apps/api/docker-compose.debug.yml `
-  logs --no-color --tail 200 api
-```
-
-The lifecycle wrapper automatically uses both Compose files for startup and
-failure logs when `-Debug` is set.
-
-## Frontend workflows
-
-### Fully local
-
-`npm run start:local` runs Angular's `local` configuration. It keeps
-`src/environments/environment.ts`, disables optimization and license
-extraction, enables source maps, and disables output hashing. Its pre-hook
-regenerates `public/env.js` on every start, so stale production placeholders
-or values do not survive into a local session.
-
-### Local frontend against production
-
-```powershell
-Push-Location apps\web
-npm run start:local-prod
-Pop-Location
-```
-
-Only the Angular development server is local. API calls, authentication,
-Storage operations, and database-backed actions target production services.
-Application actions can affect production data, so use this mode carefully.
-It neither requires nor starts the local Supabase/backend stack and does not
-run the local environment preparation script.
-
-## Supabase and database operations
-
-The local Supabase stack is for development and CI only. Production Compose
-starts only the RedSun API and connects it to hosted database and Supabase
-services through environment variables.
-
-The lifecycle command excludes unused Logflare Analytics, Vector, Realtime,
-Edge Runtime, imgproxy, PostgREST, and Supavisor services. It keeps PostgreSQL,
-Auth, Storage, the API gateway, Studio with pgMeta, and Mailpit. No manual
-`--exclude` argument is required.
-
-The Supabase CLI project namespace is `redsun-supabase`. The CLI creates one
-container per service, using names such as
-`supabase_db_redsun-supabase`; it does not create one combined container.
-
-Use the following command to inspect local service status. Its output contains
-keys, so do not commit or share it:
-
-```powershell
-supabase status --workdir apps/api
-```
-
-### Database reset and seed behavior
-
-> **Warning:** `-Reset` destroys the local application schema and configured
-> application-owned Auth and Storage records before restoring the committed
-> seed state. It is not a repair or normal startup command.
-
-Run an intentional reset with:
-
-```powershell
-.\apps\api\supabase\scripts\start-local.ps1 -Reset
-```
-
-The Supabase `config.toml` deliberately disables CLI migrations and automatic
-seeding. The reset wrapper applies these repository files in order:
-
-1. `apps/api/supabase/db/schema.sql`
-2. `apps/api/supabase/db/private-wipe.sql`
-3. `apps/api/supabase/db/storage.sql`
-4. `apps/api/supabase/db/storage-wipe.sql`
-5. `apps/api/supabase/db/auth-wipe.sql`
-6. `apps/api/supabase/db/data-api-hardening.sql`
-7. `apps/api/supabase/db/app-role-grants.sql`
-8. `apps/api/supabase/db/seed.sql`
-
-`reset-local-supabase.ps1` refuses non-local database hosts and
-`prod`/`production` environment markers. It creates or updates only the
-validated local runtime role `redsun_dev`, runs SQL with `ON_ERROR_STOP`, and
-verifies that the restricted runtime login can execute `SELECT 1`.
-
-### Security and Storage posture
-
-The Storage SQL creates the public `avatars`, `tales`, `locations`, and
-`characters` buckets. There are intentionally no custom `storage.objects` RLS
-policies: public object reads use public bucket endpoints, while uploads and
-deletes go through the backend with `SUPABASE_SECRET_KEY`.
-
-The secret/service-role key bypasses Storage RLS and must never be exposed to
-the frontend. Verification should confirm the four bucket definitions and the
-absence of unintended client write policies.
-
-All application tables have RLS enabled. The `anon` and `authenticated` roles
-have no application-table grants; the restricted `redsun_dev` backend role
-receives the required policies and grants.
-
-### Host-run API connectivity
-
-Processes on the host connect through `127.0.0.1` or `localhost`. Generate a
-host-local API environment after Supabase is running:
-
-```powershell
 Push-Location apps\api
-.\supabase\scripts\prepare-local-api-env.ps1 -OutputFile .env.local
-.\mvnw.cmd test
-Pop-Location
-```
-
-For `spring-boot:run`, load `.env.local` through the IDE or shell. Its relevant
-host connections are:
-
-```dotenv
-SPRING_DATASOURCE_URL=jdbc:postgresql://127.0.0.1:54322/postgres?sslmode=disable
-SUPABASE_URL=http://127.0.0.1:54321
-```
-
-An API container cannot use the host's `127.0.0.1`. `start-local.ps1`
-therefore generates `apps/api/.env.local.container` with
-`host.docker.internal:54322` for PostgreSQL and
-`http://host.docker.internal:54321` for Supabase. The app-local Compose file
-consumes that environment automatically; no shared external Docker network is
-required.
-
-### Local database verification
-
-After a clean reset, verify the restricted runtime login:
-
-```powershell
-$previousPgPassword = $env:PGPASSWORD
-$env:PGPASSWORD = "local-redsun-password"
-psql -h 127.0.0.1 -p 54322 -U redsun_dev -d postgres `
-  -v ON_ERROR_STOP=1 -c "SELECT 1;"
-$env:PGPASSWORD = $previousPgPassword
-```
-
-Expected infrastructure state:
-
-- The schema matches the JPA entities and passes
-  `spring.jpa.hibernate.ddl-auto=validate`.
-- The three seeded users, subscriptions, tale, participant, character sheet,
-  Auth users, and Auth identities exist.
-- `redsun_dev` is a login role without superuser, role creation, database
-  creation, replication, or `BYPASSRLS`.
-- The four public Storage buckets exist with no unintended client write policy
-  on `storage.objects`.
-- Local Auth accepts a seeded login, and backend Storage upload/delete works
-  with the local secret key.
-
-For a persistence check, insert an independent marker through the runtime
-role:
-
-```sql
-INSERT INTO public.client_error_reports (message, name)
-VALUES ('persistence-marker', 'local-verification');
-```
-
-Run `stop-local.ps1`, start without `-Reset`, and confirm the marker remains.
-Then run `start-local.ps1 -Reset`; the marker count must return to zero and the
-three seeded users must exist again.
-
-Finish with the Maven workflow used by CI:
-
-```powershell
-Push-Location apps\api
-.\supabase\scripts\prepare-local-api-env.ps1 -OutputFile .env.local
 .\mvnw.cmd -B -ntp test
 Pop-Location
 ```
 
-GitHub Actions pins Supabase CLI `2.109.1` in
-[API CI](../.github/workflows/api-ci.yml) and
-[E2E CI](../.github/workflows/e2e-ci.yml).
+Hibernate uses `ddl-auto: validate`, so application startup and the Maven suite
+validate the JPA mapping against the migrated schema.
 
-### Remote database backup and reset
+### Playwright
 
-Remote commands use an app-local environment file such as `apps/api/.env`.
-Relative `-EnvFile` paths resolve from `apps/api`; SQL and backup paths resolve
-from `apps/api/supabase`.
-
-Create a logical backup before a remote reset:
+With the lifecycle stack running:
 
 ```powershell
-Push-Location apps\api
-.\supabase\scripts\backup-db.ps1 -EnvFile .env -OverrideEnv
+Push-Location apps\web
+npm run e2e -- --workers=1
 Pop-Location
 ```
 
-Include Auth and Storage metadata only when required:
+The suite runs the configured Chromium, Firefox, and WebKit projects. A later
+`.\local.ps1 reset` removes E2E-created tales, participants, locations, users,
+and other database records.
 
-```powershell
-Push-Location apps\api
-.\supabase\scripts\backup-db.ps1 `
-  -Schemas public,private,auth,storage `
-  -EnvFile .env `
-  -OverrideEnv
-Pop-Location
-```
+## CI behavior
 
-Backups are written to the ignored `apps/api/supabase/backups/` directory.
-Database dumps contain Storage metadata, not the stored object files.
+API CI runs for pull requests to `main` and manual dispatch. It:
 
-The remote reset below is destructive and has no interactive confirmation.
-Verify every target value and take a backup first:
+1. Starts local Supabase.
+2. Runs a standard reset and seed.
+3. Provisions the restricted local login and exports the discovered key.
+4. Verifies role attributes, public/private RLS, Data API isolation, seeded Auth
+   users, and Storage buckets.
+5. Runs Maven tests with JPA schema validation.
 
-```powershell
-Push-Location apps\api
-.\supabase\scripts\run-supabase-sql.ps1 -EnvFile .env -OverrideEnv
-Pop-Location
-```
+E2E CI runs for pull requests to `main` and manual dispatch. It calls
+`local.ps1 reset`, uses the Docker API, runs all Playwright browser projects
+with one worker, and stores API logs and the Playwright report on failure.
 
-Remote reset protections and limitations:
+Web CI retains Angular lint and full build verification. Do not run the full
+frontend build from the agent environment because it is known to fail there
+with `spawn EPERM`; use targeted lint/static checks locally.
 
-- `-EnvFile` makes the target explicit; `-OverrideEnv` prevents stale shell
-  values from taking precedence.
-- Supavisor pooler users are rejected unless they include a project reference
-  in the expected `role.<project-ref>` form.
-- SQL stops on the first error.
-- Reapplying `app-role-grants.sql` ends with a restricted runtime login check.
-- The script does not ask for confirmation or reject a production marker. The
-  operator must verify `DB_HOST`, `DB_ADMIN_HOST`, `DB_NAME`, and all
-  project-qualified users.
+## Production boundary
 
-To execute selected SQL files instead of the full reset:
+Production values are supplied externally:
 
-```powershell
-Push-Location apps\api
-.\supabase\scripts\run-supabase-sql.ps1 `
-  -EnvFile .env `
-  -OverrideEnv `
-  -SqlFiles db/data-api-hardening.sql,db/app-role-grants.sql
-Pop-Location
-```
+- Cloudflare supplies frontend build/runtime values.
+- Coolify supplies API/database/integration values.
+- Supabase retains hosted platform configuration and migration history.
 
-### Restore protections
+The repository does not contain production credentials and GitHub Actions does
+not receive production database access.
 
-Restore is destructive and requires exact confirmation:
-
-```powershell
-Push-Location apps\api
-.\supabase\scripts\restore-db.ps1 `
-  -BackupFile backups\postgres-YYYYMMDD-HHMMSS.dump `
-  -EnvFile .env.local `
-  -OverrideEnv `
-  -ConfirmRestore "RESTORE postgres"
-Pop-Location
-```
-
-The restore script:
-
-- Refuses `prod`/`production` environment markers.
-- Refuses non-local hosts unless `-AllowRemote` is supplied.
-- Requires administrator credentials and the exact
-  `RESTORE <DB_NAME>` confirmation.
-- Uses `--clean --if-exists` unless `-NoClean` is supplied.
-- Stops on the first restore error.
-
-`-AllowRemote` is only for a non-production test database. After restoring,
-reapply Data API hardening and runtime grants:
-
-```powershell
-Push-Location apps\api
-.\supabase\scripts\run-supabase-sql.ps1 `
-  -EnvFile .env.local `
-  -OverrideEnv `
-  -SslMode disable `
-  -SqlFiles db/data-api-hardening.sql,db/app-role-grants.sql
-Pop-Location
-```
-
-### Supabase directory layout
-
-- `apps/api/supabase/config.toml` configures local services.
-- `apps/api/supabase/db/` contains schema, wipe, hardening, grants, Storage,
-  and seed SQL.
-- `apps/api/supabase/scripts/` contains lifecycle, environment, reset, backup,
-  and restore tools.
-- `apps/api/supabase/backups/` is created on demand and ignored by Git.
-
-See the official Supabase guides for
-[local development](https://supabase.com/docs/guides/local-development) and
-[database backups](https://supabase.com/docs/guides/platform/backups).
-
-## Optional Codex agent launcher
-
-Start a layered session for the whole repository:
-
-```powershell
-.\scripts\codexLaucher.ps1 -App all
-```
-
-Valid app selections are `web`, `api`, `repo`, and `all`. Validate layer
-resolution without launching Codex:
-
-```powershell
-.\scripts\codexLaucher.ps1 -App all -DryRun
-```
+The current baseline file is provisional because this repository session had
+no authenticated production connection. Before the first production push, an
+operator must replace it through the `supabase db pull` workflow and ensure the
+forward hardening migration sorts after the pulled baseline. Follow
+[production database deployment](production-database.md).
 
 ## Troubleshooting
 
-### Unsupported Node or Supabase CLI version
+### Supabase CLI version rejected
 
-Compare `node --version` with `>=24.15.0 <25` and `supabase --version` with
-`>=2.108.0 <3.0.0`. The Node range is declared in `apps/web/package.json`;
-the API lifecycle wrapper stops with an explicit Supabase version error before
-startup.
+Install exactly `2.109.1`, matching `local.ps1` and GitHub Actions.
 
-### Docker is unavailable
+### Docker unavailable
 
-Start Docker Desktop and wait until its engine is ready. Run `docker info`.
-If that fails, confirm WSL 2 and Linux containers are enabled and restart
-Docker Desktop.
+Start Docker Desktop, wait for the Linux engine, then run `docker info`.
 
-### A port is occupied
+### Frontend reports missing runtime values
 
-Check ports `4200`, `5005`, `54321` through `54324`, `54322`, and `8080`:
+Stop Angular, run `.\local.ps1 start`, and restart `npm run start:local`.
+Do not manually copy a service-role key into `public/env.js`.
 
-```powershell
-Get-NetTCPConnection -State Listen |
-  Where-Object LocalPort -In 4200,5005,54321,54322,54323,54324,8080
-```
+### API health timeout
 
-Stop the conflicting process or container before retrying. Port `5005` matters
-only with `-Debug`.
-
-### `psql` is missing
-
-Install PostgreSQL 17 client tools, add their `bin` directory to `PATH`, open a
-new PowerShell session, and run `psql --version`. `-Reset` requires `psql`;
-ordinary data-preserving startup does not.
-
-### Local Supabase status fails
-
-Run:
-
-```powershell
-supabase status --workdir apps/api
-```
-
-If it fails, start the stack through `start-local.ps1` and inspect the
-Supabase/Docker output. `npm run start:local` intentionally refuses to start
-when it cannot read a local publishable key.
-
-### Frontend has stale environment output
-
-Stop Angular and run `npm run start:local` again. The pre-hook rewrites
-`apps/web/public/env.js`. Do not manually copy production keys into this file,
-and never expose a Supabase secret/service-role key to the frontend.
-
-### API health times out
-
-Inspect the failure logs printed by `start-local.ps1`, then run:
+Inspect API logs:
 
 ```powershell
 docker compose --project-directory apps/api `
-  --file apps/api/docker-compose.yml `
-  logs --no-color --tail 200 api
+  --file apps/api/docker-compose.yml logs --no-color --tail 200 api
 ```
 
-Confirm port `8080` is free, Docker has adequate resources, and the local
-schema has been initialized. Use `-Reset` only when a destructive reset is
-intended.
+Confirm ports `8080`, `54321`, `54322`, `54323`, and `54324` are free.
 
-## Safety boundaries
+### Schema or fixture drift
 
-The local Supabase stack is development-only, uses development credentials,
-and must not be exposed publicly. The repository's production Compose file
-contains only the RedSun API service; it never launches local Supabase.
+Run `.\local.ps1 reset`. Do not restore a remote dump or recreate the removed
+wipe/reset scripts.
