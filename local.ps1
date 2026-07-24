@@ -144,16 +144,32 @@ function Set-LocalBackendLogin {
     [string]$DockerCommand
   )
 
-  $provisionSql = @"
+  $provisionSql = @'
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'redsun_dev') THEN
+    CREATE ROLE redsun_dev
+      NOLOGIN
+      NOSUPERUSER
+      NOCREATEDB
+      NOCREATEROLE
+      NOINHERIT
+      NOREPLICATION
+      NOBYPASSRLS;
+  END IF;
+END
+$$;
+
 ALTER ROLE redsun_dev
   WITH LOGIN
   PASSWORD 'local-redsun-password'
   NOSUPERUSER
   NOCREATEDB
   NOCREATEROLE
+  NOINHERIT
   NOREPLICATION
   NOBYPASSRLS;
-"@
+'@
 
   Invoke-Checked `
     -Command $DockerCommand `
@@ -215,6 +231,9 @@ Invoke-Checked `
   "Supabase failed to start."
 
 if ($Action -eq "reset") {
+  # PostgreSQL roles are cluster-scoped and survive a database reset. Normalize
+  # a role left by an older local setup before migrations run as `postgres`.
+  Set-LocalBackendLogin $docker
   Write-Warning "Reset destroys local database data and restores the committed migration and seed state."
   Invoke-Checked `
     $supabase `

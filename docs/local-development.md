@@ -158,6 +158,10 @@ It never contains the service-role/secret key.
 `apps/api/supabase/config.toml` retains PostgreSQL 17, enables migrations, and
 enables the standard `seed.sql` lifecycle.
 
+`apps/api/supabase/roles.sql` defines the credential-free, restricted
+cluster-level `redsun_dev` role before migrations run. Local credentials are
+assigned afterward by `local.ps1`.
+
 `apps/api/supabase/migrations/` contains:
 
 - The provisional production schema baseline.
@@ -223,7 +227,7 @@ After reset:
 Invoke-RestMethod http://localhost:8080/actuator/health
 
 docker exec supabase_db_redsun-supabase psql -U postgres -d postgres -c `
-  "select rolcanlogin, rolsuper, rolcreaterole, rolcreatedb, rolreplication, rolbypassrls from pg_roles where rolname = 'redsun_dev';"
+  "select rolcanlogin, rolsuper, rolcreaterole, rolcreatedb, rolinherit, rolreplication, rolbypassrls from pg_roles where rolname = 'redsun_dev';"
 
 docker exec supabase_db_redsun-supabase psql -U postgres -d postgres -c `
   "select count(*) as seeded_auth_users from auth.users;"

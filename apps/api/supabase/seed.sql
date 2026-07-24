@@ -265,6 +265,33 @@ VALUES
   )
 ON CONFLICT (id) DO NOTHING;
 
+INSERT INTO public.user_settings (
+  user_id,
+  app_language,
+  app_theme,
+  redirect_to_favorite
+)
+VALUES
+  (
+    '00000000-0000-0000-0000-000000000101',
+    'PT',
+    'DARK',
+    false
+  ),
+  (
+    '00000000-0000-0000-0000-000000000102',
+    'PT',
+    'DARK',
+    false
+  ),
+  (
+    '00000000-0000-0000-0000-000000000103',
+    'PT',
+    'DARK',
+    false
+  )
+ON CONFLICT (user_id) DO NOTHING;
+
 INSERT INTO public.subscriptions (
   user_id,
   plan,

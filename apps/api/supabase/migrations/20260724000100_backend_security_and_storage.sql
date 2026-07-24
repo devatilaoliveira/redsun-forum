@@ -38,23 +38,30 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'redsun_dev') THEN
     CREATE ROLE redsun_dev
       NOLOGIN
-      NOSUPERUSER
-      NOCREATEDB
-      NOCREATEROLE
-      NOINHERIT
-      NOREPLICATION
-      NOBYPASSRLS;
+      NOINHERIT;
   END IF;
 END
 $$;
 
-ALTER ROLE redsun_dev
-  NOSUPERUSER
-  NOCREATEDB
-  NOCREATEROLE
-  NOINHERIT
-  NOREPLICATION
-  NOBYPASSRLS;
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM pg_roles
+    WHERE rolname = 'redsun_dev'
+      AND (
+        rolsuper
+        OR rolcreatedb
+        OR rolcreaterole
+        OR rolinherit
+        OR rolreplication
+        OR rolbypassrls
+      )
+  ) THEN
+    RAISE EXCEPTION 'redsun_dev has elevated role attributes';
+  END IF;
+END
+$$;
 
 GRANT CONNECT ON DATABASE postgres TO redsun_dev;
 GRANT USAGE ON SCHEMA public, private TO redsun_dev;
