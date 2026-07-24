@@ -85,6 +85,9 @@ apps/api/HELP.md
 **/reports/
 **/exports/
 **/backups/
+apps/api/supabase/.temp/
+apps/api/supabase/.branches/
+**/supabase-status.env
 **/todos/
 Notes.txt
 TODO.txt

@@ -76,8 +76,27 @@ function Assert-RequiredEnv {
   }
 }
 
+function Resolve-PathFromRoot {
+  param(
+    [string]$Path,
+    [string]$Root
+  )
+
+  if ([System.IO.Path]::IsPathRooted($Path)) {
+    return [System.IO.Path]::GetFullPath($Path)
+  }
+
+  return [System.IO.Path]::GetFullPath((Join-Path -Path $Root -ChildPath $Path))
+}
+
+$supabaseRoot = Split-Path -Parent $PSScriptRoot
+$apiRoot = Split-Path -Parent $supabaseRoot
+
 try {
-  Load-EnvFile -Path $EnvFile
+  $envFilePath = Resolve-PathFromRoot -Path $EnvFile -Root $apiRoot
+  $outputDirPath = Resolve-PathFromRoot -Path $OutputDir -Root $supabaseRoot
+
+  Load-EnvFile -Path $envFilePath
   Assert-RequiredEnv -Names @("DB_HOST", "DB_PORT", "DB_NAME", "DB_ADMIN_USER", "DB_ADMIN_PASSWORD")
 
   if ($Schemas.Count -eq 0) {
@@ -85,7 +104,7 @@ try {
   }
 
   $pgDumpCmd = Get-ToolCommand -ExplicitPath $PgDumpPath -CommandName "pg_dump"
-  $backupRoot = New-Item -ItemType Directory -Force -Path $OutputDir
+  $backupRoot = New-Item -ItemType Directory -Force -Path $outputDirPath
   $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
   $backupPath = Join-Path -Path $backupRoot.FullName -ChildPath "$($env:DB_NAME)-$timestamp.dump"
 

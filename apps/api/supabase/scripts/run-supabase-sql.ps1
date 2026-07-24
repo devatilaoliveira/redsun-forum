@@ -101,6 +101,19 @@ function Get-EndpointSource {
   return "$HostVariableName/$PortVariableName"
 }
 
+function Resolve-PathFromRoot {
+  param(
+    [string]$Path,
+    [string]$Root
+  )
+
+  if ([System.IO.Path]::IsPathRooted($Path)) {
+    return [System.IO.Path]::GetFullPath($Path)
+  }
+
+  return [System.IO.Path]::GetFullPath((Join-Path -Path $Root -ChildPath $Path))
+}
+
 function Test-RuntimeDatabaseLogin {
   param(
     [string]$PsqlCommand,
@@ -145,8 +158,16 @@ function Test-RuntimeDatabaseLogin {
   throw "Runtime database login failed for DB_USER after app-role grants. Confirm DB_HOST/DB_PORT and DB_ADMIN_HOST/DB_ADMIN_PORT point to the same Supabase project, wait for pooler credential propagation after any password rotation, and restart old app instances that may still be using stale credentials."
 }
 
+$supabaseRoot = Split-Path -Parent $PSScriptRoot
+$apiRoot = Split-Path -Parent $supabaseRoot
+
 try {
-  $loadedEnvNames = Load-EnvFile -Path $EnvFile
+  $envFilePath = Resolve-PathFromRoot -Path $EnvFile -Root $apiRoot
+  $resolvedSqlFiles = @($SqlFiles | ForEach-Object {
+    Resolve-PathFromRoot -Path $_ -Root $supabaseRoot
+  })
+
+  $loadedEnvNames = Load-EnvFile -Path $envFilePath
   if ($OverrideEnv) {
     Clear-AbsentOptionalEnv -LoadedNames $loadedEnvNames -Names @("DB_ADMIN_HOST", "DB_ADMIN_PORT")
   }
@@ -191,7 +212,7 @@ try {
   }
 
   Write-Host "Using admin database endpoint $($adminHost):$($adminPort) from $adminEndpointSource."
-  foreach ($file in $SqlFiles) {
+  foreach ($file in $resolvedSqlFiles) {
     if (-not (Test-Path -Path $file)) {
       throw "SQL file not found: $file"
     }
@@ -213,7 +234,7 @@ try {
     }
   }
 
-  $runsAppRoleGrantsSql = $SqlFiles | Where-Object { (Split-Path -Path $_ -Leaf) -eq "app-role-grants.sql" }
+  $runsAppRoleGrantsSql = $resolvedSqlFiles | Where-Object { (Split-Path -Path $_ -Leaf) -eq "app-role-grants.sql" }
   if ($runsAppRoleGrantsSql -and -not $SkipRuntimeLoginVerification) {
     Test-RuntimeDatabaseLogin -PsqlCommand $psqlCmd
   } elseif ($runsAppRoleGrantsSql) {

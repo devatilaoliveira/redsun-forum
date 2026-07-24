@@ -105,6 +105,19 @@ function Assert-ValidRoleName {
   }
 }
 
+function Resolve-PathFromRoot {
+  param(
+    [string]$Path,
+    [string]$Root
+  )
+
+  if ([System.IO.Path]::IsPathRooted($Path)) {
+    return [System.IO.Path]::GetFullPath($Path)
+  }
+
+  return [System.IO.Path]::GetFullPath((Join-Path -Path $Root -ChildPath $Path))
+}
+
 function Ensure-LocalRuntimeRole {
   param([string]$PsqlCommand)
 
@@ -113,11 +126,31 @@ function Ensure-LocalRuntimeRole {
   $rolePassword = $env:DB_PASSWORD.Replace("'", "''")
   $roleSql = @"
 DO `$`$
+DECLARE
+  existing_role record;
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '$roleName') THEN
+  SELECT
+    rolsuper,
+    rolcreatedb,
+    rolcreaterole,
+    rolreplication,
+    rolbypassrls
+  INTO existing_role
+  FROM pg_roles
+  WHERE rolname = '$roleName';
+
+  IF NOT FOUND THEN
     EXECUTE format('CREATE ROLE %I WITH LOGIN PASSWORD %L NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS', '$roleName', '$rolePassword');
   ELSE
-    EXECUTE format('ALTER ROLE %I WITH LOGIN PASSWORD %L NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS', '$roleName', '$rolePassword');
+    IF existing_role.rolsuper
+      OR existing_role.rolcreatedb
+      OR existing_role.rolcreaterole
+      OR existing_role.rolreplication
+      OR existing_role.rolbypassrls THEN
+      RAISE EXCEPTION 'Existing runtime role % has privileged attributes and cannot be repaired by the restricted local admin', '$roleName';
+    END IF;
+
+    EXECUTE format('ALTER ROLE %I WITH LOGIN PASSWORD %L', '$roleName', '$rolePassword');
   END IF;
 END
 `$`$;
@@ -160,13 +193,14 @@ function Invoke-SqlFile {
   }
 }
 
+$supabaseRoot = Split-Path -Parent $PSScriptRoot
+$apiRoot = Split-Path -Parent $supabaseRoot
+
 try {
-  $startingDirectory = (Get-Location).Path
-  $envFilePath = if ([System.IO.Path]::IsPathRooted($EnvFile)) {
-    $EnvFile
-  } else {
-    Join-Path -Path $startingDirectory -ChildPath $EnvFile
-  }
+  $envFilePath = Resolve-PathFromRoot -Path $EnvFile -Root $apiRoot
+  $resolvedSeedFiles = @($SeedFiles | ForEach-Object {
+    Resolve-PathFromRoot -Path $_ -Root $supabaseRoot
+  })
 
   Load-EnvFile -Path $envFilePath
   Assert-RequiredEnv -Names @("DB_HOST", "DB_PORT", "DB_NAME", "DB_ADMIN_USER", "DB_ADMIN_PASSWORD", "DB_APP_ROLE", "DB_USER", "DB_PASSWORD")
@@ -181,31 +215,22 @@ try {
 
   Ensure-LocalRuntimeRole -PsqlCommand $psqlCmd
 
-  $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-  $apiRoot = Split-Path -Parent $scriptRoot
+  & (Join-Path -Path $PSScriptRoot -ChildPath "run-supabase-sql.ps1") `
+    -EnvFile $envFilePath `
+    -OverrideEnv `
+    -SslMode "disable"
+  if ($LASTEXITCODE -ne 0) {
+    throw "run-supabase-sql.ps1 failed."
+  }
 
-  Push-Location $apiRoot
-  try {
-    & (Join-Path -Path $scriptRoot -ChildPath "run-supabase-sql.ps1") `
-      -EnvFile $envFilePath `
-      -OverrideEnv `
-      -SslMode "disable"
-    if ($LASTEXITCODE -ne 0) {
-      throw "run-supabase-sql.ps1 failed."
-    }
-
-    if (-not $SkipSeed) {
-      foreach ($seedFile in $SeedFiles) {
-        if (Test-Path -Path $seedFile) {
-          Invoke-SqlFile -PsqlCommand $psqlCmd -SqlFile $seedFile
-        } else {
-          Write-Warning "Seed file not found, skipping: $seedFile"
-        }
+  if (-not $SkipSeed) {
+    foreach ($seedFile in $resolvedSeedFiles) {
+      if (Test-Path -Path $seedFile) {
+        Invoke-SqlFile -PsqlCommand $psqlCmd -SqlFile $seedFile
+      } else {
+        Write-Warning "Seed file not found, skipping: $seedFile"
       }
     }
-  }
-  finally {
-    Pop-Location
   }
 
   Write-Host "Local Supabase reset complete."

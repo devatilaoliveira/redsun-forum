@@ -37,7 +37,8 @@ function Get-LocalSupabasePublishableKey {
 if ([string]::IsNullOrWhiteSpace($SupabaseWorkdir)) {
   $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
   $webRoot = Split-Path -Parent $scriptRoot
-  $SupabaseWorkdir = Split-Path -Parent (Split-Path -Parent $webRoot)
+  $appsRoot = Split-Path -Parent $webRoot
+  $SupabaseWorkdir = Join-Path -Path $appsRoot -ChildPath "api"
 }
 
 $env:BASE_URL = $BaseUrl

@@ -29,7 +29,7 @@ jobs:
       - name: Set up Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: 2.101.0
+          version: 2.109.1
 
       - name: Install PostgreSQL client
         run: |
@@ -44,22 +44,23 @@ jobs:
         run: npm ci
 
       - name: Start local Supabase
-        run: supabase start
+        working-directory: apps/api
+        run: supabase start --exclude logflare,vector,realtime,edge-runtime,imgproxy,postgrest,supavisor
 
       - name: Prepare local API environment
         working-directory: apps/api
         shell: pwsh
-        run: ./scripts/prepare-local-api-env.ps1 -OutputFile .env.local.ci
+        run: ./supabase/scripts/prepare-local-api-env.ps1 -OutputFile .env.local.ci
 
       - name: Reset local Supabase database
         working-directory: apps/api
         shell: pwsh
-        run: ./scripts/reset-local-supabase.ps1 -EnvFile .env.local.ci -OverrideEnv
+        run: ./supabase/scripts/reset-local-supabase.ps1 -EnvFile .env.local.ci -OverrideEnv
 
       - name: Prepare local web environment
         working-directory: apps/web
         shell: pwsh
-        run: ./scripts/prepare-local-web-env.ps1
+        run: ./scripts/prepare-local-web-env.ps1 -SupabaseWorkdir "${{ github.workspace }}/apps/api"
 
       - name: Start API
         working-directory: apps/api
@@ -100,3 +101,13 @@ jobs:
           name: playwright-report
           path: apps/web/playwright-report
           if-no-files-found: ignore
+
+      - name: Clean up generated local environments
+        if: always()
+        shell: pwsh
+        run: |
+          Remove-Item -Force -ErrorAction SilentlyContinue `
+            apps/api/.env.local.ci, `
+            apps/api/supabase/supabase-status.env, `
+            apps/web/supabase-status.env
+          git restore --worktree -- apps/web/public/env.js

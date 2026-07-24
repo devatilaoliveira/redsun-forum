@@ -29,7 +29,7 @@ jobs:
       - name: Set up Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: 2.101.0
+          version: 2.109.1
 
       - name: Install PostgreSQL client
         run: |
@@ -41,16 +41,20 @@ jobs:
         run: chmod +x mvnw
 
       - name: Start local Supabase
-        run: supabase start
-        working-directory: .
+        run: supabase start --exclude logflare,vector,realtime,edge-runtime,imgproxy,postgrest,supavisor
 
       - name: Prepare local API environment
         shell: pwsh
-        run: ./scripts/prepare-local-api-env.ps1 -OutputFile .env.local.ci
+        run: ./supabase/scripts/prepare-local-api-env.ps1 -OutputFile .env.local.ci
 
       - name: Reset local Supabase database
         shell: pwsh
-        run: ./scripts/reset-local-supabase.ps1 -EnvFile .env.local.ci -OverrideEnv
+        run: ./supabase/scripts/reset-local-supabase.ps1 -EnvFile .env.local.ci -OverrideEnv
 
       - name: Run tests
         run: ./mvnw -B -ntp test
+
+      - name: Clean up generated local environment
+        if: always()
+        shell: pwsh
+        run: Remove-Item -Force -ErrorAction SilentlyContinue .env.local.ci, supabase/supabase-status.env

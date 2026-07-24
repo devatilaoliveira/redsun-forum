@@ -106,8 +106,27 @@ function Assert-LocalHostUnlessAllowed {
   }
 }
 
+function Resolve-PathFromRoot {
+  param(
+    [string]$Path,
+    [string]$Root
+  )
+
+  if ([System.IO.Path]::IsPathRooted($Path)) {
+    return [System.IO.Path]::GetFullPath($Path)
+  }
+
+  return [System.IO.Path]::GetFullPath((Join-Path -Path $Root -ChildPath $Path))
+}
+
+$supabaseRoot = Split-Path -Parent $PSScriptRoot
+$apiRoot = Split-Path -Parent $supabaseRoot
+
 try {
-  Load-EnvFile -Path $EnvFile
+  $envFilePath = Resolve-PathFromRoot -Path $EnvFile -Root $apiRoot
+  $backupFilePath = Resolve-PathFromRoot -Path $BackupFile -Root $supabaseRoot
+
+  Load-EnvFile -Path $envFilePath
   Assert-RequiredEnv -Names @("DB_HOST", "DB_PORT", "DB_NAME", "DB_ADMIN_USER", "DB_ADMIN_PASSWORD")
   Assert-NotProduction
   Assert-LocalHostUnlessAllowed -HostName $env:DB_HOST
@@ -117,11 +136,11 @@ try {
     throw "Invalid confirmation. Re-run with -ConfirmRestore `"$expectedConfirmation`" if you really want to replace data in this database."
   }
 
-  if (-not (Test-Path -Path $BackupFile)) {
-    throw "Backup file not found: $BackupFile"
+  if (-not (Test-Path -Path $backupFilePath)) {
+    throw "Backup file not found: $backupFilePath"
   }
 
-  $backupPath = (Resolve-Path -Path $BackupFile).Path
+  $backupPath = (Resolve-Path -Path $backupFilePath).Path
   $pgRestoreCmd = Get-ToolCommand -ExplicitPath $PgRestorePath -CommandName "pg_restore"
 
   $prevPgPassword = $env:PGPASSWORD

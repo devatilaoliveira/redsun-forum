@@ -1,7 +1,7 @@
 # Local Supabase configuration for RedSun development and CI.
-# The application schema is managed by apps/api/db/*.sql and applied through
-# apps/api/scripts/reset-local-supabase.ps1.
-project_id = "redsun"
+# The application schema is managed by apps/api/supabase/db/*.sql and applied
+# through apps/api/supabase/scripts/reset-local-supabase.ps1.
+project_id = "redsun-supabase"
 
 [api]
 enabled = true
@@ -27,13 +27,13 @@ default_pool_size = 20
 max_client_conn = 100
 
 [db.migrations]
-enabled = true
+enabled = false
 schema_paths = []
 
 [db.seed]
 # Seed is intentionally disabled here because the RedSun schema is applied by
 # the API reset wrapper, not by Supabase migrations. The wrapper runs
-# apps/api/db/seed.sql after schema/auth/storage setup.
+# apps/api/supabase/db/seed.sql after schema/auth/storage setup.
 enabled = false
 sql_paths = []
 
@@ -46,7 +46,7 @@ port = 54323
 api_url = "http://127.0.0.1"
 openai_api_key = "env(OPENAI_API_KEY)"
 
-[inbucket]
+[local_smtp]
 enabled = true
 port = 54324
 

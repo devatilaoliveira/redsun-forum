@@ -7,13 +7,9 @@ services:
     image: redsun-api:latest
     container_name: redsun-api
     env_file:
-      - ${APP_ENV_FILE:-.env}
+      - ${APP_ENV_FILE:-.env.local.container}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "8080:8080"
     restart: unless-stopped
-    networks:
-      - rs-net
-
-networks:
-  rs-net:
-    external: true

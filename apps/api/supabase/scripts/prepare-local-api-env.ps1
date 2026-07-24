@@ -60,13 +60,30 @@ function Add-GitHubEnv {
   }
 }
 
-if ([string]::IsNullOrWhiteSpace($SupabaseWorkdir)) {
-  $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-  $apiRoot = Split-Path -Parent $scriptRoot
-  $SupabaseWorkdir = Split-Path -Parent (Split-Path -Parent $apiRoot)
+function Resolve-PathFromRoot {
+  param(
+    [string]$Path,
+    [string]$Root
+  )
+
+  if ([System.IO.Path]::IsPathRooted($Path)) {
+    return [System.IO.Path]::GetFullPath($Path)
+  }
+
+  return [System.IO.Path]::GetFullPath((Join-Path -Path $Root -ChildPath $Path))
 }
 
-$serviceRoleKey = Get-LocalSupabaseServiceRoleKey -StatusFile $SupabaseStatusFile -Workdir $SupabaseWorkdir
+$supabaseRoot = Split-Path -Parent $PSScriptRoot
+$apiRoot = Split-Path -Parent $supabaseRoot
+$outputFilePath = Resolve-PathFromRoot -Path $OutputFile -Root $apiRoot
+$statusFilePath = Resolve-PathFromRoot -Path $SupabaseStatusFile -Root $supabaseRoot
+$supabaseWorkdirPath = if ([string]::IsNullOrWhiteSpace($SupabaseWorkdir)) {
+  $apiRoot
+} else {
+  Resolve-PathFromRoot -Path $SupabaseWorkdir -Root $apiRoot
+}
+
+$serviceRoleKey = Get-LocalSupabaseServiceRoleKey -StatusFile $statusFilePath -Workdir $supabaseWorkdirPath
 
 $envValues = [ordered]@{
   SERVER_PORT = "8080"
@@ -91,7 +108,7 @@ $envValues = [ordered]@{
   BREVO_SENDER_NAME = "RedSun_CI"
 }
 
-Write-EnvFile -Path $OutputFile -Values $envValues
+Write-EnvFile -Path $outputFilePath -Values $envValues
 Add-GitHubEnv -Path $GitHubEnvFile -Values $envValues
 
-Write-Host "Wrote local API environment to $OutputFile."
+Write-Host "Wrote local API environment to $outputFilePath."

@@ -1,7 +1,7 @@
 -- Grant runtime privileges and recreate backend RLS bypass policies.
 -- This file intentionally does not create the application role or change its password.
 --
--- This file is run by scripts/run-supabase-sql.ps1 with:
+-- This file is run by supabase/scripts/run-supabase-sql.ps1 with:
 --   APP_DB_NAME = DB_NAME
 --   APP_DB_ROLE = DB_APP_ROLE
 --
