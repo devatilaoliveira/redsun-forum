@@ -14,6 +14,12 @@
     "username": "worker-login-2",
     "email": "worker-login-2@redsun.com"
   },
+  "SEEDED_TALE_VISITOR": {
+    "id": "00000000-0000-0000-0000-000000000103",
+    "username": "worker-login-3",
+    "email": "worker-login-3@redsun.com",
+    "password": "123redsun3"
+  },
   "SEEDED_TALE": {
     "id": "00000000-0000-0000-0000-000000000301",
     "name": "Seeded RedSun Tale"

@@ -1,26 +1,6 @@
 -- Enable UUID generator (pgcrypto) for UUID defaults
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
--- Drop existing tables to start from scratch
-DROP TABLE IF EXISTS public.client_error_reports CASCADE;
-DROP TABLE IF EXISTS public.patch_notes CASCADE;
-DROP TABLE IF EXISTS public.letter_read_by CASCADE;
-DROP TABLE IF EXISTS public.letter_recipients CASCADE;
-DROP TABLE IF EXISTS public.letters CASCADE;
-DROP TABLE IF EXISTS public.posts CASCADE;
-DROP TABLE IF EXISTS public.locations CASCADE;
-DROP TABLE IF EXISTS public.redsun_sheets CASCADE;
-DROP TABLE IF EXISTS public.basic_sheets CASCADE;
-DROP TABLE IF EXISTS public.tale_participants CASCADE;
-DROP TABLE IF EXISTS public.tales CASCADE;
-DROP TABLE IF EXISTS public.user_contacts CASCADE;
-DROP TABLE IF EXISTS public.user_favorite_roles CASCADE;
-DROP TABLE IF EXISTS public.user_favorite_rules CASCADE;
-DROP TABLE IF EXISTS public.user_favorite_languages CASCADE;
-DROP TABLE IF EXISTS public.user_settings CASCADE;
-DROP TABLE IF EXISTS public.subscriptions CASCADE;
-DROP TABLE IF EXISTS public.users CASCADE;
-
 -- Users
 CREATE TABLE public.users (
   id uuid PRIMARY KEY,

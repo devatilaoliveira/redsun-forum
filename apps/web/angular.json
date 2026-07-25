@@ -36,6 +36,12 @@
             ]
           },
           "configurations": {
+            "local": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "outputHashing": "none"
+            },
             "prod": {
               "budgets": [
                 {
@@ -50,51 +56,6 @@
                 }
               ],
               "outputHashing": "all"
-            },
-            "local-prod": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
-                }
-              ],
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "900kb",
-                  "maximumError": "1MB"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kB",
-                  "maximumError": "8kB"
-                }
-              ],
-              "outputHashing": "all"
-            },
-            "stage": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.stage.ts"
-                }
-              ],
-              "optimization": false,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "2700kB",
-                  "maximumError": "3MB"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kB",
-                  "maximumError": "8kB"
-                }
-              ],
-              "outputHashing": "none"
             }
           },
           "defaultConfiguration": "prod"
@@ -102,14 +63,11 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "configurations": {
+            "local": {
+              "buildTarget": "redsun-web:build:local"
+            },
             "prod": {
               "buildTarget": "redsun-web:build:prod"
-            },
-            "local-prod": {
-              "buildTarget": "redsun-web:build:local-prod"
-            },
-            "stage": {
-              "buildTarget": "redsun-web:build:stage"
             }
           },
           "defaultConfiguration": "prod"

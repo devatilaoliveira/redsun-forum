@@ -7,8 +7,23 @@ services:
       dockerfile: apps/api/Dockerfile
     image: redsun-api:${IMAGE_TAG:-latest}
     container_name: redsun-api
-    env_file:
-      - ${API_ENV_FILE:-apps/api/.env.prod}
+    environment:
+      SERVER_PORT: ${SERVER_PORT:-8080}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      APP_FRONTEND_URL: ${APP_FRONTEND_URL:?Set APP_FRONTEND_URL in Coolify}
+      APP_LOGOUT_REDIRECT: ${APP_LOGOUT_REDIRECT:?Set APP_LOGOUT_REDIRECT in Coolify}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:?Set CORS_ALLOWED_ORIGINS in Coolify}
+      DB_USER: ${DB_USER:?Set DB_USER in Coolify}
+      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in Coolify}
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:?Set SPRING_DATASOURCE_URL in Coolify}
+      SUPABASE_URL: ${SUPABASE_URL:?Set SUPABASE_URL in Coolify}
+      SUPABASE_STORAGE_URL: ${SUPABASE_STORAGE_URL:?Set SUPABASE_STORAGE_URL in Coolify}
+      SUPABASE_SECRET_KEY: ${SUPABASE_SECRET_KEY:?Set SUPABASE_SECRET_KEY in Coolify}
+      BREVO_API_KEY: ${BREVO_API_KEY:?Set BREVO_API_KEY in Coolify}
+      BREVO_SENDER_EMAIL: ${BREVO_SENDER_EMAIL:?Set BREVO_SENDER_EMAIL in Coolify}
+      BREVO_SENDER_NAME: ${BREVO_SENDER_NAME:?Set BREVO_SENDER_NAME in Coolify}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:?Set GEMINI_API_KEY in Coolify}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.1-flash-lite}
     ports:
       - "8080:8080"
     restart: unless-stopped

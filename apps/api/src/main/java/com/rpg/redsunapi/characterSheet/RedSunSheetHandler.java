@@ -21,6 +21,12 @@ public class RedSunSheetHandler implements RuleCharacterSheetHandler {
   }
 
   @Override
+  public CharacterSheet getSheet(Tale tale, UUID characterId) {
+    return redSunSheetRepository.findByTale_IdAndCharacterId(requirePersistedTaleId(tale), characterId)
+      .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Character sheet not found"));
+  }
+
+  @Override
   public CharacterSheet getOrCreateSheet(Tale tale, UUID characterId) {
     UUID taleId = requirePersistedTaleId(tale);
     RedSunSheet sheet = redSunSheetRepository.findByTale_IdAndCharacterId(taleId, characterId)

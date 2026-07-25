@@ -1,10 +1,10 @@
 // Generated from runtime environment variables.
 (function initEnv() {
   window.__env = {
-    "APP_ENV": "prod",
-    "BASE_URL": "__BASE_URL__",
-    "API_BASE_URL": "__API_BASE_URL__",
-    "SUPABASE_URL": "__SUPABASE_URL__",
-    "SUPABASE_PUBLISHABLE_KEY": "__SUPABASE_PUBLISHABLE_KEY__"
+    "APP_ENV": "local",
+    "BASE_URL": "http://localhost:4200",
+    "API_BASE_URL": "http://localhost:8080",
+    "SUPABASE_URL": "http://127.0.0.1:54321",
+    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH"
   };
 })();

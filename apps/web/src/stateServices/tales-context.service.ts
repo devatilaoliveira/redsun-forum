@@ -22,6 +22,8 @@ export class TalesContextService {
   public readonly participants: Signal<TaleParticipantProfileDTO[]> = this._taleState.participants;
   public readonly owner: Signal<TaleParticipantProfileDTO | null> = this._taleState.owner;
   public readonly role: Signal<TaleAccessRole> = this._taleState.role;
+  public readonly canManage: Signal<boolean> = this._taleState.canManage;
+  public readonly canPlay: Signal<boolean> = this._taleState.canPlay;
   public readonly isLoading: Signal<boolean> = this._taleState.isLoading;
 
   constructor() {

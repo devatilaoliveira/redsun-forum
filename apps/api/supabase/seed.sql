@@ -1,6 +1,5 @@
 -- Deterministic local/CI seed data.
--- Run this only after the schema, auth wipe, storage setup, Data API hardening,
--- and app role grants have been applied.
+-- Supabase runs this after all migrations during first start and db reset.
 
 INSERT INTO public.patch_notes (id, release_date, content_pt, content_en, content_de)
 VALUES
@@ -265,6 +264,33 @@ VALUES
     '1.0'
   )
 ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public.user_settings (
+  user_id,
+  app_language,
+  app_theme,
+  redirect_to_favorite
+)
+VALUES
+  (
+    '00000000-0000-0000-0000-000000000101',
+    'PT',
+    'DARK',
+    false
+  ),
+  (
+    '00000000-0000-0000-0000-000000000102',
+    'PT',
+    'DARK',
+    false
+  ),
+  (
+    '00000000-0000-0000-0000-000000000103',
+    'PT',
+    'DARK',
+    false
+  )
+ON CONFLICT (user_id) DO NOTHING;
 
 INSERT INTO public.subscriptions (
   user_id,

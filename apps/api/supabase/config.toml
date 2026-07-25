@@ -1,7 +1,5 @@
 # Local Supabase configuration for RedSun development and CI.
-# The application schema is managed by apps/api/db/*.sql and applied through
-# apps/api/scripts/reset-local-supabase.ps1.
-project_id = "redsun"
+project_id = "redsun-supabase"
 
 [api]
 enabled = true
@@ -31,14 +29,11 @@ enabled = true
 schema_paths = []
 
 [db.seed]
-# Seed is intentionally disabled here because the RedSun schema is applied by
-# the API reset wrapper, not by Supabase migrations. The wrapper runs
-# apps/api/db/seed.sql after schema/auth/storage setup.
-enabled = false
-sql_paths = []
+enabled = true
+sql_paths = ["./seed.sql"]
 
 [realtime]
-enabled = true
+enabled = false
 
 [studio]
 enabled = true
@@ -46,7 +41,7 @@ port = 54323
 api_url = "http://127.0.0.1"
 openai_api_key = "env(OPENAI_API_KEY)"
 
-[inbucket]
+[local_smtp]
 enabled = true
 port = 54324
 
@@ -73,7 +68,7 @@ password_requirements = ""
 [auth.email]
 enable_signup = true
 double_confirm_changes = true
-enable_confirmations = false
+enable_confirmations = true
 secure_password_change = false
 max_frequency = "1s"
 otp_length = 6
@@ -92,6 +87,6 @@ message_service_sid = ""
 auth_token = "env(SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN)"
 
 [analytics]
-enabled = true
+enabled = false
 port = 54327
 backend = "postgres"

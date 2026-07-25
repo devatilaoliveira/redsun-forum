@@ -1,23 +1,19 @@
 name: E2E CI
 
 on:
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
   e2e:
-    name: Playwright E2E
+    name: Playwright full stack
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "21"
-          cache: maven
 
       - name: Set up Node
         uses: actions/setup-node@v5
@@ -29,51 +25,15 @@ jobs:
       - name: Set up Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: 2.101.0
-
-      - name: Install PostgreSQL client
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client
-
-      - name: Make Maven wrapper executable
-        run: chmod +x apps/api/mvnw
+          version: 2.109.1
 
       - name: Install web dependencies
         working-directory: apps/web
         run: npm ci
 
-      - name: Start local Supabase
-        run: supabase start
-
-      - name: Prepare local API environment
-        working-directory: apps/api
+      - name: Reset and start the local stack
         shell: pwsh
-        run: ./scripts/prepare-local-api-env.ps1 -OutputFile .env.local.ci
-
-      - name: Reset local Supabase database
-        working-directory: apps/api
-        shell: pwsh
-        run: ./scripts/reset-local-supabase.ps1 -EnvFile .env.local.ci -OverrideEnv
-
-      - name: Prepare local web environment
-        working-directory: apps/web
-        shell: pwsh
-        run: ./scripts/prepare-local-web-env.ps1
-
-      - name: Start API
-        working-directory: apps/api
-        shell: bash
-        run: |
-          nohup ./mvnw -B -ntp spring-boot:run > api.log 2>&1 &
-          for i in {1..60}; do
-            if curl -fsS http://localhost:8080/actuator/health; then
-              exit 0
-            fi
-            sleep 2
-          done
-          cat api.log
-          exit 1
+        run: ./local.ps1 reset
 
       - name: Install Playwright browsers
         working-directory: apps/web
@@ -81,16 +41,18 @@ jobs:
 
       - name: Run E2E tests
         working-directory: apps/web
-        env:
-          API_BASE_URL: http://localhost:8080
-        run: npm run e2e
+        run: npm run e2e -- --workers=1
 
       - name: Upload API log
+        if: failure()
+        run: docker logs redsun-api > api.log 2>&1
+
+      - name: Store API log
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: api-log
-          path: apps/api/api.log
+          path: api.log
           if-no-files-found: ignore
 
       - name: Upload Playwright report
@@ -100,3 +62,9 @@ jobs:
           name: playwright-report
           path: apps/web/playwright-report
           if-no-files-found: ignore
+
+      - name: Stop local services
+        if: always()
+        continue-on-error: true
+        shell: pwsh
+        run: ./local.ps1 stop

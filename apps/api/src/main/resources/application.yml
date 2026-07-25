@@ -28,6 +28,7 @@ app:
     base-url: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com/v1beta}
 
 supabase:
+  jwt-issuer: ${SUPABASE_JWT_ISSUER:}
   bucket:
     avatars: avatars
     tales: tales

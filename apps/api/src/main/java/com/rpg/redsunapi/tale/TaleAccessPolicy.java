@@ -35,14 +35,22 @@ public class TaleAccessPolicy {
     }
   }
 
-  public void ensureCanReadCharacterSheet(Tale tale, UUID requesterId) {
-    if (!TaleMembership.of(tale, requesterId).canViewPublicOrMemberTale()) {
+  public void ensureCanReadCharacterSheet(Tale tale, UUID requesterId, UUID characterSheetId) {
+    TaleMembership membership = TaleMembership.of(tale, requesterId);
+    if (!membership.canViewPublicOrMemberTale()) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot access this character sheet.");
+    }
+    if (!membership.isMember(characterSheetId)) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Character sheet not found");
     }
   }
 
   public void ensureCanWriteCharacterSheet(Tale tale, UUID requesterId, UUID characterSheetId) {
-    if (!TaleMembership.of(tale, requesterId).canWriteCharacterSheet(characterSheetId)) {
+    TaleMembership membership = TaleMembership.of(tale, requesterId);
+    if (!membership.isMember(characterSheetId)) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Character sheet not found");
+    }
+    if (!membership.canWriteCharacterSheet(characterSheetId)) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot access this character sheet.");
     }
   }

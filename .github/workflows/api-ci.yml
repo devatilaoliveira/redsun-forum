@@ -10,6 +10,22 @@ jobs:
   maven-test:
     name: Maven test
     runs-on: ubuntu-latest
+    env:
+      SERVER_PORT: "8080"
+      SPRING_PROFILES_ACTIVE: local
+      APP_FRONTEND_URL: http://localhost:4200
+      APP_LOGOUT_REDIRECT: http://localhost:4200
+      CORS_ALLOWED_ORIGINS: http://localhost:4200
+      DB_USER: redsun_dev
+      DB_PASSWORD: local-redsun-password
+      SPRING_DATASOURCE_URL: jdbc:postgresql://127.0.0.1:54322/postgres?sslmode=disable
+      SUPABASE_URL: http://127.0.0.1:54321
+      SUPABASE_STORAGE_URL: http://127.0.0.1:54321/storage/v1/object/public/
+      BREVO_API_KEY: local-placeholder
+      BREVO_SENDER_EMAIL: local-placeholder@redsun.invalid
+      BREVO_SENDER_NAME: RedSun_CI
+      GEMINI_API_KEY: local-placeholder
+      GEMINI_MODEL: gemini-3.1-flash-lite
 
     defaults:
       run:
@@ -29,28 +45,123 @@ jobs:
       - name: Set up Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: 2.101.0
-
-      - name: Install PostgreSQL client
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client
-        working-directory: .
+          version: 2.109.1
 
       - name: Make Maven wrapper executable
         run: chmod +x mvnw
 
-      - name: Start local Supabase
-        run: supabase start
-        working-directory: .
+      - name: Start and reset local Supabase
+        run: |
+          supabase start --exclude logflare,vector,realtime,edge-runtime,imgproxy,postgrest,supavisor
+          supabase db reset --local
 
-      - name: Prepare local API environment
-        shell: pwsh
-        run: ./scripts/prepare-local-api-env.ps1 -OutputFile .env.local.ci
+      - name: Provision backend login and export local key
+        shell: bash
+        run: |
+          docker exec supabase_db_redsun-supabase \
+            psql --username supabase_admin --dbname postgres --set ON_ERROR_STOP=1 \
+            --command "ALTER ROLE redsun_dev WITH LOGIN PASSWORD 'local-redsun-password' NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOREPLICATION NOBYPASSRLS;"
 
-      - name: Reset local Supabase database
-        shell: pwsh
-        run: ./scripts/reset-local-supabase.ps1 -EnvFile .env.local.ci -OverrideEnv
+          status_output="$(supabase status --output env)"
+          service_role_key="$(printf '%s\n' "$status_output" | sed -nE 's/^SERVICE_ROLE_KEY="?([^"]+)"?$/\1/p' | head -n 1)"
+          test -n "$service_role_key"
+          printf 'SUPABASE_SECRET_KEY=%s\n' "$service_role_key" >> "$GITHUB_ENV"
+
+      - name: Verify database security and fixtures
+        shell: bash
+        run: |
+          docker exec supabase_db_redsun-supabase \
+            psql --username postgres --dbname postgres --set ON_ERROR_STOP=1 \
+            --command "DO \$\$ BEGIN
+              IF NOT EXISTS (
+                SELECT 1 FROM pg_roles
+                WHERE rolname = 'redsun_dev'
+                  AND rolcanlogin
+                  AND NOT rolsuper
+                  AND NOT rolcreaterole
+                  AND NOT rolcreatedb
+                  AND NOT rolinherit
+                  AND NOT rolreplication
+                  AND NOT rolbypassrls
+              ) THEN
+                RAISE EXCEPTION 'redsun_dev has unexpected attributes';
+              END IF;
+              IF (SELECT count(*) FROM auth.users) <> 3 THEN
+                RAISE EXCEPTION 'expected three seeded Auth users';
+              END IF;
+              IF EXISTS (
+                SELECT 1
+                FROM public.users users
+                LEFT JOIN public.user_settings settings ON settings.user_id = users.id
+                WHERE settings.user_id IS NULL
+              ) THEN
+                RAISE EXCEPTION 'an application user is missing settings';
+              END IF;
+              IF EXISTS (
+                SELECT 1
+                FROM pg_class c
+                JOIN pg_namespace n ON n.oid = c.relnamespace
+                WHERE n.nspname = 'public'
+                  AND c.relkind = 'r'
+                  AND NOT c.relrowsecurity
+              ) THEN
+                RAISE EXCEPTION 'an application table does not have RLS enabled';
+              END IF;
+              IF EXISTS (
+                SELECT 1
+                FROM pg_class c
+                JOIN pg_namespace n ON n.oid = c.relnamespace
+                WHERE n.nspname = 'public'
+                  AND c.relkind = 'r'
+                  AND EXISTS (
+                    SELECT 1
+                    FROM (VALUES ('anon'), ('authenticated')) AS roles(role_name)
+                    CROSS JOIN (
+                      VALUES
+                        ('SELECT'),
+                        ('INSERT'),
+                        ('UPDATE'),
+                        ('DELETE'),
+                        ('TRUNCATE'),
+                        ('REFERENCES'),
+                        ('TRIGGER')
+                    ) AS privileges(privilege_name)
+                    WHERE has_table_privilege(
+                      roles.role_name::name,
+                      c.oid,
+                      privileges.privilege_name
+                    )
+                  )
+              ) THEN
+                RAISE EXCEPTION 'Data API roles have application-table privileges';
+              END IF;
+              IF EXISTS (
+                SELECT 1
+                FROM pg_class c
+                JOIN pg_namespace n ON n.oid = c.relnamespace
+                WHERE n.nspname = 'public'
+                  AND c.relkind = 'r'
+                  AND NOT has_table_privilege('redsun_dev', c.oid, 'SELECT')
+              ) THEN
+                RAISE EXCEPTION 'redsun_dev lacks required read access';
+              END IF;
+              IF NOT COALESCE((
+                SELECT c.relrowsecurity
+                FROM pg_class c
+                JOIN pg_namespace n ON n.oid = c.relnamespace
+                WHERE n.nspname = 'private'
+                  AND c.relname = 'username_counters'
+              ), false) THEN
+                RAISE EXCEPTION 'private.username_counters does not have RLS enabled';
+              END IF;
+              IF has_schema_privilege('anon', 'private', 'USAGE')
+                OR has_schema_privilege('authenticated', 'private', 'USAGE') THEN
+                RAISE EXCEPTION 'Data API roles can use the private schema';
+              END IF;
+              IF (SELECT count(*) FROM storage.buckets WHERE id IN ('avatars','tales','locations','characters')) <> 4 THEN
+                RAISE EXCEPTION 'expected four application Storage buckets';
+              END IF;
+            END \$\$;"
 
       - name: Run tests
         run: ./mvnw -B -ntp test

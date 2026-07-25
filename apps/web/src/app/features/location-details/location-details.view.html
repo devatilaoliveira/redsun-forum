@@ -7,7 +7,8 @@
     @if (locationDetails(); as location) {
       <rs-local-details-card [location]="location" />
       <rs-view-header [title]="location.locationName" />
-      <div class="post-form">
+      @if (canParticipate()) {
+        <div class="post-form" data-testid="location-post-composer">
         <div class="input-toggle">
           <rs-tooltip [text]="'SHOW_POST_INPUT' | translate" align="end">
             <rs-round-icon-button
@@ -119,7 +120,8 @@
             {{ 'POST_SUBMIT' | translate }}
           </rs-button>
         </div>
-      </div>
+        </div>
+      }
 
       @if (isLoadingPosts()) {
         <div class="status">

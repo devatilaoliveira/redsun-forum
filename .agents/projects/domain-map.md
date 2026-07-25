@@ -22,5 +22,5 @@ Use this layer when tracing request flows or deciding where code belongs.
 - Security and endpoint access: `apps/api/src/main/java/com/rpg/redsunapi/configuration/SecurityConfig.java`
 - JWT auth flow: `apps/api/src/main/java/com/rpg/redsunapi/jwt/`
 - Tale visibility: ` apps/api/src/main/java/com/rpg/redsunapi/tale/TaleAccessPolicy.java`
-- Supabase buckets and database shape: `apps/api/db/`
+- Supabase buckets and database shape: ` apps/api/supabase/db/`
 - Environment configuration: ` apps/api/src/main/resources/application.yml`
