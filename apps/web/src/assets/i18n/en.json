@@ -60,6 +60,8 @@
   "SUPPORT_SENT": "Support message sent.",
   "SUPPORT_FAILED": "Could not send support message. Please try again.",
   "LOGIN": "Login",
+  "LOGIN_CRAFTED_WITH": "Crafted with",
+  "LOGIN_CRAFTED_BY": "by",
   "REGISTER": "Register",
   "EMAIL": "Email",
   "ADD_MEMBER_BY_EMAIL_OR_USERNAME": "Add member by email or username",

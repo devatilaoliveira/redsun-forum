@@ -23,6 +23,9 @@ export class RsButtonText {
   public readonly type: InputSignal<"button" | "submit" | "reset"> = input<"button" | "submit" | "reset">("button");
   public readonly form: InputSignal<string | null> = input<string | null>(null);
   public readonly routePath: InputSignal<RsButtonTextRoute> = input<RsButtonTextRoute>(null);
+  public readonly href: InputSignal<string | null> = input<string | null>(null);
+  public readonly target: InputSignal<"_blank" | "_self" | "_parent" | "_top" | null> = input<"_blank" | "_self" | "_parent" | "_top" | null>(null);
+  public readonly rel: InputSignal<string | null> = input<string | null>(null);
   public readonly disabled: InputSignal<boolean> = input<boolean>(false);
   public readonly inProgress: InputSignal<boolean> = input<boolean>(false);
   public readonly variant: InputSignal<RsButtonTextVariant> = input<RsButtonTextVariant>(EVariant.PRIMARY);
@@ -36,7 +39,14 @@ export class RsButtonText {
       return null;
     }
 
-    return this.routePath();
+    return this.href() ? null : this.routePath();
+  });
+  protected readonly interactiveHref: Signal<string | null> = computed<string | null>(() => {
+    if (this.disabled() || this.inProgress()) {
+      return null;
+    }
+
+    return this.href();
   });
 
   protected onClick(event: MouseEvent): void {
