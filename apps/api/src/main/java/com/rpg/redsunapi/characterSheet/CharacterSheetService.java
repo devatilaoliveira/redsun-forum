@@ -271,7 +271,6 @@ public class CharacterSheetService {
 
   private RuleCharacterSheetHandler resolveHandlerForCharacter(Tale tale, UUID characterId) {
     if (isTaleOwner(tale, characterId)) {
-      redSunSheetHandler.deleteCompleteSheetDetails(tale, characterId);
       return basicSheetHandler;
     }
 
