@@ -81,9 +81,47 @@ public class UserRepositoryAdapter implements UserRepository {
     typedQuery.setMaxResults(pageable.getPageSize());
 
     List<User> users = typedQuery.getResultList();
+    initializeSearchCollections(users);
     long total = countSearchUsers(criteriaBuilder, requesterId, username, role, rule, language);
 
     return new PageImpl<>(users, pageable, total);
+  }
+
+  private void initializeSearchCollections(List<User> users) {
+    if (users.isEmpty()) {
+      return;
+    }
+
+    List<UUID> userIds = users.stream()
+        .map(User::getId)
+        .toList();
+
+    entityManager.createQuery("""
+        select distinct u
+        from User u
+        left join fetch u.favoriteLanguage
+        where u.id in :userIds
+        """, User.class)
+      .setParameter("userIds", userIds)
+      .getResultList();
+
+    entityManager.createQuery("""
+        select distinct u
+        from User u
+        left join fetch u.favoriteRules
+        where u.id in :userIds
+        """, User.class)
+      .setParameter("userIds", userIds)
+      .getResultList();
+
+    entityManager.createQuery("""
+        select distinct u
+        from User u
+        left join fetch u.favoriteRole
+        where u.id in :userIds
+        """, User.class)
+      .setParameter("userIds", userIds)
+      .getResultList();
   }
 
   private long countSearchUsers(

@@ -582,7 +582,6 @@ public class UserService {
         rule == null ? null : parseRule(rule),
         language == null ? null : parseLanguage(language),
         pageable);
-    users.forEach(UserService::initializeUserSearchCollections);
     return users;
   }
 
@@ -602,14 +601,6 @@ public class UserService {
     } catch (IllegalArgumentException ex) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role value: " + role, ex);
     }
-  }
-
-  private static void initializeUserSearchCollections(User user) {
-    // Calling .size() forces lazy collections to load while the read transaction is still open for DTO mapping.
-    // TODO: Do more tests to try to remove .size(): here.
-    user.getFavoriteLanguage().size();
-    user.getFavoriteRules().size();
-    user.getFavoriteRole().size();
   }
 
   private static ERuleSystem parseRule(String rule) {
