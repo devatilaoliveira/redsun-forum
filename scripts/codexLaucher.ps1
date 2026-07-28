@@ -6,11 +6,8 @@ param(
   [string[]]$Project,
   [string[]]$Stack,
   [string[]]$Skill,
-  [string]$Model,
-  [ValidateSet("none", "low", "medium", "high", "xhigh")]
-  [string]$ReasoningEffort,
-  [ValidateSet("Frontier", "Balanced", "Mini")]
-  [string]$ModelPreset,
+  [ValidateSet("frontier", "balanced", "fast")]
+  [string]$Model = "balanced",
   [Alias("NoExec")]
   [switch]$DryRun
 )
@@ -19,10 +16,6 @@ $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $layersRoot = Join-Path $repoRoot ".agents"
-
-if (-not [string]::IsNullOrWhiteSpace($Model) -and -not [string]::IsNullOrWhiteSpace($ModelPreset)) {
-  throw "Use either -Model or -ModelPreset, not both."
-}
 
 function Resolve-LayerFiles {
   param(
@@ -191,26 +184,31 @@ $codexArgs = @(
   "--search"
 )
 
-$presetModels = @{
-  Frontier = "gpt-5.6-sol"
-  Balanced = "gpt-5.4"
-  Mini     = "gpt-5.4-mini"
+$modelProfiles = @{
+  frontier = @{
+    Model           = "gpt-5.6-sol"
+    ReasoningEffort = "xhigh"
+  }
+  balanced = @{
+    Model           = "gpt-5.6-sol"
+    ReasoningEffort = "medium"
+  }
+  fast = @{
+    Model           = "gpt-5.6-terra"
+    ReasoningEffort = "medium"
+  }
 }
 
-$resolvedModel = if (-not [string]::IsNullOrWhiteSpace($Model)) {
-  $Model
-} elseif (-not [string]::IsNullOrWhiteSpace($ModelPreset)) {
-  $presetModels[$ModelPreset]
-} else {
-  "gpt-5.6-sol"
-}
+$modelProfile = $modelProfiles[$Model]
+$resolvedModel = $modelProfile.Model
+$resolvedReasoningEffort = $modelProfile.ReasoningEffort
 
 if (-not [string]::IsNullOrWhiteSpace($resolvedModel)) {
   $codexArgs += @("--model", $resolvedModel)
 }
 
-if (-not [string]::IsNullOrWhiteSpace($ReasoningEffort)) {
-  $codexArgs += @("-c", "model_reasoning_effort=`"$ReasoningEffort`"")
+if (-not [string]::IsNullOrWhiteSpace($resolvedReasoningEffort)) {
+  $codexArgs += @("-c", "model_reasoning_effort=`"$resolvedReasoningEffort`"")
 }
 
 if ($layerFiles.Count -gt 0) {
@@ -220,6 +218,8 @@ if ($layerFiles.Count -gt 0) {
 if ($DryRun) {
   Write-Host "Dry run: Codex was not started."
   Write-Host "App: $App"
+  Write-Host "Model: $resolvedModel"
+  Write-Host "Reasoning effort: $resolvedReasoningEffort"
   Write-Host "Active layers:"
   foreach ($relativeFile in $relativeFiles) {
     Write-Host "- $relativeFile"

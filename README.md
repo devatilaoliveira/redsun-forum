@@ -98,10 +98,45 @@ See [local development](docs/local-development.md) for installation,
 credentials, verification commands, generated-file behavior, and
 troubleshooting.
 
-## Optional Codex launcher
+## Launch Codex
+
+Install and authenticate the Codex CLI, then run the repository launcher from
+the repository root:
 
 ```powershell
 .\scripts\codexLaucher.ps1 -App all
 ```
 
-Valid selections are `web`, `api`, `repo`, and `all`.
+The `-App` selection loads the instruction layers relevant to the task:
+
+| Selection | Instruction layers |
+| --- | --- |
+| `web` | Shared core, RedSun web, and Angular |
+| `api` | Shared core, RedSun API, domain map, Spring Boot, and persistence/storage |
+| `all` | All web and API layers |
+| `repo` | Shared core only (the default) |
+
+Choose a model profile with `-Model`:
+
+```powershell
+.\scripts\codexLaucher.ps1 -App web -Model fast
+.\scripts\codexLaucher.ps1 -App api -Model balanced
+.\scripts\codexLaucher.ps1 -App all -Model frontier
+```
+
+Valid model profiles are `fast`, `balanced` (the default), and `frontier`.
+Use `-DryRun` to validate the selection and print the resolved layers without
+starting Codex:
+
+```powershell
+.\scripts\codexLaucher.ps1 -App all -DryRun
+```
+
+Advanced sessions can override the default layer selections with `-Core`,
+`-Project`, `-Stack`, and `-Skill`. Names are resolved from the corresponding
+folders under `.agents`; multiple values can be comma-separated:
+
+```powershell
+.\scripts\codexLaucher.ps1 -App web -Core methodical,teacher
+.\scripts\codexLaucher.ps1 -App web -Skill angular\maintain-e2e-tests
+```
