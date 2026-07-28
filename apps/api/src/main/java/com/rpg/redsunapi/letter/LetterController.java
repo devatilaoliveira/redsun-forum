@@ -35,8 +35,7 @@ public class LetterController {
     @AuthenticationPrincipal AuthenticatedUser principal,
     @Valid @RequestBody LetterCreateRequestDTO request
   ) {
-    Letter letter = letterService.createLetter(request, principal.user());
-    return ResponseEntity.status(HttpStatus.CREATED).body(LetterDTO.from(letter));
+    return ResponseEntity.status(HttpStatus.CREATED).body(letterService.createLetter(request, principal.user()));
   }
 
   @GetMapping("/sent")
@@ -45,9 +44,7 @@ public class LetterController {
     @RequestParam(name = "page", defaultValue = "0") int page,
     @RequestParam(name = "size", defaultValue = "10") int size
   ) {
-    Page<LetterDTO> letters = letterService.listSentLettersForUser(principal.user(), page, size)
-      .map(LetterDTO::from);
-    return ResponseEntity.ok(letters);
+    return ResponseEntity.ok(letterService.listSentLettersForUser(principal.user(), page, size));
   }
 
   @GetMapping("/received")
@@ -56,9 +53,7 @@ public class LetterController {
     @RequestParam(name = "page", defaultValue = "0") int page,
     @RequestParam(name = "size", defaultValue = "10") int size
   ) {
-    Page<LetterDTO> letters = letterService.listReceivedLettersForUser(principal.user(), page, size)
-      .map(LetterDTO::from);
-    return ResponseEntity.ok(letters);
+    return ResponseEntity.ok(letterService.listReceivedLettersForUser(principal.user(), page, size));
   }
 
   @GetMapping("/{id}")
@@ -66,7 +61,6 @@ public class LetterController {
     @AuthenticationPrincipal AuthenticatedUser principal,
     @PathVariable("id") UUID letterId
   ) {
-    Letter letter = letterService.findLetterById(letterId, principal.user());
-    return ResponseEntity.ok(LetterDTO.from(letter));
+    return ResponseEntity.ok(letterService.findLetterById(letterId, principal.user()));
   }
 }

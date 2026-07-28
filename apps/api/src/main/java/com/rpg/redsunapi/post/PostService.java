@@ -2,8 +2,8 @@ package com.rpg.redsunapi.post;
 
 import com.rpg.redsunapi.location.Location;
 import com.rpg.redsunapi.location.LocationRepository;
-import com.rpg.redsunapi.post.dto.CreatedPostDTO;
 import com.rpg.redsunapi.post.dto.PostCreateRequestDTO;
+import com.rpg.redsunapi.post.dto.PostDTO;
 import com.rpg.redsunapi.post.enums.EPostStatus;
 import com.rpg.redsunapi.subscription.Subscription;
 import com.rpg.redsunapi.subscription.SubscriptionRepository;
@@ -41,9 +41,6 @@ public class PostService {
   private final GeminiPostTextClient geminiPostTextClient;
   private final TaleAccessPolicy taleAccessPolicy;
 
-  public record PostsForLocation(Page<Post> posts, Tale tale) {
-  }
-
   public PostService(
     PostRepository postRepository,
     LocationRepository locationRepository,
@@ -63,7 +60,7 @@ public class PostService {
   }
 
   @Transactional
-  public CreatedPostDTO createPost(PostCreateRequestDTO request, User author) {
+  public PostDTO createPost(PostCreateRequestDTO request, User author) {
     UUID locationId = request.locationId();
     String content = request.content();
 
@@ -92,7 +89,7 @@ public class PostService {
     locationRepository.save(location);
     taleRepository.save(tale);
 
-    return new CreatedPostDTO(savedPost, tale);
+    return PostDTO.from(savedPost, tale);
   }
 
   public String improvePostText(String content, User requester) {
@@ -107,7 +104,7 @@ public class PostService {
   }
 
   @Transactional(readOnly = true)
-  public PostsForLocation findPostsByLocation(UUID locationId, User requester, int page, int size) {
+  public Page<PostDTO> findPostsByLocation(UUID locationId, User requester, int page, int size) {
     Location location = locationRepository.findById(locationId)
       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Location not found"));
 
@@ -118,13 +115,12 @@ public class PostService {
     boolean isOwner = requester != null && tale.isOwnedBy(requester.getId());
 
     if (isOwner) {
-      return new PostsForLocation(postRepository.findByLocationId(location.getId(), pageable), tale);
+      return postRepository.findByLocationId(location.getId(), pageable)
+        .map(post -> PostDTO.from(post, tale));
     }
 
-    return new PostsForLocation(
-      postRepository.findByLocationIdAndStatus(location.getId(), EPostStatus.ACTIVE, pageable),
-      tale
-    );
+    return postRepository.findByLocationIdAndStatus(location.getId(), EPostStatus.ACTIVE, pageable)
+      .map(post -> PostDTO.from(post, tale));
   }
 
   @Transactional(readOnly = true)

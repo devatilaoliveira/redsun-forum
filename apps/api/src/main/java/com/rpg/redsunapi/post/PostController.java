@@ -1,7 +1,6 @@
 package com.rpg.redsunapi.post;
 
 import com.rpg.redsunapi.authentication.AuthenticatedUser;
-import com.rpg.redsunapi.post.dto.CreatedPostDTO;
 import com.rpg.redsunapi.post.dto.PostCreateRequestDTO;
 import com.rpg.redsunapi.post.dto.PostDTO;
 import com.rpg.redsunapi.post.dto.PostImproveTextRequestDTO;
@@ -42,8 +41,7 @@ public class PostController {
     @AuthenticationPrincipal AuthenticatedUser principal,
     @Valid @RequestBody PostCreateRequestDTO request
   ) {
-    CreatedPostDTO createdPost = postService.createPost(request, principal.user());
-    return ResponseEntity.status(HttpStatus.CREATED).body(PostDTO.from(createdPost.post(), createdPost.tale()));
+    return ResponseEntity.status(HttpStatus.CREATED).body(postService.createPost(request, principal.user()));
   }
 
   @PostMapping("/improve-text")
@@ -62,15 +60,7 @@ public class PostController {
     @RequestParam(name = "page", defaultValue = "0") int page,
     @RequestParam(name = "size", defaultValue = "10") int size
   ) {
-    PostService.PostsForLocation postsForLocation = postService.findPostsByLocation(
-      locationId,
-      principal.user(),
-      page,
-      size
-    );
-    Page<PostDTO> posts = postsForLocation.posts()
-      .map(post -> PostDTO.from(post, postsForLocation.tale()));
-    return ResponseEntity.ok(posts);
+    return ResponseEntity.ok(postService.findPostsByLocation(locationId, principal.user(), page, size));
   }
 
   @DeleteMapping("/{id}")

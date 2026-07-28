@@ -56,9 +56,7 @@ public class LocationController {
     @RequestParam(name = "page", defaultValue = "0") int page,
     @RequestParam(name = "size", defaultValue = "10") int size
   ) {
-    Page<LocationDTO> locations = locationService.findLocationsByTaleId(taleId, principal.user(), page, size)
-      .map(LocationDTO::from);
-    return ResponseEntity.ok(locations);
+    return ResponseEntity.ok(locationService.findLocationsByTaleId(taleId, principal.user(), page, size));
   }
 
   @GetMapping("/{id}")

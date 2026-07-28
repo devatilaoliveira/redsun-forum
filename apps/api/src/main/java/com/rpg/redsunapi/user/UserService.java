@@ -19,6 +19,7 @@ import com.rpg.redsunapi.user.dto.UserSettingsInitializationRequestDto;
 import com.rpg.redsunapi.user.dto.UserSettingsRequestDto;
 import com.rpg.redsunapi.user.dto.UserAsContactDTO;
 import com.rpg.redsunapi.user.dto.UserAsContactProfileDTO;
+import com.rpg.redsunapi.user.dto.UserSearchResultDTO;
 import com.rpg.redsunapi.utils.GeneralUtil;
 import com.rpg.redsunapi.user.persistence.JpaUserSettingsRepository;
 import org.springframework.data.domain.Page;
@@ -248,7 +249,7 @@ public class UserService {
   }
 
   @Transactional
-  public User updateAvatar(UUID userId, MultipartFile file) throws IOException {
+  public MeResponseDto updateAvatar(UUID userId, MultipartFile file) throws IOException {
     User user = userRepository.findById(userId).orElseThrow();
     ensureActiveUser(user);
     String oldImageUrl = user.getImageURL();
@@ -257,12 +258,13 @@ public class UserService {
     try {
       newImageUrl = avatarStorageService.uploadAvatar(userId, file);
       if (newImageUrl.equals(oldImageUrl)) {
-        return user;
+        return toMeResponse(user, List.of());
       }
       user.setImageURL(newImageUrl);
       User saved = userRepository.save(user);
+      MeResponseDto response = toMeResponse(saved, List.of());
       deleteAvatarIfPresent(userId, oldImageUrl);
-      return saved;
+      return response;
     } catch (Exception ex) {
       if (newImageUrl != null) {
         try {
@@ -441,7 +443,7 @@ public class UserService {
   }
 
   @Transactional
-  public User updateMe(UUID userId, MeRequestDto request) {
+  public MeResponseDto updateMe(UUID userId, MeRequestDto request) {
     if (request == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request body is required");
     }
@@ -504,7 +506,9 @@ public class UserService {
     // Guard against concurrent updates hitting the DB unique constraint for
     // username.
     try {
-      return userRepository.save(user);
+      User savedUser = userRepository.save(user);
+      List<UserAsContactDTO> contacts = getContactsForUser(savedUser.getId());
+      return toMeResponse(savedUser, contacts);
     } catch (DataIntegrityViolationException ex) {
       throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already taken", ex);
     }
@@ -555,7 +559,7 @@ public class UserService {
   }
 
   @Transactional(readOnly = true)
-  public Page<User> findUsers(
+  public Page<UserSearchResultDTO> findUsers(
       UUID requesterId,
       int page,
       int size,
@@ -575,14 +579,14 @@ public class UserService {
     );
     Pageable pageable = PageRequest.of(safePage, boundedSize, sort);
 
-    Page<User> users = userRepository.searchUsers(
+    return userRepository.searchUsers(
         requesterId,
         username == null ? null : GeneralUtil.trimRequired(username),
         role == null ? null : parseRole(role),
         rule == null ? null : parseRule(rule),
         language == null ? null : parseLanguage(language),
-        pageable);
-    return users;
+        pageable)
+      .map(UserSearchResultDTO::from);
   }
 
   private static String buildDeletedUsername(UUID userId) {
