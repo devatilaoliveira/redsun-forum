@@ -242,6 +242,7 @@ public class TaleService {
     taleRepository.save(tale);
   }
 
+  @Transactional(readOnly = true)
   public Tale findTaleById(UUID taleId, User requester) {
     Tale tale = taleRepository.findById(taleId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tale not found"));
 

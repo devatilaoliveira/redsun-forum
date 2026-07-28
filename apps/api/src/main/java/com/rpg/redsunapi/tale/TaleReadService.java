@@ -4,14 +4,12 @@ import com.rpg.redsunapi.location.Location;
 import com.rpg.redsunapi.location.LocationRepository;
 import com.rpg.redsunapi.tale.dto.TaleDetailDTO;
 import com.rpg.redsunapi.user.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -41,16 +39,14 @@ public class TaleReadService {
     taleAccessPolicy.ensureNotSleeping(tale);
     taleAccessPolicy.ensureCanViewTale(tale, requester);
 
-    PageRequest recentLocations = PageRequest.of(
-      0,
-      RECENT_LOCATIONS_LIMIT,
-      Sort.by(Sort.Order.desc("lastTimeActive"), Sort.Order.desc("id"))
+    List<Location> recentLocations = locationRepository.findRecentByTaleId(
+      tale.getId(),
+      RECENT_LOCATIONS_LIMIT
     );
-    Page<Location> locations = locationRepository.findByTaleId(tale.getId(), recentLocations);
 
     return TaleDetailDTO.fromWithRecentLocations(
       tale,
-      locations.getContent(),
+      recentLocations,
       RECENT_LOCATIONS_LIMIT
     );
   }

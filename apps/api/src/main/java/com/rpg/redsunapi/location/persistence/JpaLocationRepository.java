@@ -12,5 +12,7 @@ public interface JpaLocationRepository extends JpaRepository<Location, UUID> {
 
   Page<Location> findByTaleId(UUID taleId, Pageable pageable);
 
+  List<Location> findAllByTaleId(UUID taleId, Pageable pageable);
+
   List<Location> findByTaleId(UUID taleId);
 }
