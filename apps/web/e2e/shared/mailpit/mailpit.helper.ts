@@ -116,7 +116,7 @@ async function assertEmailConfirmationsEnabled(request: APIRequestContext): Prom
   if (settings.mailer_autoconfirm) {
     throw new Error(
       "Local Supabase Auth is still auto-confirming email addresses and will not send a " +
-      "confirmation message. Run `.\\local.ps1 reset` from the repository root to restart " +
+      "confirmation message. Run `.\\scripts\\local.ps1 reset` from the repository root to restart " +
       "Supabase and load auth.email.enable_confirmations=true.",
     );
   }

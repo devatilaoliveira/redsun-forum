@@ -11,10 +11,9 @@ interface SeededTaleOwner extends SeededLoginUser {
   username: string;
 }
 
-interface SeededTaleParticipant {
+interface SeededTaleParticipant extends SeededLoginUser {
   id: string;
   username: string;
-  email: string;
 }
 
 interface SeededTaleVisitor extends SeededLoginUser {
@@ -27,12 +26,18 @@ interface SeededTale {
   name: string;
 }
 
+interface SeededLocation {
+  id: string;
+  name: string;
+}
+
 interface SeededDataMap {
   SEEDED_LOGIN_USER: SeededLoginUser;
   SEEDED_TALE_OWNER: SeededTaleOwner;
   SEEDED_TALE_PARTICIPANT: SeededTaleParticipant;
   SEEDED_TALE_VISITOR: SeededTaleVisitor;
   SEEDED_TALE: SeededTale;
+  SEEDED_LOCATION: SeededLocation;
 }
 
 const SEEDED_DATA_PATH = resolve(__dirname, "./seeded-data.json");
