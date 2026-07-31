@@ -39,18 +39,15 @@ public record TaleDetailDTO(
   }
 
   private static TaleDetailDTO fromInternal(Tale tale, List<Location> sourceLocations, Integer maxLocations) {
-    OffsetDateTime creation = tale.getCreationDate() != null ? tale.getCreationDate() : OffsetDateTime.now();
-    OffsetDateTime lastActive = tale.getLastTimeActive() != null ? tale.getLastTimeActive() : creation;
-    ETaleStatus status = tale.getStatus() != null ? tale.getStatus() : ETaleStatus.ACTIVE;
+    OffsetDateTime creation = tale.getCreationDate();
+    OffsetDateTime lastActive = tale.getLastTimeActive();
+    ETaleStatus status = tale.getStatus();
     ERuleSystem rulesSystem = tale.getRules();
     ELanguage language = tale.getLanguage();
 
     List<TaleParticipantProfileDTO> participants = List.of();
-    List<User> taleParticipants = tale.getParticipants() == null
-      ? List.of()
-      : tale.getParticipants().stream()
-        .filter(Objects::nonNull)
-        .toList();
+    List<User> taleParticipants = tale.getParticipants().stream()
+      .toList();
 
     if (!taleParticipants.isEmpty()) {
       participants = taleParticipants.stream()
@@ -59,7 +56,7 @@ public record TaleDetailDTO(
     }
 
     TaleParticipantProfileDTO author = null;
-    if (tale.getOwnerId() != null && !taleParticipants.isEmpty()) {
+    if (!taleParticipants.isEmpty()) {
       author = taleParticipants.stream()
         .filter(user -> tale.isOwnedBy(user.getId()))
         .findFirst()
@@ -70,7 +67,7 @@ public record TaleDetailDTO(
     List<LocationDTO> locationDTOs = buildLocations(sourceLocations, maxLocations);
 
     return new TaleDetailDTO(
-      tale.getId() != null ? tale.getId().toString() : null,
+      tale.getId().toString(),
       tale.getTaleName(),
       tale.getPublic(),
       tale.getDescription(),
