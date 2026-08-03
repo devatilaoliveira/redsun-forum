@@ -188,20 +188,24 @@ $modelProfiles = @{
   frontier = @{
     Model           = "gpt-5.6-sol"
     ReasoningEffort = "xhigh"
+    PlanModeReasoningEffort = "xhigh"
   }
   balanced = @{
-    Model           = "gpt-5.6-sol"
-    ReasoningEffort = "medium"
+    Model           = "gpt-5.6-luna"
+    ReasoningEffort = "max"
+    PlanModeReasoningEffort = "high"
   }
   fast = @{
-    Model           = "gpt-5.6-terra"
-    ReasoningEffort = "medium"
+    Model           = "gpt-5.6-luna"
+    ReasoningEffort = "high"
+    PlanModeReasoningEffort = "high"
   }
 }
 
 $modelProfile = $modelProfiles[$Model]
 $resolvedModel = $modelProfile.Model
 $resolvedReasoningEffort = $modelProfile.ReasoningEffort
+$resolvedPlanModeReasoningEffort = $modelProfile.PlanModeReasoningEffort
 
 if (-not [string]::IsNullOrWhiteSpace($resolvedModel)) {
   $codexArgs += @("--model", $resolvedModel)
@@ -209,6 +213,10 @@ if (-not [string]::IsNullOrWhiteSpace($resolvedModel)) {
 
 if (-not [string]::IsNullOrWhiteSpace($resolvedReasoningEffort)) {
   $codexArgs += @("-c", "model_reasoning_effort=`"$resolvedReasoningEffort`"")
+}
+
+if (-not [string]::IsNullOrWhiteSpace($resolvedPlanModeReasoningEffort)) {
+  $codexArgs += @("-c", "plan_mode_reasoning_effort=`"$resolvedPlanModeReasoningEffort`"")
 }
 
 if ($layerFiles.Count -gt 0) {
@@ -220,6 +228,7 @@ if ($DryRun) {
   Write-Host "App: $App"
   Write-Host "Model: $resolvedModel"
   Write-Host "Reasoning effort: $resolvedReasoningEffort"
+  Write-Host "Plan mode reasoning effort: $resolvedPlanModeReasoningEffort"
   Write-Host "Active layers:"
   foreach ($relativeFile in $relativeFiles) {
     Write-Host "- $relativeFile"
