@@ -37,6 +37,7 @@ interface SeededDataMap {
   SEEDED_TALE_PARTICIPANT: SeededTaleParticipant;
   SEEDED_TALE_VISITOR: SeededTaleVisitor;
   SEEDED_TALE: SeededTale;
+  SEEDED_PUBLIC_TALE: SeededTale;
   SEEDED_LOCATION: SeededLocation;
 }
 

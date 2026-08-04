@@ -22,7 +22,8 @@ export const test = base.extend<
       baseURL: workerInfo.project.use.baseURL as string | undefined
     });
     try {
-      await loginWithSeededUser(page, SEEDED_DATA.SEEDED_TALE_VISITOR);
+      // Worker 2 is not a member of the public tale used by this access test.
+      await loginWithSeededUser(page, SEEDED_DATA.SEEDED_TALE_PARTICIPANT);
       await page.context().storageState({path: storageStatePath});
     } finally {
       await page.close();
