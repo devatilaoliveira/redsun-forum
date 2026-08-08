@@ -66,6 +66,11 @@
     &--logo {
       width: var(--topbar-element-size);
       padding: 0;
+
+      rs-logo {
+        width: 32px;
+        height: 32px;
+      }
     }
 
     &--title {
@@ -80,7 +85,7 @@
     }
 
     &:hover {
-      background: var(--color-hover);
+      background: var(--color-button-neutral-hover);
     }
 
     &:focus-visible {
@@ -112,7 +117,7 @@
         height: 47px;
         width: 47px;
 
-        img {
+        rs-logo {
           height: 100%;
           width: 100%;
         }

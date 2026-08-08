@@ -4,7 +4,6 @@ import {Router} from "@angular/router";
 import {ROUTE_PATHS} from "../../../interface/constants/route-path.constants";
 import {IAuthCallbackState} from "../../../interface/models/iauth-callback-state";
 import {RedsunTitle} from "../../shared/fragments/redsunTitle/redsun.title";
-import {NgOptimizedImage} from "@angular/common";
 import {ITranslateService, TranslatePipe, TranslateService} from "@ngx-translate/core";
 import {RsInput} from "../../shared/fragments/rsInput/rs.input";
 import {RsButton} from "../../shared/fragments/rsButton/rs.button";
@@ -22,11 +21,12 @@ import {MeResponseDTO} from "../../../interface/dtos/user/MeResponseDTO";
 import {resolvePreferredHomeUrl} from "../../../infra/miscellaneous/preferred-home.functions";
 import {UTIL_CONSTANTS} from "../../../interface/constants/util.constants";
 import {ESize} from "../../../interface/enums/ESize";
+import {RedsunLogo} from "../../shared/fragments/redsunLogo/redsun.logo";
 
 @Component({
   selector: "rs-login",
   standalone: true,
-  imports: [RedsunTitle, NgOptimizedImage, TranslatePipe, RsInput, RsButton, RsButtonText, PublicLegalFooterComponent, GoogleButton, RsOptionsMenu],
+  imports: [RedsunTitle, RedsunLogo, TranslatePipe, RsInput, RsButton, RsButtonText, PublicLegalFooterComponent, GoogleButton, RsOptionsMenu],
   templateUrl: "./login.view.html",
   styleUrl: "./login.view.scss"
 })

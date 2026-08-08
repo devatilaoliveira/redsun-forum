@@ -37,6 +37,10 @@
   overscroll-behavior: contain;
 }
 
+:host-context([data-theme='light']) img[rsButtonIcon] {
+  filter: brightness(0);
+}
+
 .support-button {
   margin-top: auto;
 }

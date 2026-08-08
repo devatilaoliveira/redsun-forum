@@ -82,12 +82,16 @@
   filter: brightness(0.88);
 }
 
-.rs-button[data-variant="black"]:not(:disabled):hover {
-  filter: brightness(1.18);
+.rs-button[data-variant="black"]:not(:disabled):hover,
+.rs-button[data-variant="black"]:not(:disabled):focus-visible {
+  background-color: var(--color-button-neutral-hover);
+  filter: none;
 }
 
+.rs-button[data-variant="black"]:not(:disabled):active,
 :host(.is-active) .rs-button[data-variant="black"]:not(:disabled) {
-  filter: brightness(1.28);
+  background-color: var(--color-button-neutral-active);
+  filter: none;
 }
 
 .rs-button:disabled {
