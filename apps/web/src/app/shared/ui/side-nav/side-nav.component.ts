@@ -1,5 +1,6 @@
 import {DOCUMENT, NgOptimizedImage} from "@angular/common";
 import {
+  afterRenderEffect,
   Component,
   effect,
   ElementRef,
@@ -22,6 +23,7 @@ import {IStyleMap} from "../../../../interface/models/istyle-map";
 import {ROUTE_PATHS} from "../../../../interface/constants/route-path.constants";
 import {RsSideNavItem} from "../../../../interface/models/side-nav-item";
 import {UTIL_CONSTANTS} from "../../../../interface/constants/util.constants";
+import {FocusHandler, IFocusHandler} from "../../../../infra/miscellaneous/focus.handler";
 
 @Component({
   selector: "rs-side-nav",
@@ -54,6 +56,7 @@ export class RsSideNavComponent {
   private readonly _router: Router = inject(Router);
   private readonly _printer: IPrinter = inject(Printer);
   private readonly _document: Document = inject(DOCUMENT);
+  private readonly _focusHandler: IFocusHandler = inject(FocusHandler);
 
   constructor() {
     effect(() => {
@@ -65,7 +68,6 @@ export class RsSideNavComponent {
 
         this.isClosing.set(false);
         this.isVisible.set(true);
-        setTimeout(() => this.focusDrawer(), 0);
         return;
       }
 
@@ -85,6 +87,14 @@ export class RsSideNavComponent {
         this.isVisible.set(false);
         this.closeTimeoutId = null;
       }, this.closeAnimationMs);
+    });
+
+    afterRenderEffect({
+      write: () => {
+        if (this.menuOpen() && this.isVisible()) {
+          this.focusDrawer();
+        }
+      }
     });
   }
 
@@ -141,11 +151,12 @@ export class RsSideNavComponent {
 
     const focusable: HTMLElement[] = this.getFocusableElements(drawer);
     if (focusable.length > 0) {
-      focusable[0].focus();
-      return;
+      if (this._focusHandler.focus(focusable[0])) {
+        return;
+      }
     }
 
-    drawer.focus();
+    this._focusHandler.focus(drawer);
   }
 
   private trapFocus(event: KeyboardEvent): void {
@@ -156,8 +167,9 @@ export class RsSideNavComponent {
 
     const focusable: HTMLElement[] = this.getFocusableElements(drawer);
     if (focusable.length === 0) {
-      event.preventDefault();
-      drawer.focus();
+      if (this._focusHandler.focus(drawer)) {
+        event.preventDefault();
+      }
       return;
     }
 
@@ -166,14 +178,16 @@ export class RsSideNavComponent {
     const active: Element | null = this._document.activeElement;
 
     if (event.shiftKey && active === first) {
-      event.preventDefault();
-      last.focus();
+      if (this._focusHandler.focus(last)) {
+        event.preventDefault();
+      }
       return;
     }
 
     if (!event.shiftKey && active === last) {
-      event.preventDefault();
-      first.focus();
+      if (this._focusHandler.focus(first)) {
+        event.preventDefault();
+      }
     }
   }
 

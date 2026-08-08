@@ -365,23 +365,17 @@ export class RsTopBarNavigatorComponent implements OnInit {
 
   private restoreMenuButtonFocus(): void {
     const menuButton: HTMLElement | null = this.getMenuButton();
-    if (menuButton) {
-      menuButton.focus();
-    }
+    this._focusHandler.focus(menuButton);
   }
 
   private restoreManageButtonFocus(): void {
     const manageButton: HTMLElement | null = this.getManageButton();
-    if (manageButton) {
-      manageButton.focus();
-    }
+    this._focusHandler.focus(manageButton);
   }
 
   private restorePlayerButtonFocus(): void {
     const playerButton: HTMLElement | null = this.getPlayerButton();
-    if (playerButton) {
-      playerButton.focus();
-    }
+    this._focusHandler.focus(playerButton);
   }
 
   private getMenuButton(): HTMLElement | null {

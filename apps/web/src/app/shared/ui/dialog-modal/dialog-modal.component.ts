@@ -1,12 +1,13 @@
 import {NgTemplateOutlet} from "@angular/common";
 import {
-  AfterViewInit,
+  afterNextRender,
   Component,
   ContentChild,
   ElementRef,
   TemplateRef,
   ViewChild,
   computed,
+  inject,
   input,
   InputSignal,
   output,
@@ -17,6 +18,7 @@ import {
 import {RsButton} from "../../fragments/rsButton/rs.button";
 import {RsRoundIconButton} from "../../fragments/rsRoundIconButton/rs.round-icon-button";
 import {EVariant} from "../../../../interface/enums/EVariant";
+import {FocusHandler, IFocusHandler} from "../../../../infra/miscellaneous/focus.handler";
 
 export interface RsDialogCta {
   label: string;
@@ -32,7 +34,7 @@ export interface RsDialogCta {
   templateUrl: "./dialog-modal.component.html",
   styleUrl: "./dialog-modal.component.scss"
 })
-export class RsDialogModalComponent implements AfterViewInit {
+export class RsDialogModalComponent {
   public readonly title: InputSignal<string> = input.required<string>();
   public readonly ctaBtnOne: InputSignal<RsDialogCta | null> = input<RsDialogCta | null>(null);
   public readonly ctaBtnTwo: InputSignal<RsDialogCta | null> = input<RsDialogCta | null>(null);
@@ -68,8 +70,12 @@ export class RsDialogModalComponent implements AfterViewInit {
     return !!this.ctaOne() || !!this.ctaTwo();
   });
 
-  public ngAfterViewInit(): void {
-    this.focusFirstElement();
+  private readonly _focusHandler: IFocusHandler = inject(FocusHandler);
+
+  constructor() {
+    afterNextRender({
+      write: () => this.focusFirstElement()
+    });
   }
 
   protected onClose(): void {
@@ -107,18 +113,18 @@ export class RsDialogModalComponent implements AfterViewInit {
     };
   }
 
-
   private focusFirstElement(): void {
     const panel: HTMLElement | undefined = this.panelRef?.nativeElement;
     if (!panel) return;
 
     const focusable: HTMLElement[] = this.getFocusableElements(panel);
     if (focusable.length > 0) {
-      focusable[0].focus();
-      return;
+      if (this._focusHandler.focus(focusable[0])) {
+        return;
+      }
     }
 
-    panel.focus();
+    this._focusHandler.focus(panel);
   }
 
   private trapFocus(event: KeyboardEvent): void {
@@ -127,8 +133,9 @@ export class RsDialogModalComponent implements AfterViewInit {
 
     const focusable: HTMLElement[] = this.getFocusableElements(panel);
     if (focusable.length === 0) {
-      event.preventDefault();
-      panel.focus();
+      if (this._focusHandler.focus(panel)) {
+        event.preventDefault();
+      }
       return;
     }
 
@@ -137,14 +144,16 @@ export class RsDialogModalComponent implements AfterViewInit {
     const active: Element | null = document.activeElement;
 
     if (event.shiftKey && active === first) {
-      event.preventDefault();
-      last.focus();
+      if (this._focusHandler.focus(last)) {
+        event.preventDefault();
+      }
       return;
     }
 
     if (!event.shiftKey && active === last) {
-      event.preventDefault();
-      first.focus();
+      if (this._focusHandler.focus(first)) {
+        event.preventDefault();
+      }
     }
   }
 
