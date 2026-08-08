@@ -1,19 +1,44 @@
 @if (kind() === "link") {
-  <a
-    [routerLink]="interactiveRoutePath()"
-    class="rs-button-text"
-    [class.is-busy]="inProgress()"
-    [class.is-disabled]="disabled()"
-    [attr.aria-busy]="inProgress()"
-    [attr.aria-disabled]="disabled() ? 'true' : null"
-    [attr.aria-haspopup]="ariaHasPopup()"
-    [attr.aria-expanded]="ariaExpanded()"
-    [attr.data-variant]="variant()"
-    [attr.data-size]="size()"
-    (click)="onClick($event)"
-  >
-    <ng-container [ngTemplateOutlet]="content"></ng-container>
-  </a>
+  <!--
+    Keep external and router links separate because RouterLink owns the host anchor's href binding
+    and can overwrite an external href. Angular documentation: "Represents an `href` attribute value
+    applied to a host element." See https://angular.dev/api/router/RouterLink#href
+  -->
+  @if (href()) {
+    <a
+      [attr.href]="href() ? interactiveHref(): null"
+      [attr.target]="target()"
+      [attr.rel]="rel()"
+      class="rs-button-text"
+      [class.is-busy]="inProgress()"
+      [class.is-disabled]="disabled()"
+      [attr.aria-busy]="inProgress()"
+      [attr.aria-disabled]="disabled() ? 'true' : null"
+      [attr.aria-haspopup]="ariaHasPopup()"
+      [attr.aria-expanded]="ariaExpanded()"
+      [attr.data-variant]="variant()"
+      [attr.data-size]="size()"
+      (click)="onClick($event)"
+    >
+      <ng-container [ngTemplateOutlet]="content"></ng-container>
+    </a>
+  } @else {
+    <a
+      [routerLink]="interactiveRoutePath()"
+      class="rs-button-text"
+      [class.is-busy]="inProgress()"
+      [class.is-disabled]="disabled()"
+      [attr.aria-busy]="inProgress()"
+      [attr.aria-disabled]="disabled() ? 'true' : null"
+      [attr.aria-haspopup]="ariaHasPopup()"
+      [attr.aria-expanded]="ariaExpanded()"
+      [attr.data-variant]="variant()"
+      [attr.data-size]="size()"
+      (click)="onClick($event)"
+    >
+      <ng-container [ngTemplateOutlet]="content"></ng-container>
+    </a>
+  }
 } @else {
   <button
     [attr.type]="type()"

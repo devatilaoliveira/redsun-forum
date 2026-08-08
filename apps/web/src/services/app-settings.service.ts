@@ -24,7 +24,7 @@ export class AppSettingsService implements IAppSettingsService {
   private readonly _translate: TranslateService = inject(TranslateService);
   private readonly _themeHandler: IThemeHandler = inject(ThemeHandler);
   private readonly _language: WritableSignal<ELanguage> = signal<ELanguage>(this._detectLanguage());
-  private readonly _theme: WritableSignal<EThemeApplication> = signal<EThemeApplication>(this._detectTheme());
+  private readonly _theme: WritableSignal<EThemeApplication> = signal<EThemeApplication>(EThemeApplication.DARK);
   private readonly _redirectToFavorite: WritableSignal<boolean> = signal<boolean>(false);
   private readonly _favoriteTaleId: WritableSignal<string | null> = signal<string | null>(null);
 
@@ -39,7 +39,7 @@ export class AppSettingsService implements IAppSettingsService {
 
   public initDefaults(settings?: UserSettingsDTO): Observable<InterpolatableTranslation> {
     const language: ELanguage = this._toLanguage(settings?.appLanguage) ?? this._language();
-    const theme: EThemeApplication = this._toTheme(settings?.appTheme) ?? this._theme();
+    const theme: EThemeApplication = this._toTheme(settings?.appTheme) ?? EThemeApplication.DARK;
     const redirectToFavorite: boolean = settings?.redirectToFavorite ?? false;
     const favoriteTaleId: string | null = settings?.favoriteTaleId ?? null;
 
@@ -52,17 +52,19 @@ export class AppSettingsService implements IAppSettingsService {
   }
 
   public applyUserSettings(settings: UserSettingsDTO): void {
+    const theme: EThemeApplication = this._toTheme(settings.appTheme) ?? EThemeApplication.DARK;
+
     this._language.set(settings.appLanguage);
-    this._theme.set(settings.appTheme);
+    this._theme.set(theme);
     this._redirectToFavorite.set(settings.redirectToFavorite);
     this._favoriteTaleId.set(settings.favoriteTaleId ?? null);
-    this._themeHandler.setTheme(settings.appTheme);
+    this._themeHandler.setTheme(theme);
     this._translate.use(AppSettingsService.toTranslateLang(settings.appLanguage)).subscribe();
   }
 
   public resetToDetectedDefaults(): void {
     const language: ELanguage = this._detectLanguage();
-    const theme: EThemeApplication = this._detectTheme();
+    const theme: EThemeApplication = EThemeApplication.DARK;
 
     this._language.set(language);
     this._theme.set(theme);
@@ -96,14 +98,6 @@ export class AppSettingsService implements IAppSettingsService {
     }
 
     return ELanguage.PT;
-  }
-
-  private _detectTheme(): EThemeApplication {
-    if (typeof window !== "undefined" && window.matchMedia?.("(prefers-color-scheme: light)").matches) {
-      return EThemeApplication.LIGHT;
-    }
-
-    return EThemeApplication.DARK;
   }
 
   private _toLanguage(value: ELanguage | null | undefined): ELanguage | null {

@@ -59,9 +59,7 @@ public class UserController {
     @AuthenticationPrincipal AuthenticatedUser principal,
     @Valid @RequestBody MeRequestDto request
   ) {
-    User updatedUser = userService.updateMe(principal.user().getId(), request);
-    List<UserAsContactDTO> contacts = userService.getContactsForUser(updatedUser.getId());
-    return ResponseEntity.ok(userService.toMeResponse(updatedUser, contacts));
+    return ResponseEntity.ok(userService.updateMe(principal.user().getId(), request));
   }
 
   @PatchMapping("/me/settings")
@@ -100,8 +98,7 @@ public class UserController {
     @AuthenticationPrincipal AuthenticatedUser principal,
     @RequestPart("file") MultipartFile file
   ) throws IOException {
-    User updatedUser = userService.updateAvatar(principal.user().getId(), file);
-    return ResponseEntity.ok(userService.toMeResponse(updatedUser, List.of()));
+    return ResponseEntity.ok(userService.updateAvatar(principal.user().getId(), file));
   }
 
   @DeleteMapping("/avatar")
@@ -128,10 +125,9 @@ public class UserController {
     @RequestParam(name = "rule", required = false) String rule,
     @RequestParam(name = "language", required = false) String language
   ) {
-    Page<UserSearchResultDTO> users = userService
-      .findUsers(principal.user().getId(), page, size, userName, role, rule, language)
-      .map(UserSearchResultDTO::from);
-    return ResponseEntity.ok(users);
+    return ResponseEntity.ok(
+      userService.findUsers(principal.user().getId(), page, size, userName, role, rule, language)
+    );
   }
 
   @PostMapping("/contacts")

@@ -13,6 +13,8 @@ public interface LocationRepository {
 
   Page<Location> findByTaleId(UUID taleId, Pageable pageable);
 
+  List<Location> findRecentByTaleId(UUID taleId, int limit);
+
   List<Location> findByTaleId(UUID taleId);
 
   Location save(Location location);

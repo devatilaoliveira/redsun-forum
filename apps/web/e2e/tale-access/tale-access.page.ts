@@ -20,6 +20,10 @@ export class TaleAccessPage {
     await expect(this.playerMenuButton).toHaveCount(0);
   }
 
+  async expectTaleVisible(taleName: string): Promise<void> {
+    await expect(this.page.getByRole("heading", {name: taleName})).toBeVisible();
+  }
+
   async gotoCharacterProfile(taleId: string, participantId: string): Promise<void> {
     const profilePath = `/${ROUTE_PATHS.tales}/${taleId}/${ROUTE_PATHS.participants}/${participantId}`;
     await this.page.goto(profilePath);

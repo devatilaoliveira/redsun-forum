@@ -1,6 +1,7 @@
 package com.rpg.redsunapi.letter;
 
 import com.rpg.redsunapi.letter.dto.LetterCreateRequestDTO;
+import com.rpg.redsunapi.letter.dto.LetterDTO;
 import com.rpg.redsunapi.user.User;
 import com.rpg.redsunapi.user.UserRepository;
 import org.springframework.data.domain.Page;
@@ -32,7 +33,7 @@ public class LetterService {
   }
 
   @Transactional
-  public Letter createLetter(LetterCreateRequestDTO request, User sender) {
+  public LetterDTO createLetter(LetterCreateRequestDTO request, User sender) {
     if (sender == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User must be authenticated");
     }
@@ -69,31 +70,33 @@ public class LetterService {
     letter.setSubject(request.subject());
     letter.setContent(request.content());
 
-    return letterRepository.save(letter);
+    return LetterDTO.from(letterRepository.save(letter));
   }
 
   @Transactional(readOnly = true)
-  public Page<Letter> listSentLettersForUser(User user, int page, int size) {
+  public Page<LetterDTO> listSentLettersForUser(User user, int page, int size) {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User must be authenticated");
     }
 
     Pageable pageable = buildPageable(page, size);
-    return letterRepository.findSentLettersForUser(user.getId(), pageable);
+    return letterRepository.findSentLettersForUser(user.getId(), pageable)
+      .map(LetterDTO::from);
   }
 
   @Transactional(readOnly = true)
-  public Page<Letter> listReceivedLettersForUser(User user, int page, int size) {
+  public Page<LetterDTO> listReceivedLettersForUser(User user, int page, int size) {
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User must be authenticated");
     }
 
     Pageable pageable = buildPageable(page, size);
-    return letterRepository.findReceivedLettersForUser(user.getId(), pageable);
+    return letterRepository.findReceivedLettersForUser(user.getId(), pageable)
+      .map(LetterDTO::from);
   }
 
   @Transactional
-  public Letter findLetterById(UUID letterId, User requester) {
+  public LetterDTO findLetterById(UUID letterId, User requester) {
     if (requester == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User must be authenticated");
     }
@@ -108,7 +111,7 @@ public class LetterService {
       this.markAsRead(letter, requester);
     }
 
-    return letter;
+    return LetterDTO.from(letter);
   }
 
   private void markAsRead(Letter letter, User requester) {

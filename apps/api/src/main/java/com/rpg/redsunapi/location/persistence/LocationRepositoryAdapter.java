@@ -3,7 +3,9 @@ package com.rpg.redsunapi.location.persistence;
 import com.rpg.redsunapi.location.Location;
 import com.rpg.redsunapi.location.LocationRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -27,6 +29,16 @@ public class LocationRepositoryAdapter implements LocationRepository {
   @Override
   public Page<Location> findByTaleId(UUID taleId, Pageable pageable) {
     return jpaLocationRepository.findByTaleId(taleId, pageable);
+  }
+
+  @Override
+  public List<Location> findRecentByTaleId(UUID taleId, int limit) {
+    PageRequest recentLocations = PageRequest.of(
+      0,
+      limit,
+      Sort.by(Sort.Order.desc("lastTimeActive"), Sort.Order.desc("id"))
+    );
+    return jpaLocationRepository.findAllByTaleId(taleId, recentLocations);
   }
 
   @Override

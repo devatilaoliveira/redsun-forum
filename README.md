@@ -28,7 +28,7 @@ Pop-Location
 Start Supabase and the containerized API:
 
 ```powershell
-.\local.ps1 start
+.\scripts\local.ps1 start
 ```
 
 The command applies migrations and seed data on the first Supabase start,
@@ -43,16 +43,16 @@ npm run start:local
 Pop-Location
 ```
 
-`npm run start:local` expects `local.ps1 start` or `local.ps1 reset` to have
+`npm run start:local` expects `scripts/local.ps1 start` or `scripts/local.ps1 reset` to have
 already generated `apps/web/public/env.js`.
 
 ## Local lifecycle
 
 | Command | Result |
 | --- | --- |
-| `.\local.ps1 start` | Starts or resumes local state and recreates the API container |
-| `.\local.ps1 reset` | Runs `supabase db reset --local`, reseeds, and restarts the API |
-| `.\local.ps1 stop` | Stops the API and Supabase while preserving local state |
+| `.\scripts\local.ps1 start` | Starts or resumes local state and recreates the API container |
+| `.\scripts\local.ps1 reset` | Runs `supabase db reset --local`, reseeds, and restarts the API |
+| `.\scripts\local.ps1 stop` | Stops the API and Supabase while preserving local state |
 | `npm run start:local` from `apps/web` | Starts Angular against the local API and Supabase |
 
 The reset command is destructive only to the local database. It restores the
@@ -75,7 +75,7 @@ so related operations use the application's normal failure handling.
 
 - `apps/api/supabase/migrations/` is the only schema history.
 - `apps/api/supabase/seed.sql` contains synthetic local/CI data only.
-- `redsun_dev` is restricted by migrations; only `local.ps1` assigns its
+- `redsun_dev` is restricted by migrations; only `scripts/local.ps1` assigns its
   committed local password.
 - Production migrations are deployed manually with `supabase db push`.
 - Production deployment must never use `--include-seed`.
@@ -91,17 +91,52 @@ Do not perform the first production push before completing the procedure in
 - API CI resets and seeds local Supabase, verifies role/RLS/Data API/Storage
   state, and runs Maven tests.
 - E2E CI runs on pull requests to `main` and manual dispatch, starts the same
-  local stack through `local.ps1 reset`, and runs all Playwright browser
+  local stack through `scripts/local.ps1 reset`, and runs all Playwright browser
   projects with one worker.
 
 See [local development](docs/local-development.md) for installation,
 credentials, verification commands, generated-file behavior, and
 troubleshooting.
 
-## Optional Codex launcher
+## Launch Codex
+
+Install and authenticate the Codex CLI, then run the repository launcher from
+the repository root:
 
 ```powershell
 .\scripts\codexLaucher.ps1 -App all
 ```
 
-Valid selections are `web`, `api`, `repo`, and `all`.
+The `-App` selection loads the instruction layers relevant to the task:
+
+| Selection | Instruction layers |
+| --- | --- |
+| `web` | Shared core, RedSun web, and Angular |
+| `api` | Shared core, RedSun API, domain map, Spring Boot, and persistence/storage |
+| `all` | All web and API layers |
+| `repo` | Shared core only (the default) |
+
+Choose a model profile with `-Model`:
+
+```powershell
+.\scripts\codexLaucher.ps1 -App web -Model fast
+.\scripts\codexLaucher.ps1 -App api -Model balanced
+.\scripts\codexLaucher.ps1 -App all -Model frontier
+```
+
+Valid model profiles are `fast`, `balanced` (the default), and `frontier`.
+Use `-DryRun` to validate the selection and print the resolved layers without
+starting Codex:
+
+```powershell
+.\scripts\codexLaucher.ps1 -App all -DryRun
+```
+
+Advanced sessions can override the default layer selections with `-Core`,
+`-Project`, `-Stack`, and `-Skill`. Names are resolved from the corresponding
+folders under `.agents`; multiple values can be comma-separated:
+
+```powershell
+.\scripts\codexLaucher.ps1 -App web -Core methodical,teacher
+.\scripts\codexLaucher.ps1 -App web -Skill angular\maintain-e2e-tests
+```

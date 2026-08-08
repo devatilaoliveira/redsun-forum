@@ -33,7 +33,7 @@ jobs:
 
       - name: Reset and start the local stack
         shell: pwsh
-        run: ./local.ps1 reset
+        run: ./scripts/local.ps1 reset
 
       - name: Install Playwright browsers
         working-directory: apps/web
@@ -67,4 +67,4 @@ jobs:
         if: always()
         continue-on-error: true
         shell: pwsh
-        run: ./local.ps1 stop
+        run: ./scripts/local.ps1 stop

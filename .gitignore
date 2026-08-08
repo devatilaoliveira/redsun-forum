@@ -65,6 +65,7 @@ apps/web/__screenshots__/
 ### Java, Maven, and build output ###
 apps/api/HELP.md
 **/.m2/
+**/.maven-home/
 **/.m2-repo/
 **/target/
 **/build/

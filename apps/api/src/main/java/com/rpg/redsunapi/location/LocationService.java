@@ -1,6 +1,7 @@
 package com.rpg.redsunapi.location;
 
 import com.rpg.redsunapi.location.dto.LocationCreateRequestDTO;
+import com.rpg.redsunapi.location.dto.LocationDTO;
 import com.rpg.redsunapi.location.dto.LocationDetailDTO;
 import com.rpg.redsunapi.location.dto.LocationUpdateRequestDTO;
 import com.rpg.redsunapi.location.enums.ELocationStatus;
@@ -105,7 +106,7 @@ public class LocationService {
   }
 
   @Transactional(readOnly = true)
-  public Page<Location> findLocationsByTaleId(UUID taleId, User requester, int page, int size) {
+  public Page<LocationDTO> findLocationsByTaleId(UUID taleId, User requester, int page, int size) {
     Tale tale = findTaleForView(taleId, requester);
 
     int safePage = Math.max(page, 0);
@@ -113,7 +114,8 @@ public class LocationService {
     Sort sort = Sort.by(Sort.Order.desc("lastTimeActive"), Sort.Order.desc("id"));
     Pageable pageable = PageRequest.of(safePage, boundedSize, sort);
 
-    return locationRepository.findByTaleId(tale.getId(), pageable);
+    return locationRepository.findByTaleId(tale.getId(), pageable)
+      .map(LocationDTO::from);
   }
 
   @Transactional

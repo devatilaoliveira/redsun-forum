@@ -13,11 +13,13 @@ import {ROUTE_PATHS} from "../../../../interface/constants/route-path.constants"
 import {TaleContextStateService} from "../../../../stateServices/tale-context-state.service";
 import {AppSettingsService, IAppSettingsService} from "../../../../services/app-settings.service";
 import {resolvePreferredHomeUrl} from "../../../../infra/miscellaneous/preferred-home.functions";
+import {FocusHandler, IFocusHandler} from "../../../../infra/miscellaneous/focus.handler";
+import {RedsunLogo} from "../../fragments/redsunLogo/redsun.logo";
 
 @Component({
   selector: "rs-top-bar-navigator",
   standalone: true,
-  imports: [RedsunTitle, RsRoundIconButton, RsSideNavComponent, TranslatePipe],
+  imports: [RedsunTitle, RedsunLogo, RsRoundIconButton, RsSideNavComponent, TranslatePipe],
   templateUrl: "./top-bar-navigator.component.html",
   styleUrl: "./top-bar-navigator.component.scss"
 })
@@ -63,6 +65,7 @@ export class RsTopBarNavigatorComponent implements OnInit {
   private readonly _document: Document = inject(DOCUMENT);
   private readonly _taleState: TaleContextStateService = inject(TaleContextStateService);
   private readonly _appSettingsService: IAppSettingsService = inject(AppSettingsService);
+  private readonly _focusHandler: IFocusHandler = inject(FocusHandler);
 
   constructor() {
     this.manageVisible = this._taleState.canManage;
@@ -365,23 +368,17 @@ export class RsTopBarNavigatorComponent implements OnInit {
 
   private restoreMenuButtonFocus(): void {
     const menuButton: HTMLElement | null = this.getMenuButton();
-    if (menuButton) {
-      menuButton.focus();
-    }
+    this._focusHandler.focus(menuButton);
   }
 
   private restoreManageButtonFocus(): void {
     const manageButton: HTMLElement | null = this.getManageButton();
-    if (manageButton) {
-      manageButton.focus();
-    }
+    this._focusHandler.focus(manageButton);
   }
 
   private restorePlayerButtonFocus(): void {
     const playerButton: HTMLElement | null = this.getPlayerButton();
-    if (playerButton) {
-      playerButton.focus();
-    }
+    this._focusHandler.focus(playerButton);
   }
 
   private getMenuButton(): HTMLElement | null {

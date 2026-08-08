@@ -6,6 +6,8 @@ import com.rpg.redsunapi.location.LocationRepository;
 import com.rpg.redsunapi.storage.LocationStorageService;
 import com.rpg.redsunapi.storage.TaleStorageService;
 import com.rpg.redsunapi.tale.dto.TaleCreateRequestDTO;
+import com.rpg.redsunapi.tale.dto.TaleDetailDTO;
+import com.rpg.redsunapi.tale.dto.TaleResponseDTO;
 import com.rpg.redsunapi.tale.dto.TaleUpdateRequestDTO;
 import com.rpg.redsunapi.tale.enums.ELanguage;
 import com.rpg.redsunapi.tale.enums.ERuleSystem;
@@ -67,7 +69,7 @@ public class TaleService {
   }
 
   @Transactional
-  public Tale createTale(TaleCreateRequestDTO taleDTO, User owner) throws IOException {
+  public TaleDetailDTO createTale(TaleCreateRequestDTO taleDTO, User owner) throws IOException {
     Set<User> participants = new HashSet<>();
     List<String> ids = taleDTO.participantsIds();
     if (ids != null && !ids.isEmpty()) {
@@ -106,11 +108,11 @@ public class TaleService {
       characterSheetService.ensureCharacterSheetForParticipant(savedTale, participant);
     }
 
-    return savedTale;
+    return TaleDetailDTO.from(savedTale);
   }
 
   @Transactional
-  public Tale updateTale(UUID taleId, TaleUpdateRequestDTO request, User requester) throws IOException {
+  public TaleDetailDTO updateTale(UUID taleId, TaleUpdateRequestDTO request, User requester) throws IOException {
     Tale tale = taleRepository.findById(taleId)
       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tale not found"));
 
@@ -212,7 +214,7 @@ public class TaleService {
         }
       }
 
-      return saved;
+      return TaleDetailDTO.from(saved);
     } catch (Exception ex) {
       if (hasImageUpdate && newImageUrl != null && !newImageUrl.isBlank() && !Objects.equals(newImageUrl, oldImageUrl)) {
         try {
@@ -240,6 +242,7 @@ public class TaleService {
     taleRepository.save(tale);
   }
 
+  @Transactional(readOnly = true)
   public Tale findTaleById(UUID taleId, User requester) {
     Tale tale = taleRepository.findById(taleId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tale not found"));
 
@@ -249,16 +252,19 @@ public class TaleService {
     return tale;
   }
 
-  public Page<Tale> findTalesForUser(User user, int page, int size) {
+  @Transactional(readOnly = true)
+  public Page<TaleResponseDTO> findTalesForUser(User user, int page, int size) {
     int safePage = Math.max(page, 0);
     int boundedSize = size <= 0 ? MAX_PAGE_SIZE : Math.min(size, MAX_PAGE_SIZE);
     Sort sort = Sort.by(Sort.Order.desc("lastTimeActive"), Sort.Order.desc("creationDate"));
     Pageable pageable = PageRequest.of(safePage, boundedSize, sort);
 
-    return taleRepository.findAllByOwnerOrParticipant(user.getId(), pageable);
+    return taleRepository.findAllByOwnerOrParticipant(user.getId(), pageable)
+      .map(TaleResponseDTO::from);
   }
 
-  public Page<Tale> findPublicTales(int page, int size, @Nullable String language, @Nullable String rules) {
+  @Transactional(readOnly = true)
+  public Page<TaleResponseDTO> findPublicTales(int page, int size, @Nullable String language, @Nullable String rules) {
     int safePage = Math.max(page, 0);
     int boundedSize = size <= 0 ? MAX_PAGE_SIZE : Math.min(size, MAX_PAGE_SIZE);
     Sort sort = Sort.by(Sort.Order.desc("lastTimeActive"), Sort.Order.desc("creationDate"));
@@ -267,9 +273,10 @@ public class TaleService {
     ELanguage normalizedLanguage = language == null ? null : parseLanguage(language);
 
     return taleRepository.findAllPublic(
-        pageable,
-        normalizedLanguage,
-        rules == null ? null : parseRules(rules));
+      pageable,
+      normalizedLanguage,
+      rules == null ? null : parseRules(rules)
+    ).map(TaleResponseDTO::from);
   }
 
   @Transactional
@@ -299,7 +306,7 @@ public class TaleService {
   }
 
   @Transactional
-  public Tale addParticipantByIdentifier(UUID taleId, String identifier, User requester) {
+  public TaleDetailDTO addParticipantByIdentifier(UUID taleId, String identifier, User requester) {
     String normalizedIdentifier = identifier.trim();
 
     Tale tale = taleRepository.findById(taleId)
@@ -319,11 +326,11 @@ public class TaleService {
 
     tale.addParticipant(participant);
     characterSheetService.ensureCharacterSheetForParticipant(tale, participant);
-    return taleRepository.save(tale);
+    return TaleDetailDTO.from(taleRepository.save(tale));
   }
 
   @Transactional
-  public Tale removeParticipantById(UUID taleId, UUID participantId, User requester) {
+  public TaleDetailDTO removeParticipantById(UUID taleId, UUID participantId, User requester) {
     Tale tale = taleRepository.findById(taleId)
       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tale not found"));
 
@@ -343,11 +350,11 @@ public class TaleService {
     }
 
     characterSheetService.removeCharacterSheetForParticipant(tale, participantId);
-    return taleRepository.save(tale);
+    return TaleDetailDTO.from(taleRepository.save(tale));
   }
 
   @Transactional
-  public Tale removeSelfFromTale(UUID taleId, User requester) {
+  public TaleDetailDTO removeSelfFromTale(UUID taleId, User requester) {
     Tale tale = taleRepository.findById(taleId)
       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tale not found"));
 
@@ -366,11 +373,11 @@ public class TaleService {
     }
 
     characterSheetService.removeCharacterSheetForParticipant(tale, requester.getId());
-    return taleRepository.save(tale);
+    return TaleDetailDTO.from(taleRepository.save(tale));
   }
 
   @Transactional
-  public Tale transferOwnership(UUID taleId, UUID newOwnerId, User requester) {
+  public TaleDetailDTO transferOwnership(UUID taleId, UUID newOwnerId, User requester) {
     Tale tale = taleRepository.findById(taleId)
       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tale not found"));
 
@@ -397,7 +404,7 @@ public class TaleService {
     tale.setOwnerId(newOwnerId);
     characterSheetService.handleOwnershipTransfer(tale, previousOwnerId, newOwnerId);
 
-    return taleRepository.save(tale);
+    return TaleDetailDTO.from(taleRepository.save(tale));
   }
 
   private ELanguage parseLanguage(String language) {

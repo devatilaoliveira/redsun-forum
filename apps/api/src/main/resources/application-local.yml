@@ -4,6 +4,11 @@ spring:
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgres}
 
+#logging:
+#  level:
+#    org.hibernate.SQL: DEBUG
+#    org.hibernate.orm.jdbc.bind: TRACE
+
 supabase:
   url: ${SUPABASE_URL:http://127.0.0.1:54321}
   secret-key: ${SUPABASE_SECRET_KEY}

@@ -1,8 +1,6 @@
 package com.rpg.redsunapi.tale;
 
 import com.rpg.redsunapi.authentication.AuthenticatedUser;
-import com.rpg.redsunapi.location.Location;
-import com.rpg.redsunapi.location.LocationService;
 import com.rpg.redsunapi.tale.dto.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -26,11 +24,11 @@ import java.util.UUID;
 public class TaleController {
 
   private final TaleService taleService;
-  private final LocationService locationService;
+  private final TaleReadService taleReadService;
 
-  public TaleController(TaleService taleService, LocationService locationService) {
+  public TaleController(TaleService taleService, TaleReadService taleReadService) {
     this.taleService = taleService;
-    this.locationService = locationService;
+    this.taleReadService = taleReadService;
   }
 
   @PostMapping(path = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -38,8 +36,7 @@ public class TaleController {
     @AuthenticationPrincipal AuthenticatedUser principal,
     @Valid @ModelAttribute TaleCreateRequestDTO taleDTO
   ) throws IOException {
-    Tale savedTale = taleService.createTale(taleDTO, principal.user());
-    return ResponseEntity.status(HttpStatus.CREATED).body(TaleDetailDTO.from(savedTale));
+    return ResponseEntity.status(HttpStatus.CREATED).body(taleService.createTale(taleDTO, principal.user()));
   }
 
   @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -48,8 +45,7 @@ public class TaleController {
     @PathVariable("id") UUID taleId,
     @Valid @NotNull @ModelAttribute TaleUpdateRequestDTO taleDTO
   ) throws IOException {
-    Tale updatedTale = taleService.updateTale(taleId, taleDTO, principal.user());
-    return ResponseEntity.ok(TaleDetailDTO.from(updatedTale));
+    return ResponseEntity.ok(taleService.updateTale(taleId, taleDTO, principal.user()));
   }
 
   @PostMapping("/{id}/archive")
@@ -66,9 +62,7 @@ public class TaleController {
     @AuthenticationPrincipal AuthenticatedUser principal,
     @PathVariable("id") UUID taleId
   ) {
-    Tale tale = taleService.findTaleById(taleId, principal.user());
-    Page<Location> locations = locationService.findLocationsByTaleId(taleId, principal.user(), 0, 5);
-    return ResponseEntity.ok(TaleDetailDTO.fromWithRecentLocations(tale, locations.getContent(), 5));
+    return ResponseEntity.ok(taleReadService.findTaleDetailById(taleId, principal.user()));
   }
 
   @PostMapping("/{taleId}/participants/{identifier}")
@@ -77,8 +71,7 @@ public class TaleController {
     @PathVariable("taleId") UUID taleId,
     @PathVariable("identifier") String identifier
   ) {
-    Tale updated = taleService.addParticipantByIdentifier(taleId, identifier, principal.user());
-    return ResponseEntity.ok(TaleDetailDTO.from(updated));
+    return ResponseEntity.ok(taleService.addParticipantByIdentifier(taleId, identifier, principal.user()));
   }
 
   @DeleteMapping("/{taleId}/participants/{userId}")
@@ -87,8 +80,7 @@ public class TaleController {
     @PathVariable("taleId") UUID taleId,
     @PathVariable("userId") UUID userId
   ) {
-    Tale updated = taleService.removeParticipantById(taleId, userId, principal.user());
-    return ResponseEntity.ok(TaleDetailDTO.from(updated));
+    return ResponseEntity.ok(taleService.removeParticipantById(taleId, userId, principal.user()));
   }
 
   @DeleteMapping("/{taleId}/participants/me")
@@ -96,8 +88,7 @@ public class TaleController {
     @AuthenticationPrincipal AuthenticatedUser principal,
     @PathVariable("taleId") UUID taleId
   ) {
-    Tale updated = taleService.removeSelfFromTale(taleId, principal.user());
-    return ResponseEntity.ok(TaleDetailDTO.from(updated));
+    return ResponseEntity.ok(taleService.removeSelfFromTale(taleId, principal.user()));
   }
 
   @PostMapping("/{taleId}/owner/{newOwnerId}")
@@ -106,8 +97,7 @@ public class TaleController {
     @PathVariable("taleId") UUID taleId,
     @PathVariable("newOwnerId") UUID newOwnerId
   ) {
-    Tale updated = taleService.transferOwnership(taleId, newOwnerId, principal.user());
-    return ResponseEntity.ok(TaleDetailDTO.from(updated));
+    return ResponseEntity.ok(taleService.transferOwnership(taleId, newOwnerId, principal.user()));
   }
 
   @GetMapping("/my-tales")
@@ -116,8 +106,7 @@ public class TaleController {
     @RequestParam(name = "page", defaultValue = "0") int page,
     @RequestParam(name = "size", defaultValue = "10") int size
   ) {
-    Page<TaleResponseDTO> talesDTO = taleService.findTalesForUser(principal.user(), page, size).map(TaleResponseDTO::from);
-    return ResponseEntity.ok(talesDTO);
+    return ResponseEntity.ok(taleService.findTalesForUser(principal.user(), page, size));
   }
 
   @GetMapping("/find-tales")
@@ -127,7 +116,6 @@ public class TaleController {
     @Nullable @RequestParam(name = "language", required = false) String language,
     @Nullable @RequestParam(name = "rules", required = false) String rules
   ) {
-    Page<TaleResponseDTO> tales = taleService.findPublicTales(page, size, language, rules).map(TaleResponseDTO::from);
-    return ResponseEntity.ok(tales);
+    return ResponseEntity.ok(taleService.findPublicTales(page, size, language, rules));
   }
 }

@@ -54,6 +54,7 @@
         </div>
         @if (postInputMode() === POST_INPUT_MODE.post) {
           <rs-textarea
+            testId="location-post-content"
             [placeholder]="'POST_PLACEHOLDER' | translate"
             [maxLength]="UTIL_CONSTANTS.LONG_TEXT_LENGTH"
             [rows]="4"
@@ -113,6 +114,7 @@
             </rs-tooltip>
           }
           <rs-button
+            testId="location-post-submit"
             [inProgress]="postInProgress()"
             [disabled]="postInProgress() || !canSubmitCurrentInput()"
             (pressed)="onSubmitPost(location.id)"

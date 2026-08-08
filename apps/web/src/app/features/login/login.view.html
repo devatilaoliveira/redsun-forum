@@ -1,7 +1,7 @@
 <section class="cover">
   <rs-title />
   <div class="logo-wrapper">
-    <img ngSrc="assets/svgs/rs.svg" alt="Red Sun logo" fill priority >
+    <rs-logo fill priority />
   </div>
 
   <form id="loginForm" class="login-form" (submit)="onEmailLogin($event)">
@@ -83,6 +83,23 @@
   </div>
 
   <div class="legal-footer-wrapper">
+    <p class="creator-credit">
+      <span>{{ "LOGIN_CRAFTED_WITH" | translate }}</span>
+      <svg class="creator-credit__heart" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <use href="/assets/svgs/favorite.svg#favorite-heart"></use>
+      </svg>
+      <span>{{ "LOGIN_CRAFTED_BY" | translate }}</span>
+      <rs-button-text
+        kind="link"
+        variant="muted"
+        [size]="ESize.S"
+        [href]="developerXingUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Átila Oliveira Jr
+      </rs-button-text>
+    </p>
     <rs-public-legal-footer />
   </div>
 </section>

@@ -15,7 +15,7 @@ $min-content: bp.$bp-sm;
   font-size: var(--rs-title-font-size, clamp(2.4rem, 4vw, 6rem));
   font-weight: bold;
   text-transform: uppercase;
-  color: var(--color-yellow);
+  color: var(--color-brand);
 
   @media (max-width: $min-content) {
     width: 100%;

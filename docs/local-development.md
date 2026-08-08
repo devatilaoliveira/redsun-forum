@@ -47,7 +47,7 @@ Pop-Location
 Start Supabase and the API:
 
 ```powershell
-.\local.ps1 start
+.\scripts\local.ps1 start
 ```
 
 On a fresh Supabase instance, `supabase start` applies every committed
@@ -72,14 +72,14 @@ Pop-Location
 ```
 
 Angular does not discover Supabase keys itself. If `public/env.js` is missing or
-stale, rerun `.\local.ps1 start`.
+stale, rerun `.\scripts\local.ps1 start`.
 
 ## Lifecycle commands
 
 ### Start or resume
 
 ```powershell
-.\local.ps1 start
+.\scripts\local.ps1 start
 ```
 
 This preserves database, Auth, and Storage mutations. It refreshes generated
@@ -88,8 +88,8 @@ keys/configuration and recreates the API container.
 Use the same entrypoint for an uncached API image build or JVM debugging:
 
 ```powershell
-.\local.ps1 start -NoCache
-.\local.ps1 start -DebugApi
+.\scripts\local.ps1 start -NoCache
+.\scripts\local.ps1 start -DebugApi
 ```
 
 Debug mode exposes JDWP on `localhost:5005` with `suspend=n`.
@@ -97,7 +97,7 @@ Debug mode exposes JDWP on `localhost:5005` with `suspend=n`.
 ### Reset
 
 ```powershell
-.\local.ps1 reset
+.\scripts\local.ps1 reset
 ```
 
 Reset runs:
@@ -121,7 +121,7 @@ sequence is used.
 ### Stop
 
 ```powershell
-.\local.ps1 stop
+.\scripts\local.ps1 stop
 ```
 
 This stops the API Compose project and Supabase without using
@@ -163,7 +163,7 @@ enables the standard `seed.sql` lifecycle.
 
 `apps/api/supabase/roles.sql` defines the credential-free, restricted
 cluster-level `redsun_dev` role before migrations run. Local credentials are
-assigned afterward by `local.ps1`.
+assigned afterward by `scripts/local.ps1`.
 
 `apps/api/supabase/migrations/` contains:
 
@@ -178,13 +178,17 @@ There are no declarative schema files. Create future migration files with:
 supabase migration new <descriptive-name> --workdir apps/api
 ```
 
-Then verify the complete history with `.\local.ps1 reset`.
+Then verify the complete history with `.\scripts\local.ps1 reset`.
 
 `apps/api/supabase/seed.sql` contains deterministic synthetic fixtures only:
 
 - Three login-capable Supabase Auth users and identities
 - Matching application users and subscriptions
-- A seeded tale, owner participant, and character sheet
+- Contacts and favorite tale settings
+- Public, private, and sleeping tales with owners and participants
+- Basic and RedSun character sheets
+- Active and inactive locations and posts, including every post type
+- Sent, received, read, unread, multi-recipient, and subjectless letters
 - Localized patch-note fixtures
 
 Seeded browser credentials:
@@ -194,6 +198,21 @@ Seeded browser credentials:
 | `worker-login-1@redsun.com` | `123redsun1` |
 | `worker-login-2@redsun.com` | `123redsun2` |
 | `worker-login-3@redsun.com` | `123redsun3` |
+
+The users exercise different access paths:
+
+| User | Primary manual-test role |
+| --- | --- |
+| `worker-login-1` | Owner of the public RedSun tale; participant in the private D&D tale |
+| `worker-login-2` | Participant in the public RedSun tale; owner of the private D&D tale |
+| `worker-login-3` | Participant in the public RedSun tale; visitor denied access to the private tale |
+
+`A Coroa Rubra` has six locations so both the five-item recent-location
+projection and location pagination have deterministic data. Its first location
+contains active posts of all three types plus an inactive post: the owner can
+see every post, while participants only receive active posts. `Crônicas
+Adormecidas` and its related data exercise the API's not-found behavior for
+sleeping tales.
 
 Production data is never copied into local or CI. Production `db push` must
 never use `--include-seed`.
@@ -262,8 +281,8 @@ docker exec -e PGPASSWORD=local-redsun-password supabase_db_redsun-supabase `
   "insert into public.client_error_reports (message, name) values ('persistence-marker', 'local-verification');"
 ```
 
-Run `.\local.ps1 stop`, then `.\local.ps1 start`, and confirm the marker still
-exists. Run `.\local.ps1 reset` and confirm it is gone and the seed users are
+Run `.\scripts\local.ps1 stop`, then `.\scripts\local.ps1 start`, and confirm the marker still
+exists. Run `.\scripts\local.ps1 reset` and confirm it is gone and the seed users are
 restored.
 
 ### Maven tests
@@ -300,7 +319,7 @@ Pop-Location
 ```
 
 The suite runs the configured Chromium, Firefox, and WebKit projects. A later
-`.\local.ps1 reset` removes E2E-created tales, participants, locations, users,
+`.\scripts\local.ps1 reset` removes E2E-created tales, participants, locations, users,
 and other database records.
 
 ## CI behavior
@@ -315,7 +334,7 @@ API CI runs for pull requests to `main` and manual dispatch. It:
 5. Runs Maven tests with JPA schema validation.
 
 E2E CI runs for pull requests to `main` and manual dispatch. It calls
-`local.ps1 reset`, uses the Docker API, runs all Playwright browser projects
+`scripts/local.ps1 reset`, uses the Docker API, runs all Playwright browser projects
 with one worker, and stores API logs and the Playwright report on failure.
 
 Web CI retains Angular lint and full build verification. Do not run the full
@@ -343,7 +362,7 @@ forward hardening migration sorts after the pulled baseline. Follow
 
 ### Supabase CLI version rejected
 
-Install exactly `2.109.1`, matching `local.ps1` and GitHub Actions.
+Install exactly `2.109.1`, matching `scripts/local.ps1` and GitHub Actions.
 
 ### Docker unavailable
 
@@ -351,7 +370,7 @@ Start Docker Desktop, wait for the Linux engine, then run `docker info`.
 
 ### Frontend reports missing runtime values
 
-Stop Angular, run `.\local.ps1 start`, and restart `npm run start:local`.
+Stop Angular, run `.\scripts\local.ps1 start`, and restart `npm run start:local`.
 Do not manually copy a service-role key into `public/env.js`.
 
 ### API health timeout
@@ -367,5 +386,5 @@ Confirm ports `8080`, `54321`, `54322`, `54323`, and `54324` are free.
 
 ### Schema or fixture drift
 
-Run `.\local.ps1 reset`. Do not restore a remote dump or recreate the removed
+Run `.\scripts\local.ps1 reset`. Do not restore a remote dump or recreate the removed
 wipe/reset scripts.

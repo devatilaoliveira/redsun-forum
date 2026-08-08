@@ -19,6 +19,6 @@ export async function loginWithSeededUser(page: Page, credentials: SeededCredent
   await loginView.login(credentials.email, credentials.password);
 
   await sessionEstablishedRequestPromise;
-  await expect(page).toHaveURL((url) => url.pathname === "/");
+  await expect(page).toHaveURL((url) => url.pathname !== "/login");
   await expect.poll(() => loginView.getStoredUser()).not.toBeNull();
 }

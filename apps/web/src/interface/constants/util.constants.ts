@@ -3,6 +3,7 @@ export const UTIL_CONSTANTS = {
   JSON_EXTENSION: ".json",
   OAUTH_CALLBACK_PATH: "oauth/callback",
   RULEBOOK_URL: "https://rulebook.redsunrpg.com.br",
+  DEVELOPER_XING_URL: "https://www.xing.com/profile/Atila_OliveiraJunior",
   FILE: "file", // WARNING: This has to be the same as the 'file' defined in the backend.
   DEFAULT_ASPECT_RATIO: "16 / 9",
   DEFAULT_RESIZE_HEIGHT: 405,
