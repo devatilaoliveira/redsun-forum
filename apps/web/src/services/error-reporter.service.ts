@@ -12,6 +12,13 @@ export interface IErrorReporterService {
 
 type PlainRecord = Record<string, unknown>;
 
+interface ErrorEventDetails {
+  message: string;
+  filename: string;
+  lineno: number;
+  colno: number;
+}
+
 const MAX_MESSAGE_LENGTH = 2000;
 const MAX_NAME_LENGTH = 200;
 const MAX_STACK_LENGTH = 10000;
@@ -139,7 +146,35 @@ export class ErrorReporterService implements IErrorReporterService {
       return undefined;
     }
 
-    return this._truncate(this._safeSerialize((error as Error & {cause?: unknown}).cause), MAX_CAUSE_LENGTH);
+    const cause: unknown = (error as Error & {cause?: unknown}).cause;
+    const errorEventDetails: ErrorEventDetails | undefined = this._resolveErrorEventDetails(cause);
+    const causeToSerialize: unknown = errorEventDetails ?? cause;
+
+    return this._truncate(this._safeSerialize(causeToSerialize), MAX_CAUSE_LENGTH);
+  }
+
+  private _resolveErrorEventDetails(value: unknown): ErrorEventDetails | undefined {
+    if (!this._isPlainRecord(value)) {
+      return undefined;
+    }
+
+    const message: unknown = value["message"];
+    const filename: unknown = value["filename"];
+    const lineno: unknown = value["lineno"];
+    const colno: unknown = value["colno"];
+
+    if (
+      typeof message !== "string" ||
+      typeof filename !== "string" ||
+      typeof lineno !== "number" ||
+      !Number.isFinite(lineno) ||
+      typeof colno !== "number" ||
+      !Number.isFinite(colno)
+    ) {
+      return undefined;
+    }
+
+    return {message, filename, lineno, colno};
   }
 
   private _resolveMethod(error: unknown): string | undefined {
