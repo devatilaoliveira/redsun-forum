@@ -1,6 +1,5 @@
 import {DOCUMENT, NgOptimizedImage} from "@angular/common";
 import {
-  afterRenderEffect,
   Component,
   effect,
   ElementRef,
@@ -88,14 +87,6 @@ export class RsSideNavComponent {
         this.closeTimeoutId = null;
       }, this.closeAnimationMs);
     });
-
-    afterRenderEffect({
-      write: () => {
-        if (this.menuOpen() && this.isVisible()) {
-          this.focusDrawer();
-        }
-      }
-    });
   }
 
   protected handleNavSelection(): void {
@@ -137,26 +128,6 @@ export class RsSideNavComponent {
     }
 
     this.trapFocus(event);
-  }
-
-  private focusDrawer(): void {
-    if (!this.menuOpen()) {
-      return;
-    }
-
-    const drawer: HTMLElement | undefined = this.drawerRef?.nativeElement;
-    if (!drawer) {
-      return;
-    }
-
-    const focusable: HTMLElement[] = this.getFocusableElements(drawer);
-    if (focusable.length > 0) {
-      if (this._focusHandler.focus(focusable[0])) {
-        return;
-      }
-    }
-
-    this._focusHandler.focus(drawer);
   }
 
   private trapFocus(event: KeyboardEvent): void {

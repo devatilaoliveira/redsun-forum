@@ -187,8 +187,8 @@ $codexArgs = @(
 $modelProfiles = @{
   frontier = @{
     Model           = "gpt-5.6-sol"
-    ReasoningEffort = "xhigh"
-    PlanModeReasoningEffort = "xhigh"
+    ReasoningEffort = "high"
+    PlanModeReasoningEffort = "high"
   }
   balanced = @{
     Model           = "gpt-5.6-luna"
