@@ -1,5 +1,5 @@
 import {DOCUMENT, Location} from "@angular/common";
-import {Component, computed, DestroyRef, effect, ElementRef, HostListener, inject, OnInit, signal, Signal, ViewChild, WritableSignal} from "@angular/core";
+import {Component, computed, DestroyRef, effect, HostListener, inject, OnInit, signal, Signal, WritableSignal} from "@angular/core";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {ActivatedRoute, NavigationEnd, Router, UrlTree} from "@angular/router";
 import {TranslatePipe} from "@ngx-translate/core";
@@ -13,7 +13,6 @@ import {ROUTE_PATHS} from "../../../../interface/constants/route-path.constants"
 import {TaleContextStateService} from "../../../../stateServices/tale-context-state.service";
 import {AppSettingsService, IAppSettingsService} from "../../../../services/app-settings.service";
 import {resolvePreferredHomeUrl} from "../../../../infra/miscellaneous/preferred-home.functions";
-import {FocusHandler, IFocusHandler} from "../../../../infra/miscellaneous/focus.handler";
 import {RedsunLogo} from "../../fragments/redsunLogo/redsun.logo";
 
 @Component({
@@ -24,15 +23,6 @@ import {RedsunLogo} from "../../fragments/redsunLogo/redsun.logo";
   styleUrl: "./top-bar-navigator.component.scss"
 })
 export class RsTopBarNavigatorComponent implements OnInit {
-  @ViewChild("menuButton", { read: ElementRef })
-  private menuButtonRef?: ElementRef<HTMLElement>;
-
-  @ViewChild("manageButton", { read: ElementRef })
-  private manageButtonRef?: ElementRef<HTMLElement>;
-
-  @ViewChild("playerButton", { read: ElementRef })
-  private playerButtonRef?: ElementRef<HTMLElement>;
-
   protected readonly hideTopBar: WritableSignal<boolean> = signal(true);
   protected readonly hideBackBtn: WritableSignal<boolean> = signal(false);
   protected readonly backTarget: WritableSignal<UrlTree | null> = signal(null);
@@ -65,7 +55,6 @@ export class RsTopBarNavigatorComponent implements OnInit {
   private readonly _document: Document = inject(DOCUMENT);
   private readonly _taleState: TaleContextStateService = inject(TaleContextStateService);
   private readonly _appSettingsService: IAppSettingsService = inject(AppSettingsService);
-  private readonly _focusHandler: IFocusHandler = inject(FocusHandler);
 
   constructor() {
     this.manageVisible = this._taleState.canManage;
@@ -76,16 +65,16 @@ export class RsTopBarNavigatorComponent implements OnInit {
       const playerVisible: boolean = this.playerVisible();
 
       if (this.hideTopBar()) {
-        this.closeAllMenus(false);
+        this.closeAllMenus();
         return;
       }
 
       if (!manageVisible) {
-        this.closeManageMenu(false);
+        this.closeManageMenu();
       }
 
       if (!playerVisible || manageVisible) {
-        this.closePlayerMenu(false);
+        this.closePlayerMenu();
       }
     });
   }
@@ -99,7 +88,7 @@ export class RsTopBarNavigatorComponent implements OnInit {
       )
       .subscribe(() => {
         this.updateRouteState();
-        this.closeAllMenus(!this.hideTopBar());
+        this.closeAllMenus();
       });
     this._destroyRef.onDestroy(() => {
       if (this.menuOpen() || this.manageMenuOpen() || this.playerMenuOpen()) {
@@ -116,17 +105,17 @@ export class RsTopBarNavigatorComponent implements OnInit {
     }
 
     if (this.manageMenuOpen()) {
-      this.closeManageMenu(false);
+      this.closeManageMenu();
     }
 
     if (this.playerMenuOpen()) {
-      this.closePlayerMenu(false);
+      this.closePlayerMenu();
     }
 
     this.openMenu();
   }
 
-  protected closeMenu(restoreFocus: boolean = true): void {
+  protected closeMenu(): void {
     if (!this.menuOpen()) {
       return;
     }
@@ -134,9 +123,6 @@ export class RsTopBarNavigatorComponent implements OnInit {
     this.menuOpen.set(false);
     this.unlockScroll();
     this.restoreMainInteractivity();
-    if (restoreFocus) {
-      this.restoreMenuButtonFocus();
-    }
   }
 
   protected onManageToggle(): void {
@@ -150,11 +136,11 @@ export class RsTopBarNavigatorComponent implements OnInit {
     }
 
     if (this.menuOpen()) {
-      this.closeMenu(false);
+      this.closeMenu();
     }
 
     if (this.playerMenuOpen()) {
-      this.closePlayerMenu(false);
+      this.closePlayerMenu();
     }
 
     this.openManageMenu();
@@ -171,17 +157,17 @@ export class RsTopBarNavigatorComponent implements OnInit {
     }
 
     if (this.menuOpen()) {
-      this.closeMenu(false);
+      this.closeMenu();
     }
 
     if (this.manageMenuOpen()) {
-      this.closeManageMenu(false);
+      this.closeManageMenu();
     }
 
     this.openPlayerMenu();
   }
 
-  protected closeManageMenu(restoreFocus: boolean = true): void {
+  protected closeManageMenu(): void {
     if (!this.manageMenuOpen()) {
       return;
     }
@@ -189,12 +175,9 @@ export class RsTopBarNavigatorComponent implements OnInit {
     this.manageMenuOpen.set(false);
     this.unlockScroll();
     this.restoreMainInteractivity();
-    if (restoreFocus) {
-      this.restoreManageButtonFocus();
-    }
   }
 
-  protected closePlayerMenu(restoreFocus: boolean = true): void {
+  protected closePlayerMenu(): void {
     if (!this.playerMenuOpen()) {
       return;
     }
@@ -202,9 +185,6 @@ export class RsTopBarNavigatorComponent implements OnInit {
     this.playerMenuOpen.set(false);
     this.unlockScroll();
     this.restoreMainInteractivity();
-    if (restoreFocus) {
-      this.restorePlayerButtonFocus();
-    }
   }
 
   @HostListener("document:keydown", ["$event"])
@@ -290,19 +270,19 @@ export class RsTopBarNavigatorComponent implements OnInit {
     this.updatePlayerItems(route);
 
     if (this.hideTopBar()) {
-      this.closeAllMenus(false);
+      this.closeAllMenus();
     }
   }
 
-  private closeAllMenus(restoreFocus: boolean = true): void {
+  private closeAllMenus(): void {
     if (this.menuOpen()) {
-      this.closeMenu(restoreFocus);
+      this.closeMenu();
     }
     if (this.manageMenuOpen()) {
-      this.closeManageMenu(restoreFocus);
+      this.closeManageMenu();
     }
     if (this.playerMenuOpen()) {
-      this.closePlayerMenu(restoreFocus);
+      this.closePlayerMenu();
     }
   }
 
@@ -364,60 +344,6 @@ export class RsTopBarNavigatorComponent implements OnInit {
     };
     const otherItems = this.playerNavItems().filter((item) => item.label !== "MANAGE_PROFILE");
     this.playerNavItems.set([manageCharacterItem, ...otherItems]);
-  }
-
-  private restoreMenuButtonFocus(): void {
-    const menuButton: HTMLElement | null = this.getMenuButton();
-    this._focusHandler.focus(menuButton);
-  }
-
-  private restoreManageButtonFocus(): void {
-    const manageButton: HTMLElement | null = this.getManageButton();
-    this._focusHandler.focus(manageButton);
-  }
-
-  private restorePlayerButtonFocus(): void {
-    const playerButton: HTMLElement | null = this.getPlayerButton();
-    this._focusHandler.focus(playerButton);
-  }
-
-  private getMenuButton(): HTMLElement | null {
-    const host: HTMLElement | undefined = this.menuButtonRef?.nativeElement;
-    if (!host) {
-      return null;
-    }
-
-    if (host instanceof HTMLButtonElement) {
-      return host;
-    }
-
-    return host.querySelector("button");
-  }
-
-  private getManageButton(): HTMLElement | null {
-    const host: HTMLElement | undefined = this.manageButtonRef?.nativeElement;
-    if (!host) {
-      return null;
-    }
-
-    if (host instanceof HTMLButtonElement) {
-      return host;
-    }
-
-    return host.querySelector("button");
-  }
-
-  private getPlayerButton(): HTMLElement | null {
-    const host: HTMLElement | undefined = this.playerButtonRef?.nativeElement;
-    if (!host) {
-      return null;
-    }
-
-    if (host instanceof HTMLButtonElement) {
-      return host;
-    }
-
-    return host.querySelector("button");
   }
 
   private lockScroll(): void {

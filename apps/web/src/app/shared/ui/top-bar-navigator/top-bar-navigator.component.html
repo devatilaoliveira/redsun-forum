@@ -4,7 +4,6 @@
     <div class="content">
       <div class="top-bar-element top-bar-element--left">
         <rs-round-icon-button
-          #menuButton
           [iconSrc]="'/assets/svgs/menu.svg'"
           ariaLabel="Toggle menu"
           [ariaExpanded]="menuOpen()"
@@ -35,7 +34,6 @@
       <div class="top-bar-element top-bar-element--right">
         @if (manageVisible()) {
           <rs-round-icon-button
-            #manageButton
             [iconSrc]="'/assets/svgs/manage.svg'"
             [ariaLabel]="'Manage tale'"
             [ariaExpanded]="manageMenuOpen()"
@@ -45,7 +43,6 @@
         }
         @if (playerVisible() && !manageVisible()) {
           <rs-round-icon-button
-            #playerButton
             [iconSrc]="'/assets/svgs/profile.svg'"
             [ariaLabel]="'Player menu'"
             [ariaExpanded]="playerMenuOpen()"
