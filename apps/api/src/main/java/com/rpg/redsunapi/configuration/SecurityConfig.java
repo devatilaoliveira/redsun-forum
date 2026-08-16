@@ -31,7 +31,7 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
-      .csrf(csrf -> csrf.disable())
+      .csrf(AbstractHttpConfigurer::disable)
       .cors(Customizer.withDefaults())
       .httpBasic(AbstractHttpConfigurer::disable)
       .formLogin(AbstractHttpConfigurer::disable)
@@ -47,8 +47,6 @@ public class SecurityConfig {
         .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**").permitAll()
         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
         .requestMatchers(HttpMethod.GET, "/legal/documents/current").permitAll()
-        .requestMatchers(HttpMethod.POST, "/authentication/session-established").authenticated()
-        .requestMatchers("/user/**", "/tales/**").authenticated()
         .anyRequest().authenticated()
       )
       .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

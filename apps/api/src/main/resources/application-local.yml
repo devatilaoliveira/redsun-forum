@@ -1,13 +1,10 @@
 spring:
+  config:
+    import: "optional:file:.env.local[.properties]"
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://127.0.0.1:54322/postgres}
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgres}
-
-#logging:
-#  level:
-#    org.hibernate.SQL: DEBUG
-#    org.hibernate.orm.jdbc.bind: TRACE
 
 supabase:
   url: ${SUPABASE_URL:http://127.0.0.1:54321}
