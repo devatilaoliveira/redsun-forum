@@ -164,4 +164,9 @@ jobs:
             END \$\$;"
 
       - name: Run tests
-        run: ./mvnw -B -ntp test
+        run: ./mvnw -B -ntp verify
+
+      - name: Stop local Supabase
+        if: always()
+        continue-on-error: true
+        run: supabase stop
